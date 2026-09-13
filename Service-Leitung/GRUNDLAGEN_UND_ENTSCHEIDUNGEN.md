@@ -8,7 +8,7 @@ Die Service-Leitung trägt die Mitarbeitenden und ihre Einsatzmöglichkeiten ein
 
 ## Wo läuft die App?
 
-- Die App soll auf Windows 10 und Windows 11 funktionieren.
+- Die App soll auf Windows 11 funktionieren.
 - Sie soll vollständig ohne Internet nutzbar sein.
 - Alle Arbeitsdaten werden lokal auf dem Windows-PC gespeichert.
 - Es wird zunächst nur ein Benutzer benötigt. Eine Anmeldung ist nicht vorgesehen.

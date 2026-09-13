@@ -1,6 +1,6 @@
 # Vorschlag für die technische Architektur
 
-Status: Vorschlag – wartet auf Entscheidung
+Status: Am 2026-09-13 mit der Änderung „Windows 10 entfällt“ abgenommen
 
 Stand der Prüfung: 2026-09-13
 
@@ -10,11 +10,11 @@ Empfohlen wird eine klassische Windows-Anwendung mit **C#, .NET 10 LTS und WPF**
 
 Die erste Auslieferung soll als selbstständiger `win-x64`-Ordner erfolgen. Dieser Ordner kann kopiert und entpackt werden; eine zusätzliche .NET-Laufzeit muss nicht installiert werden. Die native Visual-C++-Laufzeit für OR-Tools bleibt bis zu einem Test auf einem sauberen Zielrechner eine gesonderte Voraussetzung.
 
-Dieser Vorschlag ist noch keine endgültige Festlegung. Erst nach seiner Abnahme wird die verbindliche Datei `ARCHITECTURE.md` angelegt.
+Dieser Vorschlag wurde bestätigt. Die verbindliche Umsetzung der Entscheidung steht in `ARCHITECTURE.md`.
 
 ## Warum diese Lösung empfohlen wird
 
-- Die Zielplattform ist ausschließlich Windows 10 und Windows 11. Eine zusätzliche plattformübergreifende Oberflächentechnik bringt daher zunächst keinen Nutzen.
+- Die Zielplattform ist ausschließlich Windows 11. Eine zusätzliche plattformübergreifende Oberflächentechnik bringt daher zunächst keinen Nutzen.
 - WPF ist eine ausgereifte Windows-Oberfläche und enthält bereits geeignete Tabellen-, Datenbindungs- und Layoutfunktionen.
 - Oberfläche, Datenbank, Excel-Verarbeitung und Planungsalgorithmus können in derselben Sprache C# entwickelt werden.
 - .NET kann Anwendungen mitsamt Laufzeit als selbstständigen Ordner veröffentlichen. Auf dem Zielrechner muss dann keine passende .NET-Version installiert sein.
@@ -45,7 +45,7 @@ Eine portable WinUI-3-Auslieferung ist möglich. Eine vollständig selbstständi
 
 Tauri würde lokale Browsertests der Oberfläche ermöglichen. Dafür kämen jedoch Rust, eine Web-Oberfläche und WebView2 als zusätzliche technische Ebenen hinzu. Für die Planungsengine und den Excel-Export wären weitere Schnittstellen zwischen diesen Ebenen nötig.
 
-Auf Windows 10 und Windows 11 ist WebView2 normalerweise vorhanden. Für garantiert offline nutzbare Rechner ohne passende Laufzeit müsste diese jedoch mitgeliefert werden, was die Ausgabe deutlich vergrößert. Da die endgültige App ausdrücklich eine klassische Windows-App sein soll, überwiegen hier die Vorteile einer einheitlichen .NET-Lösung.
+Auf Windows 11 ist WebView2 normalerweise vorhanden. Für garantiert offline nutzbare Rechner ohne passende Laufzeit müsste diese jedoch mitgeliefert werden, was die Ausgabe deutlich vergrößert. Da die endgültige App ausdrücklich eine klassische Windows-App sein soll, überwiegen hier die Vorteile einer einheitlichen .NET-Lösung.
 
 ## Vorgeschlagener technischer Aufbau
 
@@ -53,7 +53,7 @@ Auf Windows 10 und Windows 11 ist WebView2 normalerweise vorhanden. Für garanti
 
 - .NET 10 LTS
 - C#
-- Zielarchitektur zunächst Windows x64
+- Zielarchitektur Windows 11 x64
 - keine Vorabversionen von .NET oder anderen Kernbibliotheken
 - Paketversionen werden zentral festgelegt und nur kontrolliert aktualisiert
 
@@ -173,32 +173,21 @@ Spätere Prüfungen werden getrennt ausgewiesen:
 5. Excel-Vorlagentest
 6. Bedienprüfung der Windows-App
 7. portable Veröffentlichung als `win-x64`-Ordner
-8. Start- und Bedienprüfung auf dem tatsächlichen Windows-10-Zielrechner
-9. Start- und Bedienprüfung auf Windows 11
+8. Start- und Bedienprüfung auf dem tatsächlichen Windows-11-Zielrechner
 
-Ein bestandener Test ersetzt keinen anderen. Insbesondere wird Windows-10-Kompatibilität erst nach einem erfolgreichen Test auf dem vorgesehenen Klinikrechner als bestätigt gemeldet.
+Ein bestandener Test ersetzt keinen anderen. Die Funktionsfähigkeit wird erst nach einem erfolgreichen Test auf dem vorgesehenen Windows-11-Klinikrechner als bestätigt gemeldet.
 
-## Wichtige Grenze bei Windows 10
+## Bestätigte Entscheidungen
 
-Microsoft führt moderne .NET-Versionen im Jahr 2026 nur noch für bestimmte Windows-10-LTSC- und Enterprise-Ausgaben als offiziell unterstützt. Andere Windows-10-Ausgaben können technisch weiterhin funktionieren, stehen aber außerhalb der aktuellen Herstellerunterstützung.
+1. Die Zielplattform ist ausschließlich Windows 11 x64. Windows 10 wird nicht mehr berücksichtigt.
+2. Die Architektur wird auf C#, .NET 10 LTS und WPF festgelegt.
+3. Die erste portable Ausgabe wird als selbstständiger `win-x64`-Ordner vorbereitet.
+4. SQLite, OR-Tools CP-SAT und ein austauschbares Excel-Modul werden als technische Bausteine bestätigt.
+5. Die genaue Excel-Bibliothek bleibt bis zum Test mit der echten Vorlage austauschbar.
 
-Daraus folgt für dieses Projekt:
+## Folge der Zustimmung
 
-- Windows 11 ist die regulär unterstützte Zielplattform.
-- Der vorhandene Windows-10-Zielrechner wird als eigener Kompatibilitätstest behandelt.
-- Edition, Version und Systemtyp dieses Rechners müssen vor dem ersten produktiven Windows-Build festgehalten werden.
-- Bei einer nicht mehr unterstützten Windows-Ausgabe kann die App praktisch getestet werden; eine offizielle Microsoft-Unterstützung darf dann jedoch nicht behauptet werden.
-
-## Noch zu bestätigende Entscheidungen
-
-1. Soll die Architektur auf **C#, .NET 10 LTS und WPF** festgelegt werden?
-2. Ist die erste portable Ausgabe als selbstständiger `win-x64`-Ordner weiterhin richtig?
-3. Kann vor dem späteren ersten Windows-10-Abnahmetest die genaue Edition, Version und der Systemtyp des Klinikrechners mitgeteilt werden?
-4. Ist der Umgang mit Windows 10 akzeptiert: praktische Kompatibilität wird auf dem echten Rechner geprüft, aber Herstellerunterstützung wird nur behauptet, wenn die verwendete Windows-Ausgabe von Microsoft unterstützt wird?
-
-## Folgen einer Zustimmung
-
-Nach Zustimmung wird in einem eigenen abnehmbaren Teilschritt `ARCHITECTURE.md` aus diesem Vorschlag abgeleitet. Erst dieses Dokument macht die Architektur verbindlich. Es werden auch dann noch keine App-Funktionen implementiert.
+Die Entscheidung wird in PF-05B verbindlich in `ARCHITECTURE.md` dokumentiert. Dabei werden noch keine App-Funktionen implementiert.
 
 ## Geprüfte Primärquellen
 

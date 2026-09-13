@@ -173,7 +173,7 @@ Die folgenden Bereiche sollen getrennt bleiben, damit spätere Änderungen ohne 
 
 ### I. Technischer Rahmen
 
-- Unterstützt werden Windows 10 und Windows 11. Die genaue technische Mindestversion wird mit der Architektur festgelegt.
+- Unterstützt wird ausschließlich Windows 11. Windows 10 gehört nach der Entscheidung vom 2026-09-13 nicht mehr zum Zielumfang.
 - Eine portable Anwendung als entpackbarer Ordner mit einer Startdatei ist akzeptabel.
 - Die App darf Datenbank und Sicherungen im normalen Windows-Benutzerordner ablegen.
 

@@ -19,10 +19,11 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 
 ## Gerade in Arbeit
 
-- Die technischen Möglichkeiten für die Windows-App wurden verglichen.
-- Empfohlen wird eine klassische Windows-Technik von Microsoft. Damit können Oberfläche, lokale Datenspeicherung, automatische Planung und Excel-Ausgabe gut voneinander getrennt werden.
+- Die technischen Möglichkeiten für die Windows-App wurden verglichen und bestätigt.
+- Festgelegt wurde eine klassische Windows-11-Technik von Microsoft. Windows 10 wird nicht mehr berücksichtigt.
+- Oberfläche, lokale Datenspeicherung, automatische Planung und Excel-Ausgabe werden als getrennte Bausteine entwickelt.
 - Die App soll zuerst als entpackbarer Ordner bereitgestellt werden. Ob auf dem Klinikrechner noch eine kleine Windows-Zusatzkomponente benötigt wird, muss später praktisch geprüft werden.
-- Die Empfehlung wartet auf Zustimmung. Vorher wird die technische Architektur nicht verbindlich festgelegt.
+- Die ausführliche Architektur ist dokumentiert und wartet auf Abnahme. Die App selbst wurde noch nicht programmiert.
 
 ## Noch nicht gebaut
 
@@ -40,4 +41,4 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 
 ## Nächster geplanter Schritt
 
-Als Nächstes wird über die technische Empfehlung entschieden. Danach wird die Architektur verständlich und verbindlich dokumentiert. Es wurde weiterhin noch keine Funktion der App programmiert.
+Nach Abnahme der Architektur werden verbindliche Regeln für sauberen und wartbaren Programmcode dokumentiert. Es wurde weiterhin noch keine Funktion der App programmiert.

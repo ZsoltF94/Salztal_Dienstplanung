@@ -1,6 +1,6 @@
 # Teil-Roadmap: Projektgrundlage
 
-Status: Aktiv – PF-05A Architekturvorschlag wartet auf Entscheidung
+Status: Aktiv – PF-05B umgesetzt und geprüft, wartet auf Abnahme
 
 ## Ziel
 
@@ -11,7 +11,7 @@ Diese Roadmap erzeugt noch keine funktionsfähige Dienstplan-App.
 ## Verbindliche Grundlage
 
 - `GRUNDLAGEN_FRAGEN_UND_ENTSCHEIDUNGEN.md`, abgenommen am 2026-09-13
-- Zielplattform: Windows 10 und Windows 11
+- Zielplattform: ausschließlich Windows 11
 - Einzelbenutzer-Anwendung für die Service-Leitung
 - vollständig offline und lokal gespeichert
 - bevorzugt portable Auslieferung
@@ -155,12 +155,12 @@ Tatsächlich umgesetzt:
 
 ### PF-05A – Technologien vergleichen und Architekturvorschlag vorlegen
 
-Status: `[~]` – umgesetzt und geprüft, wartet auf Entscheidung
+Status: `[x]` – am 2026-09-13 mit der Änderung „Windows 10 entfällt“ abgenommen
 
 Ergebnis:
 
 - Geeignete, aktuell unterstützte Technologien werden anhand offizieller Quellen verglichen.
-- Bewertet werden mindestens Windows-10/11-Unterstützung, Offlinebetrieb, portable Auslieferung, lokale Datenbank, Excel-Erzeugung, automatische Planung, Wartbarkeit und Testbarkeit.
+- Bewertet werden mindestens Windows-11-Unterstützung, Offlinebetrieb, portable Auslieferung, lokale Datenbank, Excel-Erzeugung, automatische Planung, Wartbarkeit und Testbarkeit.
 - Die empfohlene Lösung wird vor einer Festlegung verständlich mit Vor- und Nachteilen vorgestellt.
 - Zeitkonten bleiben als nachrangiges Modul vorgesehen.
 - Der Vorschlag wird in `docs/decisions/ARCHITECTURE_PROPOSAL.md` mit Quellen, Risiken und offenen Bestätigungen festgehalten.
@@ -174,7 +174,7 @@ Prüfung:
 
 ### PF-05B – Entscheidung in `ARCHITECTURE.md` verbindlich festhalten
 
-Status: `[ ]`
+Status: `[~]` – umgesetzt und geprüft, wartet auf Abnahme
 
 Geplantes Ergebnis:
 
@@ -188,6 +188,15 @@ Prüfung:
 - `ARCHITECTURE.md` stimmt mit den abgenommenen Grundlagen und Entscheidungen überein.
 - Alle verbindlichen Entscheidungen und verbleibenden Risiken sind klar gekennzeichnet.
 - Der Technikvorschlag wird entweder als angenommen dokumentiert oder durch die bestätigte Alternative ersetzt.
+
+Tatsächlich umgesetzt:
+
+- Zielplattform verbindlich auf Windows 11 x64 eingegrenzt; Windows 10 entfällt.
+- C#, .NET 10 LTS, WPF, MVVM, SQLite mit Entity Framework Core und OR-Tools CP-SAT festgelegt.
+- Fachmodell, Anwendungsabläufe, Planung, Konflikterklärung, Speicherung, Excel und Desktop-Oberfläche als getrennte Module definiert.
+- Datenflüsse für Generierung, manuelle Bearbeitung, Abnahme und Excel-Export dokumentiert.
+- Portable Auslieferung, Visual-C++-Voraussetzung, Excel-Vorlagentest und Windows-11-Gerätetest als getrennte Nachweise festgehalten.
+- `ARCHITECTURE.md` angelegt, ohne App-Projekte oder Abhängigkeiten zu erstellen.
 
 ### PF-06 – Qualitätsregeln in `CLEANCODE.md` festlegen
 
@@ -307,4 +316,4 @@ Nach jedem einzelnen Schritt enthält der Bericht:
 
 ## Nächster minimaler Schritt
 
-Nach Abnahme von PF-05A: PF-05B – Entscheidung in `ARCHITECTURE.md` verbindlich festhalten.
+Nach Abnahme von PF-05B: PF-06 – Qualitätsregeln in `CLEANCODE.md` festlegen.
