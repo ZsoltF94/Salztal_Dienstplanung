@@ -1,6 +1,6 @@
 # Teil-Roadmap: Projektgrundlage
 
-Status: Aktiv – PF-03 umgesetzt und geprüft, wartet auf Abnahme
+Status: Aktiv – PF-04 umgesetzt und geprüft, wartet auf Abnahme
 
 ## Ziel
 
@@ -99,7 +99,7 @@ Tatsächlich umgesetzt:
 
 ### PF-03 – Projekt mit GitHub verbinden
 
-Status: `[~]` – umgesetzt und geprüft, wartet auf Abnahme
+Status: `[x]` – abgenommen am 2026-09-13
 
 Bestätigtes Repository:
 
@@ -127,7 +127,33 @@ Tatsächlich umgesetzt:
 - Der Branch `main` wurde auf GitHub veröffentlicht und verfolgt `origin/main`.
 - Es wurden keine lokalen Anwendungs-, Mitarbeiter-, Planungs-, Datenbank-, Sicherungs- oder Exportdaten übertragen.
 
-### PF-04 – Technische Architektur auswählen und `ARCHITECTURE.md` anlegen
+### PF-04 – Lesebereich für die Service-Leitung anlegen
+
+Status: `[~]` – umgesetzt und geprüft, wartet auf Abnahme
+
+Geplantes Ergebnis:
+
+- Im Ordner `Service-Leitung` entsteht eine leicht verständliche Startseite.
+- Der aktuelle Projektstand wird ohne technische Fachsprache zusammengefasst.
+- Bestätigte Grundlagen und Entscheidungen werden für die Service-Leitung verständlich erklärt.
+- Die Dokumente enthalten keine echten Mitarbeiter-, Planungs- oder Gesundheitsdaten.
+- Der Lesebereich wird nach jedem abgenommenen Projektschritt wahrheitsgemäß aktualisiert.
+
+Prüfung:
+
+- Die Service-Leitung findet von der Startseite direkt zum aktuellen Stand und zu den Grundlagen.
+- Technische Begriffe werden vermieden oder einfach erklärt.
+- Der dargestellte Stand stimmt mit der aktiven Roadmap überein.
+- Noch nicht entwickelte Funktionen sind eindeutig als geplant gekennzeichnet.
+
+Tatsächlich umgesetzt:
+
+- `Service-Leitung/README.md` dient als kurze Startseite und verlinkt alle verständlichen Informationen.
+- `Service-Leitung/AKTUELLER_STAND.md` trennt fertig abgenommene, aktuell bearbeitete und noch nicht gebaute Inhalte.
+- `Service-Leitung/GRUNDLAGEN_UND_ENTSCHEIDUNGEN.md` erklärt die bestätigte Funktionsweise ohne technische Architekturdetails.
+- Der Lesebereich enthält keine echten Mitarbeiter-, Planungs-, Gesundheits- oder Zugangsdaten.
+
+### PF-05 – Technische Architektur auswählen und `ARCHITECTURE.md` anlegen
 
 Status: `[ ]`
 
@@ -146,7 +172,7 @@ Prüfung:
 - Spätere Einsatzorte, Diensttypen und Regeln können ergänzt werden, ohne Kernbereiche neu zu bauen.
 - Die Planungslogik bleibt von Benutzeroberfläche, Speicherung und Excel-Export getrennt.
 
-### PF-05 – Qualitätsregeln in `CLEANCODE.md` festlegen
+### PF-06 – Qualitätsregeln in `CLEANCODE.md` festlegen
 
 Status: `[ ]`
 
@@ -163,7 +189,7 @@ Prüfung:
 - Das Dokument enthält keine allgemeinen Floskeln ohne praktische Bedeutung.
 - Es widerspricht nicht der Architektur.
 
-### PF-06 – Arbeitsanweisungen in `AGENTS.md` festlegen
+### PF-07 – Arbeitsanweisungen in `AGENTS.md` festlegen
 
 Status: `[ ]`
 
@@ -175,6 +201,7 @@ Geplantes Ergebnis:
 - Nicht bestätigte Gates dürfen nicht als abgeschlossen markiert werden.
 - Bestehende Benutzeränderungen müssen erhalten bleiben.
 - Architektur- und Clean-Code-Regeln werden als verbindliche Referenzen eingebunden.
+- Der aktuelle Stand im Lesebereich für die Service-Leitung muss nach jedem abgenommenen Schritt mitgeführt werden.
 
 Prüfung:
 
@@ -182,7 +209,7 @@ Prüfung:
 - Eigenmächtige Erweiterungen über einen freigegebenen Schritt hinaus werden verhindert.
 - Dokumentationsstatus und tatsächlicher Entwicklungsstand müssen übereinstimmen.
 
-### PF-07 – Systemübersicht in `MASTER_ROADMAP.md` anlegen
+### PF-08 – Systemübersicht in `MASTER_ROADMAP.md` anlegen
 
 Status: `[ ]`
 
@@ -216,7 +243,7 @@ Prüfung:
 - Abhängigkeiten und Reihenfolge sind plausibel.
 - Kein System wird ohne eigene freigegebene Teil-Roadmap zur Umsetzung freigegeben.
 
-### PF-08 – Zentralen Stand in `STATUS.md` anlegen
+### PF-09 – Zentralen Stand in `STATUS.md` anlegen
 
 Status: `[ ]`
 
@@ -225,6 +252,7 @@ Geplantes Ergebnis:
 - `STATUS.md` zeigt den aktuellen Projektstand in kompakter Form.
 - Enthalten sind die aktive Roadmap, der zuletzt abgenommene Schritt, der nächste vorgeschlagene Minimalschritt, offene Entscheidungen und echte Blockaden.
 - Ausstehende Tests, Builds oder Abnahmen bleiben ausdrücklich offen.
+- `STATUS.md` und `Service-Leitung/AKTUELLER_STAND.md` müssen inhaltlich denselben tatsächlichen Projektstand zeigen.
 
 Prüfung:
 
@@ -232,13 +260,13 @@ Prüfung:
 - Es werden keine geplanten Funktionen als umgesetzt dargestellt.
 - Das Dokument nennt genau einen nächsten Minimalschritt.
 
-### PF-09 – Leitdokumente gemeinsam prüfen und Projektgrundlage abschließen
+### PF-10 – Leitdokumente gemeinsam prüfen und Projektgrundlage abschließen
 
 Status: `[ ]`
 
 Geplantes Ergebnis:
 
-- `AGENTS.md`, `CLEANCODE.md`, `ARCHITECTURE.md`, `MASTER_ROADMAP.md` und `STATUS.md` werden auf widersprüchliche Aussagen und ungültige Verweise geprüft.
+- `AGENTS.md`, `CLEANCODE.md`, `ARCHITECTURE.md`, `MASTER_ROADMAP.md`, `STATUS.md` und der Lesebereich `Service-Leitung` werden auf widersprüchliche Aussagen und ungültige Verweise geprüft.
 - Die aktive Teil-Roadmap und der zentrale Status werden wahrheitsgemäß aktualisiert.
 - Die Projektgrundlage wird erst nach abschließender Abnahme als abgeschlossen archiviert.
 
@@ -262,4 +290,4 @@ Nach jedem einzelnen Schritt enthält der Bericht:
 
 ## Nächster minimaler Schritt
 
-Nach Abnahme von PF-02: PF-03 – Projekt mit GitHub verbinden.
+Nach Abnahme von PF-04: PF-05 – Technische Architektur auswählen und `ARCHITECTURE.md` anlegen.
