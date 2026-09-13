@@ -1,6 +1,6 @@
 # Teil-Roadmap: Projektgrundlage
 
-Status: Aktiv – PF-05B umgesetzt und geprüft, wartet auf Abnahme
+Status: Aktiv – PF-07 umgesetzt und geprüft, wartet auf Abnahme
 
 ## Ziel
 
@@ -174,7 +174,7 @@ Prüfung:
 
 ### PF-05B – Entscheidung in `ARCHITECTURE.md` verbindlich festhalten
 
-Status: `[~]` – umgesetzt und geprüft, wartet auf Abnahme
+Status: `[x]` – abgenommen am 2026-09-13
 
 Geplantes Ergebnis:
 
@@ -204,7 +204,7 @@ Tatsächlich umgesetzt:
 
 ### PF-06 – Qualitätsregeln in `CLEANCODE.md` festlegen
 
-Status: `[ ]`
+Status: `[x]` – abgenommen am 2026-09-13
 
 Geplantes Ergebnis:
 
@@ -219,9 +219,19 @@ Prüfung:
 - Das Dokument enthält keine allgemeinen Floskeln ohne praktische Bedeutung.
 - Es widerspricht nicht der Architektur.
 
+Tatsächlich umgesetzt:
+
+- `CLEANCODE.md` mit verbindlichen Regeln für Sprache, Benennung, Typen, Methoden und Fachmodell angelegt.
+- Rollen, Benennung, Ordnerzuordnung, Sichtbarkeit und geschützte Grenzen der Namespaces festgelegt.
+- Konkrete Grenzen für Application, Planning, Konflikterklärung, WPF/MVVM, Entity Framework Core, SQLite und Excel dokumentiert.
+- Unveränderliche Modulübergaben, asynchrone Abläufe, Fehlerbehandlung und Datenschutz geregelt.
+- Mindestfälle für Fachregel-, Planning-, Architektur-, Datenbank- und Excel-Tests festgelegt.
+- Definition of Done, Review-Warnsignale, verbotene Muster und kontrollierte Abweichungen dokumentiert.
+- Keine App-Projekte, Pakete oder Implementierungen angelegt.
+
 ### PF-07 – Arbeitsanweisungen in `AGENTS.md` festlegen
 
-Status: `[ ]`
+Status: `[~]` – umgesetzt und geprüft, wartet auf Abnahme
 
 Geplantes Ergebnis:
 
@@ -238,6 +248,16 @@ Prüfung:
 - Die Anweisungen sind eindeutig und im Projektalltag ausführbar.
 - Eigenmächtige Erweiterungen über einen freigegebenen Schritt hinaus werden verhindert.
 - Dokumentationsstatus und tatsächlicher Entwicklungsstand müssen übereinstimmen.
+
+Tatsächlich umgesetzt:
+
+- Eine Root-`AGENTS.md` mit verbindlichen Regeln für das gesamte Repository angelegt.
+- Den kleinschrittigen Roadmap-, Berichts- und Abnahmeprozess festgeschrieben.
+- Architektur-, Clean-Code-, Datenschutz-, Test- und Dokumentationsgrenzen als verbindliche Arbeitsgrundlage eingebunden.
+- Den Schutz vorhandener Benutzeränderungen und den Umgang mit Prüf- und Verständnisfragen geregelt.
+- Festgelegt, dass Commit, Staging und Push nur nach ausdrücklichem Auftrag erfolgen.
+- Die Pflege des einfachen Lesebereichs für die Service-Leitung in den Arbeitsablauf aufgenommen.
+- Keine App-Projekte, Pakete oder Implementierungen angelegt.
 
 ### PF-08 – Systemübersicht in `MASTER_ROADMAP.md` anlegen
 
@@ -318,6 +338,12 @@ Nach jedem einzelnen Schritt enthält der Bericht:
 5. nächster minimaler Schritt,
 6. ausdrückliche Bitte um Abnahme.
 
+## Git-Arbeitsregel
+
+- Git-Commits und Pushes führt der Auftraggeber selbst aus oder beauftragt sie ausdrücklich.
+- Ein abgeschlossener Arbeitsschritt wird nicht automatisch committed oder gepusht.
+- Read-only-Prüfungen wie `git status`, `git diff` und `git diff --check` bleiben Bestandteil der Qualitätskontrolle.
+
 ## Nächster minimaler Schritt
 
-Nach Abnahme von PF-05B: PF-06 – Qualitätsregeln in `CLEANCODE.md` festlegen.
+Nach Abnahme von PF-07: PF-08 – Systemübersicht in `MASTER_ROADMAP.md` anlegen.

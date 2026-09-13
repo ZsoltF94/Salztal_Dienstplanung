@@ -16,14 +16,16 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 - Änderungen am Projekt können nachvollziehbar gespeichert werden.
 - Das Projekt ist mit dem vorgesehenen GitHub-Repository verbunden.
 - Der leicht verständliche Lesebereich für die Service-Leitung ist eingerichtet.
+- Die technische Architektur für die Windows-11-App ist festgelegt.
+- Oberfläche, lokale Datenspeicherung, automatische Planung und Excel-Ausgabe werden als getrennte Bausteine entwickelt.
+- Die App soll zuerst als entpackbarer Ordner bereitgestellt werden. Ob auf dem Klinikrechner noch eine kleine Windows-Zusatzkomponente benötigt wird, muss später praktisch geprüft werden.
+- Verbindliche Qualitätsregeln für verständlichen, wartbaren und prüfbaren Programmcode sind festgelegt.
 
 ## Gerade in Arbeit
 
-- Die technischen Möglichkeiten für die Windows-App wurden verglichen und bestätigt.
-- Festgelegt wurde eine klassische Windows-11-Technik von Microsoft. Windows 10 wird nicht mehr berücksichtigt.
-- Oberfläche, lokale Datenspeicherung, automatische Planung und Excel-Ausgabe werden als getrennte Bausteine entwickelt.
-- Die App soll zuerst als entpackbarer Ordner bereitgestellt werden. Ob auf dem Klinikrechner noch eine kleine Windows-Zusatzkomponente benötigt wird, muss später praktisch geprüft werden.
-- Die ausführliche Architektur ist dokumentiert und wartet auf Abnahme. Die App selbst wurde noch nicht programmiert.
+- Klare Arbeitsanweisungen für alle weiteren Entwicklungsschritte wurden dokumentiert.
+- Sie schreiben unter anderem kleine einzeln abnehmbare Schritte, ehrliche Prüfberichte und den Schutz vorhandener Änderungen vor.
+- Diese Arbeitsanweisungen warten auf Abnahme. Die App selbst wurde noch nicht programmiert.
 
 ## Noch nicht gebaut
 
@@ -41,4 +43,4 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 
 ## Nächster geplanter Schritt
 
-Nach Abnahme der Architektur werden verbindliche Regeln für sauberen und wartbaren Programmcode dokumentiert. Es wurde weiterhin noch keine Funktion der App programmiert.
+Nach Abnahme der Arbeitsanweisungen wird eine grobe Übersicht über alle geplanten Systeme der App erstellt. Für die spätere Umsetzung erhält jedes System zusätzlich eine eigene kleinschrittige Roadmap. Es wurde weiterhin noch keine Funktion der App programmiert.

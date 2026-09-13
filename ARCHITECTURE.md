@@ -1,6 +1,6 @@
 # Architektur der Salztal-Dienstplanung
 
-Status: Entwurf – PF-05B umgesetzt und geprüft, wartet auf Abnahme
+Status: Abgenommen am 2026-09-13
 
 Stand: 2026-09-13
 
