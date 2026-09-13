@@ -1,0 +1,57 @@
+# Windows-generated files
+Thumbs.db
+Thumbs.db:encryptable
+Desktop.ini
+$RECYCLE.BIN/
+
+# IDE and editor state
+.vs/
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.local
+
+# Build, test and diagnostic output
+[Bb]in/
+[Oo]bj/
+[Dd]ist/
+[Bb]uild/
+[Aa]rtifacts/
+[Cc]overage/
+[Tt]est[Rr]esults/
+*.log
+
+# Package caches
+node_modules/
+packages/
+
+# Temporary files
+[Tt]emp/
+[Tt]mp/
+*.tmp
+*.bak
+*.swp
+
+# Local application data containing employee or planning information
+[Dd]ata/
+[Bb]ackups/
+[Ee]xports/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Generated spreadsheet output
+*.generated.xlsx
+*.export.xlsx
