@@ -1,6 +1,6 @@
 # Teil-Roadmap: Projektgrundlage
 
-Status: Aktiv – PF-04 umgesetzt und geprüft, wartet auf Abnahme
+Status: Aktiv – PF-05A Architekturvorschlag wartet auf Entscheidung
 
 ## Ziel
 
@@ -129,7 +129,7 @@ Tatsächlich umgesetzt:
 
 ### PF-04 – Lesebereich für die Service-Leitung anlegen
 
-Status: `[~]` – umgesetzt und geprüft, wartet auf Abnahme
+Status: `[x]` – abgenommen am 2026-09-13
 
 Geplantes Ergebnis:
 
@@ -153,24 +153,41 @@ Tatsächlich umgesetzt:
 - `Service-Leitung/GRUNDLAGEN_UND_ENTSCHEIDUNGEN.md` erklärt die bestätigte Funktionsweise ohne technische Architekturdetails.
 - Der Lesebereich enthält keine echten Mitarbeiter-, Planungs-, Gesundheits- oder Zugangsdaten.
 
-### PF-05 – Technische Architektur auswählen und `ARCHITECTURE.md` anlegen
+### PF-05A – Technologien vergleichen und Architekturvorschlag vorlegen
+
+Status: `[~]` – umgesetzt und geprüft, wartet auf Entscheidung
+
+Ergebnis:
+
+- Geeignete, aktuell unterstützte Technologien werden anhand offizieller Quellen verglichen.
+- Bewertet werden mindestens Windows-10/11-Unterstützung, Offlinebetrieb, portable Auslieferung, lokale Datenbank, Excel-Erzeugung, automatische Planung, Wartbarkeit und Testbarkeit.
+- Die empfohlene Lösung wird vor einer Festlegung verständlich mit Vor- und Nachteilen vorgestellt.
+- Zeitkonten bleiben als nachrangiges Modul vorgesehen.
+- Der Vorschlag wird in `docs/decisions/ARCHITECTURE_PROPOSAL.md` mit Quellen, Risiken und offenen Bestätigungen festgehalten.
+
+Prüfung:
+
+- Jede wesentliche Technologieentscheidung besitzt eine nachvollziehbare Begründung.
+- Der Vorschlag erfüllt die abgenommenen Grundlagen.
+- Spätere Einsatzorte, Diensttypen und Regeln können ergänzt werden, ohne Kernbereiche neu zu bauen.
+- Die Planungslogik bleibt von Benutzeroberfläche, Speicherung und Excel-Export getrennt.
+
+### PF-05B – Entscheidung in `ARCHITECTURE.md` verbindlich festhalten
 
 Status: `[ ]`
 
 Geplantes Ergebnis:
 
-- Geeignete, aktuell unterstützte Technologien werden anhand offizieller Quellen verglichen.
-- Bewertet werden mindestens Windows-10/11-Unterstützung, Offlinebetrieb, portable Auslieferung, lokale Datenbank, Excel-Erzeugung, automatische Planung, Wartbarkeit und Testbarkeit.
-- Die empfohlene Lösung wird vor einer Festlegung verständlich mit Vor- und Nachteilen vorgestellt.
-- Nach Zustimmung wird `ARCHITECTURE.md` mit Systemgrenzen, Modulen, Datenfluss, Speicherstrategie, Sicherheitsgrenzen und Erweiterungspunkten angelegt.
-- Zeitkonten bleiben als nachrangiges Modul vorgesehen.
+- Die Rückmeldungen zu `docs/decisions/ARCHITECTURE_PROPOSAL.md` werden eingearbeitet.
+- `ARCHITECTURE.md` dokumentiert die abgenommene Technologieentscheidung, Systemgrenzen, Module, Datenflüsse, Speicherstrategie, Sicherheitsgrenzen und Erweiterungspunkte.
+- Nicht bestätigte Möglichkeiten werden nicht als Architekturentscheidung dargestellt.
+- Es wird weiterhin noch kein App-Code angelegt.
 
 Prüfung:
 
-- Jede wesentliche Technologieentscheidung besitzt eine nachvollziehbare Begründung.
-- Die Architektur erfüllt die abgenommenen Grundlagen.
-- Spätere Einsatzorte, Diensttypen und Regeln können ergänzt werden, ohne Kernbereiche neu zu bauen.
-- Die Planungslogik bleibt von Benutzeroberfläche, Speicherung und Excel-Export getrennt.
+- `ARCHITECTURE.md` stimmt mit den abgenommenen Grundlagen und Entscheidungen überein.
+- Alle verbindlichen Entscheidungen und verbleibenden Risiken sind klar gekennzeichnet.
+- Der Technikvorschlag wird entweder als angenommen dokumentiert oder durch die bestätigte Alternative ersetzt.
 
 ### PF-06 – Qualitätsregeln in `CLEANCODE.md` festlegen
 
@@ -290,4 +307,4 @@ Nach jedem einzelnen Schritt enthält der Bericht:
 
 ## Nächster minimaler Schritt
 
-Nach Abnahme von PF-04: PF-05 – Technische Architektur auswählen und `ARCHITECTURE.md` anlegen.
+Nach Abnahme von PF-05A: PF-05B – Entscheidung in `ARCHITECTURE.md` verbindlich festhalten.

@@ -15,10 +15,14 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 - Die wichtigsten Entscheidungen zur Wochenplanung sind dokumentiert.
 - Änderungen am Projekt können nachvollziehbar gespeichert werden.
 - Das Projekt ist mit dem vorgesehenen GitHub-Repository verbunden.
+- Der leicht verständliche Lesebereich für die Service-Leitung ist eingerichtet.
 
 ## Gerade in Arbeit
 
-- Dieser leicht verständliche Lesebereich für die Service-Leitung wird angelegt und wartet anschließend auf Abnahme.
+- Die technischen Möglichkeiten für die Windows-App wurden verglichen.
+- Empfohlen wird eine klassische Windows-Technik von Microsoft. Damit können Oberfläche, lokale Datenspeicherung, automatische Planung und Excel-Ausgabe gut voneinander getrennt werden.
+- Die App soll zuerst als entpackbarer Ordner bereitgestellt werden. Ob auf dem Klinikrechner noch eine kleine Windows-Zusatzkomponente benötigt wird, muss später praktisch geprüft werden.
+- Die Empfehlung wartet auf Zustimmung. Vorher wird die technische Architektur nicht verbindlich festgelegt.
 
 ## Noch nicht gebaut
 
@@ -36,4 +40,4 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 
 ## Nächster geplanter Schritt
 
-Nach Abnahme dieses Lesebereichs werden geeignete technische Grundlagen für die Windows-App verglichen. Die Empfehlung wird erklärt und vor einer Festlegung gemeinsam abgestimmt.
+Als Nächstes wird über die technische Empfehlung entschieden. Danach wird die Architektur verständlich und verbindlich dokumentiert. Es wurde weiterhin noch keine Funktion der App programmiert.
