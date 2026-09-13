@@ -44,17 +44,20 @@ Nach manueller Prüfung wird ein Plan abgenommen. Erst danach kann er in eine no
 
 ### Dienste und Einsatzorte
 
-- Es wird verschiedene Diensttypen mit festen Zeiten geben.
+- Es wird verschiedene Diensttypen mit bearbeitbaren Standardzeiten geben.
+- Ein konkreter Bedarf besitzt die tatsächlich zu besetzende Zeit und verlangt genau einen Diensttyp. Seine Zeit darf nach ausdrücklicher Eingabe von der Standardzeit dieses Diensttyps abweichen.
 - Doppeldienste müssen unterstützt werden.
 - Bekannte Einsatzorte sind zunächst Cafeteria und Restaurant.
 - Weitere Einsatzorte können später ergänzt werden.
-- Die konkreten Dienst-, Einsatzort- und Mitarbeitertypregeln werden in einer späteren eigenen Phase gemeinsam definiert.
+- Einsatzorte besitzen keine eigenen Öffnungs-, Betriebs- oder Arbeitszeiten. Diensttyp-Standardzeiten und tatsächliche Bedarfszeiten bleiben getrennte Angaben.
+- Frühdienst, Spätdienst, Cafeteria-Dienst A und Cafeteria-Dienst B sind normale Diensttypen. Doppeldienst `D` und Springer `Spr` sind zusammengesetzte Einsatzmuster, die jeweils zwei dieser Diensttypen verbinden.
 
 ### Bedarf
 
 - Die Regeln bestimmen den Personalbedarf je Einsatzort, Tag und Dienst.
 - Zusätzlich zum Personalbedarf muss ein Stundenbedarf berücksichtigt werden.
 - Personalbedarf und Stundenbedarf werden getrennt betrachtet, damit sowohl die notwendige Anzahl anwesender Personen als auch die erforderliche Arbeitszeit abgedeckt werden kann.
+- Bedarfs- und Arbeitsstunden folgen der tatsächlich eingestellten Bedarfs- beziehungsweise Einsatzzeit und nicht einer davon abweichenden Standardzeit des Diensttyps.
 
 ### Regeln und Optimierung
 
@@ -110,25 +113,29 @@ Die folgenden Bereiche sollen getrennt bleiben, damit spätere Änderungen ohne 
 
 ### A. Personalbedarf und Stundenbedarf
 
-- Der Bedarf wird je Einsatzort, Wochentag und Schicht festgelegt.
-- Ein Bedarf beschreibt sowohl die Zahl benötigter Mitarbeitender als auch die durch den festen Diensttyp vorgegebene Arbeitsdauer.
-- Beispiel Cafeteria: Montag bis Freitag wird jeweils eine Person für sieben Stunden benötigt; Samstag und Sonntag jeweils eine Person für vier Stunden.
-- Beispiel Restaurant: Montag bis Freitag könnten vier Personen in einer siebenstündigen Frühschicht und vier Personen in einer vierstündigen Spätschicht benötigt werden. Diese Werte dienen nur der Veranschaulichung und sind noch keine echten Regeln.
-- Die automatische Planung darf ausschließlich vorher definierte Diensttypen verwenden.
+- Der Bedarf wird je Einsatzort, Wochentag beziehungsweise konkretem Datum und Diensttyp festgelegt.
+- Jeder Bedarf verlangt genau einen vorher definierten normalen Diensttyp und beschreibt die Zahl benötigter Mitarbeitender sowie die tatsächlich zu besetzende Anfangs- und Endzeit. Ein Bedarf verlangt niemals `D` oder `Spr`.
+- Ein Diensttyp besitzt eine bearbeitbare Standardzeit. Neue Bedarfsvorgaben übernehmen diese zunächst, dürfen aber durch eine ausdrücklich eingegebene Standardänderung oder Datums-Ausnahme abweichen.
+- Die reguläre Cafeteria-Belegung beträgt Montag bis Freitag eine Person von 13:30 bis 20:30 Uhr. Samstag und Sonntag werden eine Person von 13:30 bis 20:30 Uhr und eine zweite Person von 13:30 bis 17:30 Uhr benötigt.
+- Die reguläre Restaurant-Belegung beträgt Montag bis Sonntag vier Personen von 06:30 bis 13:30 Uhr und vier Personen von 16:30 bis 19:30 Uhr.
+- Die automatische Planung darf ausschließlich vorher definierte Diensttypen und ausdrücklich festgelegte tatsächliche Bedarfszeiten verwenden. Sie erfindet keine Diensttypen oder Zeitabweichungen.
 - Sie darf keine Überbesetzung erzeugen und den vorgegebenen Bedarf nicht überschreiten.
 
-### B. Dienste und Doppeldienste
+### B. Diensttypen und zusammengesetzte Einsatzmuster
 
 - Ein Doppeldienst besteht aus zwei getrennten, bereits definierten Diensten am selben Tag.
-- Die Unterbrechung zwischen den beiden Dienstteilen zählt als unbezahlte Freizeit.
+- Die Unterbrechung zwischen den beiden Dienstteilen zählt nicht als Arbeitszeit.
 - Beide Teile müssen am selben Einsatzort stattfinden.
 - Doppeldienste sind nach aktuellem Stand ausschließlich im Restaurant zulässig.
+- Der bestätigte Doppeldienst ist ausschließlich die Kombination aus Frühdienst und Spätdienst. Bei den Standardzeiten umfasst er zehn Arbeitsstunden mit einer nicht als Arbeitszeit zählenden Unterbrechung von 13:30 bis 16:30 Uhr.
+- Der samstägliche Springer-Einsatz `Spr` ist kein Doppeldienst. Er verbindet Cafeteria-Dienst B bis zum Ende des tatsächlichen zweiten Cafeteria-Bedarfs mit einem anschließenden Restaurant-Spätdienst.
+- Die automatische Planung darf den Springer nur verwenden, wenn sonst ein Restaurant-Spätdienst unbesetzt bleibt. Eine Teilunterdeckung im Restaurant vor dem tatsächlichen Wechsel bleibt sichtbar.
 
 ### C. Zwingende Regeln, Wünsche und Konflikte
 
 - Eine zwingende Regel ist unverletzbar.
-- Falls dadurch ein Dienst nicht besetzt werden kann, wird der übrige Plan trotzdem erzeugt.
-- Jeder unbesetzte Dienst wird konkret gemeldet.
+- Falls dadurch ein Bedarf nicht oder nur teilweise gedeckt werden kann, wird der übrige Plan trotzdem erzeugt.
+- Jeder vollständig oder teilweise ungedeckte Bedarfszeitraum wird konkret gemeldet.
 - Eine Konfliktmeldung beschreibt das Problem, dessen Ursache und hilfreiche Lösungsmöglichkeiten.
 - Weiche Regeln werden mit den drei Stufen hoch, mittel und niedrig priorisiert.
 - Eine weiche Regel darf bei der automatischen Planung nur verletzt werden, wenn keine bessere zulässige Lösung gefunden wird.
@@ -181,7 +188,9 @@ Die folgenden Bereiche sollen getrennt bleiben, damit spätere Änderungen ohne 
 
 ### Verhältnis von Schichtbedarf und Stundenbedarf
 
-Die Service-Leitung trägt beispielsweise „vier Personen in der Frühschicht“ ein. Weil die Frühschicht fest sieben Stunden dauert, berechnet die App daraus automatisch 28 benötigte Mitarbeiterstunden. Es wird kein zusätzlicher, unabhängiger Wert „28 Stunden“ eingetragen. Die automatische Planung darf auch keinen neuen Dienst mit abweichenden Zeiten erfinden, um eine Stundenlücke zu schließen.
+Die Service-Leitung trägt beispielsweise „vier Personen im Frühdienst von 06:30 bis 13:30 Uhr“ ein. Daraus berechnet die App automatisch 28 benötigte Mitarbeiterstunden. Wird die tatsächliche Bedarfszeit für ein konkretes Datum ausdrücklich auf 06:30 bis 12:30 Uhr geändert, ergeben sich für dieses Datum 24 benötigte Mitarbeiterstunden. Es wird kein zusätzlicher unabhängiger Stundenwert eingetragen.
+
+Der Bedarf verlangt weiterhin den Diensttyp Frühdienst, auch wenn seine tatsächliche Zeit an diesem Datum von dessen Standardzeit abweicht. Die automatische Planung darf weder einen anderen Diensttyp noch eine Zeitabweichung selbst erfinden.
 
 Diese Auslegung ist bestätigt.
 
@@ -211,8 +220,6 @@ Diese Versionsverwaltung ist bestätigt.
 ## Zum Zeitpunkt der Grundlagenklärung noch nicht festgelegt
 
 - konkrete Mitarbeitertypen und Vertragsmodelle,
-- konkrete Diensttypen und Dienstzeiten,
-- genaue Definition der Doppeldienste,
 - vollständige Regeln je Einsatzort,
 - gesetzliche und betriebliche zwingende Regeln,
 - Prioritäten der weichen Regeln,
@@ -221,4 +228,4 @@ Diese Versionsverwaltung ist bestätigt.
 - endgültige technische Architektur,
 - Aufbau der Excel-Vorlage.
 
-Die Planungs- beziehungsweise Optimierungsmethode und die technische Architektur wurden anschließend in `ARCHITECTURE.md` festgelegt und abgenommen. Die übrigen fachlichen Detailpunkte werden weiterhin erst vor den jeweils betroffenen Systemen gemeinsam geklärt.
+Die Planungs- beziehungsweise Optimierungsmethode und die technische Architektur wurden anschließend in `ARCHITECTURE.md` festgelegt und abgenommen. Konkrete Einsatzorte, Diensttypen, Doppeldienst und Springer-Einsatz wurden am 2026-09-13 für System 04 bestätigt. Die übrigen fachlichen Detailpunkte werden weiterhin erst vor den jeweils betroffenen Systemen gemeinsam geklärt.

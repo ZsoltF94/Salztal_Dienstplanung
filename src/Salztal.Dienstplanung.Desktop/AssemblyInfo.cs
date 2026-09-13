@@ -1,4 +1,7 @@
+using System.Runtime.CompilerServices;
 using System.Windows;
+
+[assembly: InternalsVisibleTo("Salztal.Dienstplanung.Desktop.Tests")]
 
 [assembly: ThemeInfo(
     ResourceDictionaryLocation.None,

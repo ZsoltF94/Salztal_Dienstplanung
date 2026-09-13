@@ -83,19 +83,19 @@ SQLite passt zur Einzelbenutzer-App, weil kein Dienst installiert und kein Daten
 - eine eigene Planungsengine ohne Abhängigkeit von WPF oder SQLite
 - Google OR-Tools CP-SAT hinter einer projekteeigenen Schnittstelle
 - zwingende Regeln werden als unverletzbare Bedingungen modelliert
-- jeder benötigte Platz in einer Schicht wird entweder einer zulässigen Person oder ausdrücklich dem Zustand „unbesetzt“ zugeordnet
+- jeder tatsächliche Bedarfszeitraum wird entweder durch eine zulässige Person vollständig oder teilweise gedeckt oder ausdrücklich als ungedeckt ausgewiesen
 - Bedarfsdeckung wird so modelliert, dass Überbesetzung nicht zulässig ist; Unterbesetzung bleibt als sichtbarer Konflikt möglich
-- zuerst wird die Zahl unbesetzter Dienste minimiert, danach werden weiche Regeln in der Reihenfolge hoch, mittel und niedrig optimiert
+- zuerst wird der Umfang ungedeckter Bedarfszeiträume minimiert, danach werden weiche Regeln in der Reihenfolge hoch, mittel und niedrig optimiert
 - die Prioritätsstufen werden hierarchisch gelöst, damit viele niedrige Wünsche niemals einen hohen Wunsch überstimmen
-- nicht besetzbare Dienste bleiben als konkrete offene Stellen im Ergebnis erhalten
+- nicht oder nur teilweise deckbare Bedarfszeiträume bleiben als konkrete offene Zeiträume im Ergebnis erhalten
 - ein fester Startwert und gespeicherte Eingaben machen Testergebnisse wiederholbar
 - eine einstellbare Zeitgrenze verhindert endlos lange Berechnungen
 
-Die ausdrückliche Möglichkeit „unbesetzt“ stellt sicher, dass die Planerzeugung nicht vollständig scheitert, wenn eine Schicht nicht besetzt werden kann. Zwingende Regeln bleiben trotzdem unverletzt.
+Die ausdrückliche Möglichkeit vollständiger oder teilweiser Unterdeckung stellt sicher, dass die Planerzeugung nicht vollständig scheitert, wenn ein Bedarf nicht lückenlos gedeckt werden kann. Zwingende Regeln bleiben trotzdem unverletzt.
 
 OR-Tools allein erklärt noch nicht automatisch verständlich, warum etwas unmöglich ist. Deshalb erhält jede erzeugte Bedingung zusätzlich eine eigene fachliche Kennung mit Regel, betroffener Person, Tag, Dienst und Einsatzort. Eine getrennte Diagnose ermittelt daraus:
 
-1. welcher Dienst nicht besetzt werden konnte,
+1. welcher Bedarfszeitraum vollständig oder teilweise ungedeckt blieb,
 2. welche zwingenden Bedingungen mögliche Besetzungen ausgeschlossen haben,
 3. welche priorisierten Wünsche betroffen sind,
 4. welche konkrete Änderung eine Besetzung ermöglichen könnte.
@@ -141,7 +141,7 @@ Die endgültigen Projekt- und Ordnernamen werden erst beim späteren App-Grundge
    - übersetzt fachliche Regeln in ein Optimierungsmodell
    - führt OR-Tools aus und erzeugt ein fachliches Planungsergebnis
 4. **Conflict Explanation**
-   - erklärt unbesetzte Dienste und Regelkonflikte in deutscher Sprache
+   - erklärt vollständig oder teilweise ungedeckte Bedarfszeiträume und Regelkonflikte in deutscher Sprache
    - nennt mögliche Änderungen, ohne selbst Daten zu verändern
 5. **Infrastructure**
    - SQLite, Entity Framework Core, Migrationen, lokale Dateien und Sicherungen

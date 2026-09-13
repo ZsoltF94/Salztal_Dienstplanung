@@ -28,7 +28,7 @@ Für jeden Mitarbeiter werden später der Name und die für die Planung notwendi
 - Wunschfrei,
 - andere Einschränkungen der Verfügbarkeit.
 
-Wochenstunden und Einsatzmöglichkeiten werden getrennt gespeichert. Eine Person mit 35 Wochenstunden kann dadurch unabhängig davon für die Cafeteria, das Restaurant oder beide Bereiche freigegeben werden.
+Wochenstunden und Einsatzmöglichkeiten werden getrennt gespeichert. Eine Person mit 35 Wochenstunden kann dadurch unabhängig davon für die Cafeteria, das Restaurant oder beide Bereiche freigegeben werden. Zusätzlich wird später je Diensttyp festgelegt, welche Person ihn übernehmen darf; Cafeteria-Dienst A und B sind dabei getrennte Freigaben.
 
 Die genauen Mitarbeitertypen und Regeln werden erst in einem späteren eigenen Schritt festgelegt.
 
@@ -39,21 +39,29 @@ Die zunächst bekannten Einsatzorte sind:
 - Cafeteria,
 - Restaurant.
 
-Weitere Einsatzorte können später ergänzt werden.
+Weitere Einsatzorte können später ergänzt werden. In der ersten Bedienfassung werden die vorhandenen Einträge angezeigt und bearbeitet; das Anlegen weiterer Einträge wird technisch vorbereitet und später ergänzt.
 
-Es wird feste Diensttypen mit festen Anfangs- und Endzeiten geben. Die App darf nur diese vorher festgelegten Dienste verwenden und keine eigenen Arbeitszeiten erfinden.
+Frühdienst, Spätdienst sowie Cafeteria-Dienst A und B sind die normalen Diensttypen. Jeder von ihnen besitzt eine bearbeitbare Standardzeit. Diese zeigt, wann der Dienst normalerweise stattfindet und wird als Ausgangswert für neue Bedarfsvorgaben verwendet.
 
-Ein Doppeldienst besteht aus zwei getrennten Diensten an einem Tag. Die Pause zwischen beiden Teilen ist unbezahlte Freizeit. Beide Teile finden am selben Einsatzort statt. Nach heutigem Stand sind Doppeldienste nur im Restaurant möglich.
+Die tatsächlich benötigte Zeit kann für ein bestimmtes Datum ausdrücklich geändert werden, ohne den Standard für zukünftige Wochen zu verändern. Der Bedarf verlangt weiterhin genau einen vorhandenen normalen Diensttyp. Die App darf weder einen Diensttyp noch eine Zeitabweichung selbst erfinden.
+
+Der Restaurant-Doppeldienst `D` besteht ausschließlich aus Frühdienst und Spätdienst. Die Unterbrechung zwischen beiden Teilen zählt nicht als Arbeitszeit. Beide Teile bleiben getrennte Dienste am selben Einsatzort.
+
+Der samstägliche Springer `Spr` ist dagegen kein Doppeldienst. Er arbeitet zunächst den Cafeteria-Dienst B bis zum Ende des tatsächlichen Bedarfs und wechselt anschließend ins Restaurant. Die App darf ihn automatisch nur als Notfall verwenden, wenn sonst ein Spätdienst unbesetzt bleibt. Die vor seinem Wechsel fehlende Restaurant-Besetzung bleibt sichtbar.
+
+`D` und `Spr` sind zusammengesetzte Einsatzmuster und keine zusätzlichen Diensttypen für einen einzelnen Bedarf. Ein einzelner Bedarf verlangt niemals `D` oder `Spr`.
 
 ## Personal- und Stundenbedarf
 
-Für jeden Einsatzort wird je Wochentag und Schicht festgelegt, wie viele Personen benötigt werden.
+Für jeden Einsatzort wird je Wochentag beziehungsweise konkretem Datum festgelegt, wie viele Personen in welchem tatsächlichen Zeitraum benötigt werden. Jeder Bedarf verlangt genau einen Diensttyp.
 
-Beispiel: Werden vier Personen für eine siebenstündige Frühschicht gebraucht, erkennt die App daraus automatisch einen Bedarf von 28 Arbeitsstunden. Die Service-Leitung muss diese 28 Stunden nicht noch einmal getrennt eintragen.
+Beispiel: Werden vier Personen im Frühdienst von 06:30 bis 13:30 Uhr gebraucht, erkennt die App daraus automatisch einen Bedarf von 28 Arbeitsstunden. Wird die tatsächliche Zeit für ein einzelnes Datum auf 06:30 bis 12:30 Uhr verkürzt, berechnet die App für dieses Datum 24 Stunden. Die Service-Leitung muss die Summe nicht zusätzlich eintragen.
+
+Standardbedarfe können dauerhaft für zukünftige Wochen geändert werden. Zusätzlich sind Ausnahmen nur für ein ausgewähltes Datum möglich. Frühere und abgenommene Pläne behalten ihre damaligen Zeiten.
 
 Die automatische Planung darf nicht mehr Personen als benötigt einplanen.
 
-Die später festzulegenden Zahlen und Dienstzeiten sind in diesem Dokument noch keine echten Vorgaben.
+Bestätigte Startwerte sind: Cafeteria Montag bis Freitag eine Person von 13:30 bis 20:30 Uhr, am Wochenende zusätzlich eine zweite Person von 13:30 bis 17:30 Uhr; Restaurant täglich vier Frühdienste von 06:30 bis 13:30 Uhr und vier Spätdienste von 16:30 bis 19:30 Uhr.
 
 ## Regeln für den Wochenplan
 
@@ -62,7 +70,7 @@ Es wird zwei Arten von Regeln geben:
 1. **Zwingende Regeln:** Diese dürfen nicht verletzt werden.
 2. **Wünsche:** Diese sollen möglichst erfüllt werden. Sie erhalten die Priorität hoch, mittel oder niedrig.
 
-Kann ein Dienst wegen einer zwingenden Regel nicht besetzt werden, erstellt die App trotzdem den übrigen Plan. Der unbesetzte Dienst wird deutlich angezeigt. Die App erklärt außerdem den Grund und nennt mögliche Lösungen.
+Kann ein Bedarf wegen einer zwingenden Regel nicht oder nur teilweise gedeckt werden, erstellt die App trotzdem den übrigen Plan. Der vollständig oder teilweise ungedeckte Zeitraum wird deutlich angezeigt. Die App erklärt außerdem den Grund und nennt mögliche Lösungen.
 
 Wünsche dürfen nur dann unerfüllt bleiben, wenn keine bessere erlaubte Lösung gefunden wird. Die Service-Leitung kann bei einer manuellen Änderung bewusst von einem Wunsch abweichen. Die App zeigt diese Abweichung sichtbar an.
 

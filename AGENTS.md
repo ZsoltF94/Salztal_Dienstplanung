@@ -24,7 +24,7 @@ Eine aktuelle ausdrückliche Anweisung des Auftraggebers kann eine frühere Proj
 - klassische Offline-App für Windows 11 x64,
 - Einzelbenutzer: Service-Leitung einer Rehaklinik,
 - gastronomische Einsatzorte zunächst Cafeteria und Restaurant,
-- automatische mehrwöchige Dienstplanung aus festen Diensttypen,
+- automatische mehrwöchige Dienstplanung aus normalen Diensttypen mit bearbeitbaren Standardzeiten, zusammengesetzten Einsatzmustern und ausdrücklich festgelegten tatsächlichen Bedarfszeiten,
 - zwingende Regeln und priorisierte weiche Regeln,
 - verständliche Konflikte und Lösungsmöglichkeiten,
 - manuelle Bearbeitung ohne ungefragte Neugenerierung,
@@ -152,9 +152,9 @@ Eine Änderung dieser Grenzen benötigt vor ihrer Umsetzung einen dokumentierten
 - Planning übersetzt bestätigte Regelarten in Solver-Bedingungen.
 - Eine unbekannte oder nicht übersetzte Regel blockiert die Generierung sichtbar und wird niemals ignoriert.
 - Fachliche Prüfung und Solver-Übersetzung verwenden dieselben Beispielszenarien.
-- Zwingende Regeln bleiben unverletzt; bei fehlender zulässiger Besetzung bleibt ein Dienst sichtbar unbesetzt.
+- Zwingende Regeln bleiben unverletzt; bei fehlender zulässiger Besetzung bleibt der betroffene Zeitraum vollständig oder teilweise sichtbar ungedeckt.
 - Automatische Überbesetzung ist nicht erlaubt.
-- Optimierung erfolgt hierarchisch: unbesetzte Dienste, hoch, mittel, niedrig, anschließend Stabilität.
+- Optimierung erfolgt hierarchisch: ungedeckter Bedarf, hoch, mittel, niedrig, anschließend Stabilität.
 
 ## Konflikterklärung
 

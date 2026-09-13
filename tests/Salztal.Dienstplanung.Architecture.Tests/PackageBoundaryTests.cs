@@ -40,6 +40,7 @@ public sealed class PackageBoundaryTests
 
     [Theory]
     [InlineData("CommunityToolkit.Mvvm", DesktopProject)]
+    [InlineData("Microsoft.EntityFrameworkCore.Design", InfrastructureProject)]
     [InlineData("Microsoft.EntityFrameworkCore.Sqlite", InfrastructureProject)]
     [InlineData("Google.OrTools", PlanningProject)]
     public void RequiredProductionPackageWhenLoadedExistsOnlyInResponsibleProject(

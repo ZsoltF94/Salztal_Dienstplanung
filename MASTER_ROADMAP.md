@@ -79,21 +79,21 @@ Abhängigkeiten: 01
 
 ### 03 – Mitarbeitende, Arbeitszeitmodelle und Qualifikationen
 
-Status: `[ ]`
+Status: `[~]` – Roadmap-Entwurf nach Abschluss von System 04 wieder aktiviert; MA-01 wartet auf Abnahme
 
-Ziel: Mitarbeitende, Vertragsstunden, Qualifikationen und zulässige Einsatzorte getrennt erfassen und lokal speichern können.
+Ziel: Mitarbeitende, Vertragsstunden, Qualifikationen, zulässige Einsatzorte und Freigaben für einzelne Diensttypen getrennt erfassen und lokal speichern können.
 
-Teil-Roadmap: vor Beginn anzulegen und abzunehmen
+Teil-Roadmap: noch nicht abgenommener Entwurf unter `docs/roadmaps/active/EMPLOYEES_WORK_MODELS_QUALIFICATIONS_ROADMAP.md`
 
 Abhängigkeiten: 02
 
 ### 04 – Einsatzorte, Diensttypen und Doppeldienste
 
-Status: `[ ]`
+Status: `[x]` – abgeschlossen und archiviert am 2026-09-13
 
-Ziel: Erweiterbare Einsatzorte sowie feste Diensttypen und die bestätigten Grenzen für Doppeldienste verwalten können.
+Ziel: Erweiterbare Einsatzorte, normale Diensttypen mit bearbeitbaren Standardzeiten sowie die zusammengesetzten Einsatzmuster für den festen Restaurant-Doppeldienst `D` und den samstäglichen Springer `Spr` als fachliche Grundlage verwalten können.
 
-Teil-Roadmap: vor Beginn anzulegen und abzunehmen
+Teil-Roadmap: `docs/roadmaps/completed/WORK_LOCATIONS_SHIFT_TYPES_SPLIT_SHIFTS_ROADMAP.md`
 
 Abhängigkeiten: 02
 
@@ -101,7 +101,7 @@ Abhängigkeiten: 02
 
 Status: `[ ]`
 
-Ziel: Den Bedarf je Einsatzort, Wochentag und festem Diensttyp erfassen und daraus Personen- und Stundenbedarf nachvollziehbar berechnen.
+Ziel: Standardbedarfe und datumsbezogene Ausnahmen je Einsatzort und genau einem verlangten Diensttyp mit tatsächlicher Zeit und Personenzahl erfassen; daraus Personen- und Stundenbedarf nachvollziehbar berechnen.
 
 Teil-Roadmap: vor Beginn anzulegen und abzunehmen
 
@@ -131,7 +131,7 @@ Abhängigkeiten: 03 und 04; konkrete Regeln müssen fachlich bestätigt sein
 
 Status: `[ ]`
 
-Ziel: Planungswochen von Montag bis Sonntag, mehrwöchige Zeiträume, Dienste, Zuweisungen, unbesetzte Dienste und einzelne Sperren fachlich und lokal speicherbar machen.
+Ziel: Planungswochen von Montag bis Sonntag, mehrwöchige Zeiträume, tatsächliche Dienstzeiten, Zuweisungen, vollständig oder teilweise ungedeckten Bedarf und einzelne Sperren fachlich und lokal speicherbar machen.
 
 Teil-Roadmap: vor Beginn anzulegen und abzunehmen
 
@@ -141,7 +141,7 @@ Abhängigkeiten: 05, 06 und 07
 
 Status: `[ ]`
 
-Ziel: Aus den bestätigten Eingaben einen zulässigen bestmöglichen Plan erzeugen, zwingende Regeln unverletzt lassen, Überbesetzung verhindern und nicht besetzbare Dienste sichtbar offenlassen. Nur eine ausdrücklich gestartete Neugenerierung darf nicht gesperrte Zuweisungen neu verteilen.
+Ziel: Aus den bestätigten Eingaben einen zulässigen bestmöglichen Plan erzeugen, zwingende Regeln unverletzt lassen, Überbesetzung verhindern und ungedeckte Zeiträume sichtbar offenlassen. Der samstägliche Springer darf nur als Notfall verwendet werden und verdeckt keine Teilunterdeckung vor seinem tatsächlichen Restaurantbeginn. Nur eine ausdrücklich gestartete Neugenerierung darf nicht gesperrte Zuweisungen neu verteilen.
 
 Teil-Roadmap: vor Beginn anzulegen und abzunehmen
 
@@ -151,7 +151,7 @@ Abhängigkeiten: 08
 
 Status: `[ ]`
 
-Ziel: Unbesetzte Dienste und verletzte weiche Regeln mit Ursache, Priorität und hilfreichen, nicht automatisch ausgeführten Lösungsmöglichkeiten verständlich erklären.
+Ziel: Vollständig oder teilweise ungedeckte Bedarfszeiträume und verletzte weiche Regeln mit Ursache, Priorität und hilfreichen, nicht automatisch ausgeführten Lösungsmöglichkeiten verständlich erklären.
 
 Teil-Roadmap: vor Beginn anzulegen und abzunehmen
 
@@ -257,4 +257,4 @@ System 16 ergänzt Zeitkonten nach gesonderter Priorisierung, ohne den Abschluss
 
 ## Nächster übergeordneter Schritt
 
-Die Systeme 01 und 02 sind abgeschlossen und ihre Teil-Roadmaps archiviert. Als Nächstes wird entschieden, ob System 03 – Mitarbeitende, Arbeitszeitmodelle und Qualifikationen – oder System 04 – Einsatzorte und Diensttypen – vorbereitet wird. Vor jeder Implementierung entsteht dafür eine eigene kleinschrittige Teil-Roadmap und wird abgenommen.
+System 04 – Einsatzorte, Diensttypen und Doppeldienste – ist mit ED-01 bis ED-10 abgenommen und archiviert. Als Nächstes wird MA-01 des wieder aktivierten, noch nicht abgenommenen System-03-Entwurfs gemeinsam geprüft. Mitarbeiter-Fachcode beginnt erst nach Roadmap-Abnahme und der anschließenden Bestätigung der offenen Fachfragen in MA-02.

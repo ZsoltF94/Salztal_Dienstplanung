@@ -2,29 +2,509 @@
         x:ClassModifier="internal"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title="Salztal Dienstplanung"
-        Width="720"
-        Height="420"
-        MinWidth="520"
-        MinHeight="320"
-        WindowStartupLocation="CenterScreen">
-  <Grid Margin="40">
-    <StackPanel HorizontalAlignment="Center"
-                VerticalAlignment="Center">
-      <TextBlock HorizontalAlignment="Center"
-                 FontSize="28"
-                 FontWeight="SemiBold"
-                 Text="Salztal Dienstplanung" />
-      <TextBlock Margin="0,18,0,0"
-                 HorizontalAlignment="Center"
-                 FontSize="16"
-                 Text="Das technische App-Grundgerüst ist eingerichtet."
-                 TextAlignment="Center" />
-      <TextBlock Margin="0,8,0,0"
-                 HorizontalAlignment="Center"
-                 Foreground="DimGray"
-                 Text="Dienstplanfunktionen sind noch nicht implementiert."
-                 TextAlignment="Center" />
-    </StackPanel>
+        Width="1160"
+        Height="760"
+        MinWidth="900"
+        MinHeight="600"
+        Loaded="OnLoaded"
+        WindowStartupLocation="CenterScreen"
+        mc:Ignorable="d">
+  <Window.Resources>
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+    <Style x:Key="SectionCardStyle"
+           TargetType="Border">
+      <Setter Property="Background"
+              Value="White" />
+      <Setter Property="BorderBrush"
+              Value="#D8DEE7" />
+      <Setter Property="BorderThickness"
+              Value="1" />
+      <Setter Property="CornerRadius"
+              Value="10" />
+      <Setter Property="Padding"
+              Value="24" />
+    </Style>
+
+    <Style x:Key="InnerCardStyle"
+           TargetType="Border">
+      <Setter Property="Background"
+              Value="#F7F9FC" />
+      <Setter Property="BorderBrush"
+              Value="#D8DEE7" />
+      <Setter Property="BorderThickness"
+              Value="1" />
+      <Setter Property="CornerRadius"
+              Value="8" />
+      <Setter Property="Padding"
+              Value="18" />
+    </Style>
+
+    <Style x:Key="ColorSwatchStyle"
+           TargetType="Border">
+      <Setter Property="Width"
+              Value="18" />
+      <Setter Property="Height"
+              Value="18" />
+      <Setter Property="Background"
+              Value="#E2E8F0" />
+      <Setter Property="BorderBrush"
+              Value="#475569" />
+      <Setter Property="BorderThickness"
+              Value="2" />
+      <Setter Property="CornerRadius"
+              Value="4" />
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Code}"
+                     Value="yellow">
+          <Setter Property="Background"
+                  Value="#FFF2A8" />
+          <Setter Property="BorderBrush"
+                  Value="#765A00" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Code}"
+                     Value="red">
+          <Setter Property="Background"
+                  Value="#FFD6D6" />
+          <Setter Property="BorderBrush"
+                  Value="#8B1E1E" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Code}"
+                     Value="blue">
+          <Setter Property="Background"
+                  Value="#D7E9FF" />
+          <Setter Property="BorderBrush"
+                  Value="#205B9C" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style TargetType="Button">
+      <Setter Property="MinHeight"
+              Value="40" />
+      <Setter Property="Padding"
+              Value="18,8" />
+      <Setter Property="FontSize"
+              Value="14" />
+    </Style>
+
+    <Style TargetType="TextBox">
+      <Setter Property="MinHeight"
+              Value="38" />
+      <Setter Property="Padding"
+              Value="10,7" />
+      <Setter Property="FontSize"
+              Value="14" />
+      <Setter Property="VerticalContentAlignment"
+              Value="Center" />
+    </Style>
+
+    <Style TargetType="ComboBox">
+      <Setter Property="MinHeight"
+              Value="38" />
+      <Setter Property="Padding"
+              Value="8,5" />
+      <Setter Property="FontSize"
+              Value="14" />
+    </Style>
+  </Window.Resources>
+
+  <Grid Background="#F3F6FA">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <Border Padding="32,24"
+            Background="#17324D">
+      <StackPanel>
+        <TextBlock Foreground="White"
+                   FontSize="26"
+                   FontWeight="SemiBold"
+                   Text="Einsatzorte und Diensttypen" />
+        <TextBlock Margin="0,6,0,0"
+                   Foreground="#D7E4F0"
+                   FontSize="14"
+                   Text="Stammdaten bearbeiten und feste Einsatzmuster nachvollziehen" />
+      </StackPanel>
+    </Border>
+
+    <Grid Grid.Row="1"
+          Margin="28">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="300" />
+        <ColumnDefinition Width="24" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <Border Grid.Column="0"
+              Style="{StaticResource SectionCardStyle}">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+
+          <TextBlock FontSize="19"
+                     FontWeight="SemiBold"
+                     Text="Einsatzorte" />
+          <TextBlock Grid.Row="1"
+                     Margin="0,5,0,18"
+                     Foreground="#526174"
+                     Text="Wählen Sie einen Eintrag mit seinen Diensttypen aus."
+                     TextWrapping="Wrap" />
+
+          <ListBox Grid.Row="2"
+                   AutomationProperties.Name="Vorhandene Einsatzorte"
+                   Background="Transparent"
+                   BorderThickness="0"
+                   ItemsSource="{Binding WorkLocations}"
+                   SelectedItem="{Binding SelectedWorkLocation}">
+            <ListBox.ItemContainerStyle>
+              <Style TargetType="ListBoxItem">
+                <Setter Property="HorizontalContentAlignment"
+                        Value="Stretch" />
+                <Setter Property="Margin"
+                        Value="0,0,0,8" />
+                <Setter Property="Padding"
+                        Value="12" />
+              </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <Border Margin="0,0,11,0"
+                          DataContext="{Binding SelectedColor}"
+                          Style="{StaticResource ColorSwatchStyle}" />
+                  <StackPanel Grid.Column="1">
+                    <TextBlock FontWeight="SemiBold"
+                               Text="{Binding Name}" />
+                    <TextBlock Margin="0,2,0,0"
+                               Foreground="#526174"
+                               Text="{Binding SelectedColor.DisplayName}" />
+                  </StackPanel>
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+      </Border>
+
+      <Border Grid.Column="2"
+              Style="{StaticResource SectionCardStyle}">
+        <Grid>
+          <StackPanel HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <ProgressBar Width="220"
+                         Height="8"
+                         IsIndeterminate="True" />
+            <TextBlock Margin="0,14,0,0"
+                       Foreground="#526174"
+                       Text="Katalog wird geladen …" />
+          </StackPanel>
+
+          <StackPanel MaxWidth="520"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Visibility="{Binding HasLoadError, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TextBlock HorizontalAlignment="Center"
+                       FontSize="19"
+                       FontWeight="SemiBold"
+                       Text="Laden nicht möglich" />
+            <TextBlock Margin="0,10,0,18"
+                       Foreground="#8B1E1E"
+                       Text="{Binding LoadErrorMessage}"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap" />
+            <Button Command="{Binding LoadCommand}"
+                    Content="Erneut versuchen" />
+          </StackPanel>
+
+          <StackPanel HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Visibility="{Binding IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TextBlock FontSize="19"
+                       FontWeight="SemiBold"
+                       Text="Noch keine Einsatzorte vorhanden" />
+            <TextBlock Margin="0,8,0,0"
+                       Foreground="#526174"
+                       Text="Das Anlegen neuer Einsatzorte wird später ergänzt." />
+          </StackPanel>
+
+          <ScrollViewer VerticalScrollBarVisibility="Auto"
+                        Visibility="{Binding HasWorkLocations, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel Margin="0,0,10,0">
+              <Border DataContext="{Binding SelectedWorkLocation}"
+                      Style="{StaticResource InnerCardStyle}">
+                <StackPanel>
+                  <TextBlock FontSize="22"
+                             FontWeight="SemiBold"
+                             Text="Einsatzort bearbeiten" />
+                  <TextBlock Margin="0,6,0,20"
+                             Foreground="#526174"
+                             Text="Name und Farbkennzeichnung gelten für zukünftige Planungen."
+                             TextWrapping="Wrap" />
+
+                  <TextBlock Margin="0,0,0,7"
+                             FontWeight="SemiBold"
+                             Text="Name" />
+                  <TextBox AutomationProperties.Name="Name des Einsatzortes"
+                           MaxLength="120"
+                           Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+
+                  <TextBlock Margin="0,18,0,7"
+                             FontWeight="SemiBold"
+                             Text="Farbkennzeichnung" />
+                  <ComboBox AutomationProperties.Name="Farbkennzeichnung des Einsatzortes"
+                            ItemsSource="{Binding ColorOptions}"
+                            SelectedItem="{Binding SelectedColor}">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                          <Border Margin="0,0,10,0"
+                                  Style="{StaticResource ColorSwatchStyle}" />
+                          <TextBlock VerticalAlignment="Center"
+                                     Text="{Binding DisplayName}" />
+                        </StackPanel>
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                  <TextBlock Margin="0,7,0,0"
+                             Foreground="#526174"
+                             Text="Die Farbe wird immer zusätzlich als Text angezeigt."
+                             TextWrapping="Wrap" />
+
+                  <Border Margin="0,18,0,0"
+                          Padding="12"
+                          Background="#FFF0F0"
+                          BorderBrush="#C24141"
+                          BorderThickness="1"
+                          CornerRadius="6"
+                          Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock Foreground="#711A1A"
+                               Text="{Binding ErrorMessage}"
+                               TextWrapping="Wrap" />
+                  </Border>
+                  <Border Margin="0,18,0,0"
+                          Padding="12"
+                          Background="#E8F5EC"
+                          BorderBrush="#2F7D4A"
+                          BorderThickness="1"
+                          CornerRadius="6"
+                          Visibility="{Binding HasSuccessMessage, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock Foreground="#245E39"
+                               Text="{Binding SuccessMessage}"
+                               TextWrapping="Wrap" />
+                  </Border>
+
+                  <StackPanel Margin="0,20,0,0"
+                              Orientation="Horizontal">
+                    <Button MinWidth="150"
+                            Command="{Binding SaveCommand}"
+                            Content="Änderungen speichern" />
+                    <TextBlock Margin="14,0,0,0"
+                               VerticalAlignment="Center"
+                               Foreground="#526174"
+                               Text="Speichern …"
+                               Visibility="{Binding IsSaving, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+
+              <TextBlock Margin="0,30,0,0"
+                         FontSize="22"
+                         FontWeight="SemiBold"
+                         Text="Zugehörige Diensttypen" />
+              <TextBlock Margin="0,6,0,16"
+                         Foreground="#526174"
+                         Text="Die Standardzeit gilt für zukünftige Bedarfe. Konkrete Bedarfszeiten können später davon abweichen."
+                         TextWrapping="Wrap" />
+
+              <ItemsControl ItemsSource="{Binding SelectedWorkLocation.ShiftTypes}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Border Margin="0,0,0,12"
+                            Style="{StaticResource InnerCardStyle}">
+                      <StackPanel>
+                        <Grid>
+                          <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                          </Grid.ColumnDefinitions>
+                          <StackPanel>
+                            <TextBlock FontSize="17"
+                                       FontWeight="SemiBold"
+                                       Text="{Binding Name}" />
+                            <TextBlock Margin="0,3,0,0"
+                                       Foreground="#526174"
+                                       Text="{Binding StandardTimeText}" />
+                          </StackPanel>
+                          <Border Grid.Column="1"
+                                  Padding="10,5"
+                                  Background="#E7EEF6"
+                                  CornerRadius="6">
+                            <TextBlock FontWeight="SemiBold"
+                                       Text="{Binding DisplayCode}" />
+                          </Border>
+                        </Grid>
+
+                        <Grid Margin="0,16,0,0">
+                          <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="*" />
+                          </Grid.ColumnDefinitions>
+                          <StackPanel>
+                            <TextBlock Margin="0,0,0,7"
+                                       FontWeight="SemiBold"
+                                       Text="Beginn" />
+                            <ComboBox AutomationProperties.Name="Beginn der Standardzeit"
+                                      DisplayMemberPath="DisplayName"
+                                      ItemsSource="{Binding TimeOptions}"
+                                      SelectedItem="{Binding SelectedStartTime}" />
+                          </StackPanel>
+                          <StackPanel Grid.Column="2">
+                            <TextBlock Margin="0,0,0,7"
+                                       FontWeight="SemiBold"
+                                       Text="Ende" />
+                            <ComboBox AutomationProperties.Name="Ende der Standardzeit"
+                                      DisplayMemberPath="DisplayName"
+                                      ItemsSource="{Binding TimeOptions}"
+                                      SelectedItem="{Binding SelectedEndTime}" />
+                          </StackPanel>
+                        </Grid>
+
+                        <Border Margin="0,16,0,0"
+                                Padding="12"
+                                Background="#FFF0F0"
+                                BorderBrush="#C24141"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}">
+                          <TextBlock Foreground="#711A1A"
+                                     Text="{Binding ErrorMessage}"
+                                     TextWrapping="Wrap" />
+                        </Border>
+                        <Border Margin="0,16,0,0"
+                                Padding="12"
+                                Background="#E8F5EC"
+                                BorderBrush="#2F7D4A"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Visibility="{Binding HasSuccessMessage, Converter={StaticResource BooleanToVisibilityConverter}}">
+                          <TextBlock Foreground="#245E39"
+                                     Text="{Binding SuccessMessage}"
+                                     TextWrapping="Wrap" />
+                        </Border>
+
+                        <StackPanel Margin="0,18,0,0"
+                                    Orientation="Horizontal">
+                          <Button Command="{Binding SaveCommand}"
+                                  Content="Standardzeit speichern" />
+                          <TextBlock Margin="14,0,0,0"
+                                     VerticalAlignment="Center"
+                                     Foreground="#526174"
+                                     Text="Speichern …"
+                                     Visibility="{Binding IsSaving, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        </StackPanel>
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <TextBlock Margin="0,22,0,0"
+                         FontSize="22"
+                         FontWeight="SemiBold"
+                         Text="Feste Einsatzmuster" />
+              <TextBlock Margin="0,6,0,16"
+                         Foreground="#526174"
+                         Text="Diese beiden bestätigten Muster werden nur angezeigt und können nicht frei zusammengestellt werden."
+                         TextWrapping="Wrap" />
+
+              <Border DataContext="{Binding SplitShiftPattern}"
+                      Style="{StaticResource InnerCardStyle}">
+                <StackPanel>
+                  <TextBlock FontSize="17"
+                             FontWeight="SemiBold"
+                             Text="Doppeldienst" />
+                  <TextBlock Margin="0,3,0,12"
+                             Foreground="#526174"
+                             Text="{Binding DisplayCode, StringFormat=Anzeige im Plan: {0}}" />
+                  <TextBlock Text="{Binding WorkLocationName, StringFormat=Einsatzort: {0}}" />
+                  <TextBlock Margin="0,4,0,0">
+                    <Run Text="Abfolge: " />
+                    <Run Text="{Binding FirstShiftTypeName}" />
+                    <Run Text=" und " />
+                    <Run Text="{Binding SecondShiftTypeName}" />
+                  </TextBlock>
+                  <TextBlock Margin="0,4,0,0"
+                             Text="{Binding StandardBreakText, StringFormat=Unterbrechung: {0} (keine Arbeitszeit)}" />
+                  <TextBlock Margin="0,4,0,0"
+                             Text="{Binding StandardWorkText, StringFormat=Standardarbeitszeit: {0}}" />
+                </StackPanel>
+              </Border>
+
+              <Border Margin="0,12,0,0"
+                      DataContext="{Binding ReliefShiftPattern}"
+                      Style="{StaticResource InnerCardStyle}">
+                <StackPanel>
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto" />
+                      <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Margin="0,1,10,0"
+                            DataContext="{Binding}"
+                            Style="{StaticResource ColorSwatchStyle}" />
+                    <TextBlock Grid.Column="1"
+                               FontSize="17"
+                               FontWeight="SemiBold"
+                               Text="Springer-Dienst" />
+                  </Grid>
+                  <TextBlock Margin="0,6,0,12">
+                    <Run Text="Anzeige im Plan: " />
+                    <Run FontWeight="SemiBold"
+                         Text="{Binding DisplayCode}" />
+                    <Run Text=" – Farbe: " />
+                    <Run Text="{Binding DisplayColorName}" />
+                  </TextBlock>
+                  <TextBlock Text="{Binding AllowedDayName, StringFormat=Zulässiger Tag: {0}}" />
+                  <TextBlock Margin="0,4,0,0">
+                    <Run Text="Zuerst: " />
+                    <Run Text="{Binding FirstShiftTypeName}" />
+                    <Run Text=" in " />
+                    <Run Text="{Binding FirstWorkLocationName}" />
+                  </TextBlock>
+                  <TextBlock Margin="0,4,0,0">
+                    <Run Text="Danach: " />
+                    <Run Text="{Binding SecondShiftTypeName}" />
+                    <Run Text=" im " />
+                    <Run Text="{Binding SecondWorkLocationName}" />
+                  </TextBlock>
+                  <TextBlock Margin="0,4,0,0"
+                             Text="{Binding SwitchRuleText}" />
+                  <TextBlock Margin="0,4,0,0"
+                             Text="{Binding InterruptionText, StringFormat=Abfolge: {0}}" />
+                  <TextBlock Margin="0,10,0,0"
+                             Foreground="#526174"
+                             Text="Eine feste Wechselzeit wird nicht gespeichert. Die Restaurant-Teilunterdeckung vor dem Wechsel bleibt später sichtbar."
+                             TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </ScrollViewer>
+        </Grid>
+      </Border>
+    </Grid>
   </Grid>
 </Window>

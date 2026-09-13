@@ -46,7 +46,9 @@ Vorgesehene Begriffe:
 | Arbeitszeitmodell | `WorkModel` |
 | Einsatzort | `WorkLocation` |
 | Diensttyp | `ShiftType` |
+| Einsatzmuster | `ShiftPattern` |
 | Doppeldienst | `SplitShift` |
+| Springer-Einsatz | `ReliefShiftPattern` |
 | Bedarf | `StaffingDemand` |
 | Verfügbarkeit | `Availability` |
 | Abwesenheit | `Absence` |
@@ -224,6 +226,10 @@ Salztal.Dienstplanung.Desktop.Shared
 - Arbeitsdauern werden als ganze Minuten oder durch einen geprüften Werttyp gespeichert.
 - Für Arbeitsstunden werden keine `double`- oder `float`-Werte verwendet.
 - Umrechnungen in Stunden dienen nur der Anzeige.
+- Ein Diensttyp besitzt eine bearbeitbare Standardzeit; ein Bedarf und eine geplante Zuweisung besitzen ihre tatsächlichen Zeiten.
+- Ein einzelner Bedarf referenziert genau einen normalen Diensttyp. Doppeldienst und Springer bleiben zusammengesetzte Muster und dürfen nicht als zusätzliche bedarfsfähige Diensttypen modelliert werden.
+- Berechnungen verwenden die tatsächlichen Bedarfs- und Zuweisungszeiten und greifen nicht versehentlich auf eine abweichende Standardzeit zurück.
+- Eine Datums-Ausnahme bleibt vom zukünftigen Standard getrennt. Abgenommene Planversionen bewahren die damaligen tatsächlichen Zeiten als Momentaufnahme.
 - Die aktuelle Zeit wird über eine injizierte Uhr bezogen; Fachcode ruft nicht direkt `DateTime.Now` oder `DateTime.UtcNow` auf.
 - Lokale Klinikzeiten und technische Zeitstempel werden ausdrücklich unterschieden.
 
@@ -262,6 +268,7 @@ Salztal.Dienstplanung.Desktop.Shared
 - Jede Solver-Bedingung bleibt über eine fachliche Regelkennung rückverfolgbar.
 - Solver-Variablen erhalten stabile, diagnostisch hilfreiche Namen ohne echte Personennamen.
 - Unbesetzte Plätze sind ausdrückliche Modellwerte und keine technische Ausnahme.
+- Teilweise gedeckte Bedarfszeiträume behalten den ungedeckten Zeitraum als ausdrückliches fachliches Ergebnis; eine bloße Diensttypzuordnung darf ihn nicht verbergen.
 - Überbesetzung wird nicht nachträglich aus einem Ergebnis entfernt, sondern bereits im Modell ausgeschlossen.
 - Prioritätsstufen werden hierarchisch abgesichert. Beliebige magische Strafwerte ohne Dominanznachweis sind untersagt.
 - Solver-Status, Laufzeit, Version und relevante Einstellungen werden im Ergebnis dokumentiert.
@@ -401,6 +408,9 @@ Jede Regel benötigt mindestens:
 
 - deckbarer Bedarf ohne Konflikt,
 - nicht deckbarer Bedarf mit weiterhin erzeugtem Restplan,
+- Bedarf mit einer ausdrücklich von der Diensttyp-Standardzeit abweichenden tatsächlichen Zeit,
+- genau ein verlangter Diensttyp je Bedarf,
+- samstäglicher Springer-Einsatz nur als Notfall und mit sichtbar verbleibender Teilunterdeckung vor dem Einsatzortwechsel,
 - keine Überbesetzung,
 - unverletzte Hard Rules,
 - Prioritätsreihenfolge hoch vor mittel vor niedrig,
@@ -408,7 +418,7 @@ Jede Regel benötigt mindestens:
 - Doppeldienstbedingungen,
 - reproduzierbares Ergebnis bei gleichen Eingaben,
 - Zeitgrenze und Abbruchstatus,
-- Ursache und Lösungsmöglichkeiten für unbesetzte Plätze.
+- Ursache und Lösungsmöglichkeiten für vollständig oder teilweise ungedeckte Bedarfszeiträume.
 
 ### Architekturtests
 

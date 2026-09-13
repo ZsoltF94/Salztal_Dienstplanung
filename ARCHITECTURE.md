@@ -8,7 +8,7 @@ Stand: 2026-09-13
 
 Nach seiner Abnahme legt dieses Dokument die technische Grundarchitektur der Anwendung verbindlich fest. Es beschreibt Grenzen und Verantwortlichkeiten, aber noch keine konkrete Implementierung einzelner Fachsysteme.
 
-Fachliche Grundlage ist `GRUNDLAGEN_FRAGEN_UND_ENTSCHEIDUNGEN.md`. Die begründete Technologieauswahl und ihre Primärquellen stehen in `docs/decisions/ARCHITECTURE_PROPOSAL.md`.
+Fachliche Grundlage ist `GRUNDLAGEN_FRAGEN_UND_ENTSCHEIDUNGEN.md`. Die begründete Technologieauswahl und ihre Primärquellen stehen in `docs/decisions/ARCHITECTURE_PROPOSAL.md`. Die bestätigte Trennung zwischen Diensttyp-Standardzeit und tatsächlicher Bedarfszeit sowie der Springer-Sonderfall stehen in `docs/decisions/SHIFT_TYPES_AND_STAFFING_DEMAND_MODEL.md`.
 
 ## Architekturziele
 
@@ -80,7 +80,7 @@ Enthält das reine Fachmodell und fachliche Prüfungen:
 - Arbeitszeitmodelle,
 - Qualifikationen und Einsatzfreigaben,
 - Einsatzorte,
-- Diensttypen und Doppeldienste,
+- Diensttypen, Doppeldienste und standortübergreifende Springer-Einsätze,
 - Verfügbarkeiten und Abwesenheiten,
 - Personal- und Schichtbedarf,
 - zwingende und weiche Regeln,
@@ -116,7 +116,7 @@ Enthält die technische Umsetzung der automatischen Planung:
 - hierarchische Optimierung der Ziele,
 - feste und dokumentierte Solver-Einstellungen,
 - Rückübersetzung in einen fachlichen Plan,
-- Diagnose unbesetzter Dienste,
+- Diagnose vollständig oder teilweise ungedeckter Bedarfszeiträume,
 - strukturierte fachliche Konfliktdaten für verständliche Meldungen.
 
 OR-Tools bleibt vollständig in diesem Modul gekapselt. Das Modul liefert keine fertig formulierten deutschen Oberflächentexte.
@@ -232,10 +232,14 @@ Dadurch können neue Kombinationen angelegt werden, ohne für jede Kombination e
 ### Zeitdarstellung
 
 - Kalendertage werden ohne Uhrzeit gespeichert.
-- Dienstzeiten werden als lokale Uhrzeiten und Arbeitsdauer abgebildet.
+- Diensttypen besitzen bearbeitbare lokale Standardzeiten. Diese dienen als Ausgangswert und normale Anzeige, sind aber nicht zwingend die tatsächliche Zeit jedes Bedarfs.
+- Ein Bedarf besitzt die tatsächlich zu besetzende Anfangs- und Endzeit. Eine ausdrückliche Datums-Ausnahme darf von der Standardzeit des verlangten Diensttyps abweichen.
+- Geplante Zuweisungen bewahren ihre tatsächlichen lokalen Uhrzeiten als Momentaufnahme.
 - Eine Dauer wird als ganze Minuten gespeichert und berechnet.
-- Ein Doppeldienst besitzt zwei getrennte Dienstabschnitte und eine unbezahlte Unterbrechung.
+- Einsatzorte besitzen keine eigenen Öffnungs-, Betriebs- oder Arbeitszeiten.
+- Ein Doppeldienst besitzt zwei getrennte Dienstabschnitte und eine Unterbrechung, die nicht als Arbeitszeit zählt.
 - Der Einsatzort gehört zu jedem Dienstabschnitt; beide Teile eines Doppeldienstes müssen dieselbe Restaurant-Zuordnung besitzen.
+- Ein Springer-Einsatz besitzt zwei unmittelbar aufeinanderfolgende Abschnitte an verschiedenen Einsatzorten und ist deshalb kein Doppeldienst.
 - Falls später Dienste über Mitternacht benötigt werden, muss diese Regel vor Umsetzung ausdrücklich ergänzt werden.
 
 ### Bedarf
@@ -244,9 +248,20 @@ Ein Bedarf bezeichnet eine feste Zahl benötigter Plätze für:
 
 - einen Einsatzort,
 - einen Kalendertag,
-- einen vorher definierten Diensttyp.
+- eine tatsächliche Anfangs- und Endzeit,
+- genau einen vorher definierten Diensttyp.
 
-Die benötigten Stunden werden aus Anzahl der Plätze mal bezahlter Dauer des Diensttyps berechnet. Ein unabhängiger zweiter Stundenwert wird nicht eingegeben. Überbesetzung ist nicht zulässig.
+Der verlangte Diensttyp ist immer ein normaler Ein-Ort-Diensttyp. Doppeldienst `D` und Springer `Spr` sind zusammengesetzte Muster, die jeweils zwei getrennte Bedarfe beziehungsweise Zuweisungen verbinden und niemals selbst von einem einzelnen Bedarf verlangt werden.
+
+Der Diensttyp liefert seine Standardzeit als Ausgangswert. Die Service-Leitung darf entweder den zukünftigen Standard oder nur die tatsächliche Bedarfszeit eines konkreten Datums ändern. Die benötigten Stunden werden aus Anzahl der Plätze mal tatsächlicher Bedarfsdauer berechnet. Ein unabhängiger zweiter Stundenwert wird nicht eingegeben. Überbesetzung ist nicht zulässig.
+
+Eine von der Standardzeit abweichende Bedarfszeit ändert den verlangten Diensttyp nicht. So kann beispielsweise ein ausdrücklich verkürzter Restaurantbedarf weiterhin genau den Diensttyp Frühdienst verlangen. Die automatische Planung darf weder einen Diensttyp noch eine Zeitabweichung selbst erfinden.
+
+### Doppeldienst und Springer-Einsatz
+
+Der Doppeldienst ist ausschließlich die Kombination aus Frühdienst und Spätdienst im Restaurant. Beide tatsächlichen Dienstabschnitte bleiben getrennt und die Unterbrechung zählt nicht als Arbeitszeit.
+
+Der samstägliche Springer-Einsatz `Spr` verbindet Cafeteria-Dienst B bis zum tatsächlichen Ende des zweiten Cafeteria-Bedarfs mit einem anschließenden Restaurant-Spätdienst. Die Person benötigt die Freigaben für beide Einsatzorte und beide Diensttypen. `Spr` darf automatisch nur verwendet werden, wenn sonst ein Restaurant-Spätdienst unbesetzt bleibt. Vor dem tatsächlichen Wechsel ist die Person nicht im Restaurant; eine dadurch entstehende Teilunterdeckung bleibt als solche erhalten und sichtbar.
 
 ## Planungsarchitektur
 
@@ -266,18 +281,18 @@ Die Planungsengine erhält eine unveränderliche Momentaufnahme aller für den Z
 
 Während einer Berechnung liest die Engine nicht erneut aus der Datenbank. Dadurch bleibt ein Lauf nachvollziehbar und testbar.
 
-### Besetzte und unbesetzte Plätze
+### Gedeckter und ungedeckter Bedarf
 
-Jeder benötigte Platz wird genau einmal abgebildet:
+Jeder benötigte Platz mit seinem tatsächlichen Zeitraum wird abgebildet:
 
-- durch einen zulässigen Mitarbeiter oder
-- als ausdrücklich unbesetzt.
+- durch einen zulässigen Mitarbeiter für den vollständig oder teilweise tatsächlich gedeckten Zeitraum und
+- für jeden verbleibenden Zeitraum als ausdrücklich ungedeckt.
 
-Es gibt keine zusätzlichen Plätze. So kann keine automatische Überbesetzung entstehen. Die Möglichkeit „unbesetzt“ verhindert zugleich, dass die gesamte Generierung wegen Personalmangels scheitert.
+Es gibt keine zusätzlichen Plätze. So kann keine automatische Überbesetzung entstehen. Ein nur teilweise gedeckter Platz wird nicht fälschlich als vollständig besetzt gemeldet. Die Möglichkeit „ungedeckt“ verhindert zugleich, dass die gesamte Generierung wegen Personalmangels scheitert.
 
 ### Zwingende Regeln
 
-Zwingende Regeln werden als unverletzbare Bedingungen modelliert. Eine Person wird niemals automatisch so eingeplant, dass eine zwingende Regel verletzt wird. Ist keine zulässige Person vorhanden, bleibt der Platz unbesetzt.
+Zwingende Regeln werden als unverletzbare Bedingungen modelliert. Eine Person wird niemals automatisch so eingeplant, dass eine zwingende Regel verletzt wird. Ist für einen Platz keine durchgehend zulässige Besetzung vorhanden, bleibt sein tatsächlicher Zeitraum vollständig oder teilweise ungedeckt.
 
 Gesperrte Zuweisungen sind für eine Neugenerierung ebenfalls zwingend. Widerspricht eine neue Eingabe einer Sperre, startet keine irreführende Planung; die App meldet den Widerspruch konkret.
 
@@ -286,7 +301,7 @@ Gesperrte Zuweisungen sind für eine Neugenerierung ebenfalls zwingend. Widerspr
 Die Optimierung erfolgt hierarchisch:
 
 1. zwingende Regeln einhalten,
-2. Zahl unbesetzter Plätze minimieren,
+2. ungedeckten Bedarf minimieren,
 3. weiche Regeln mit Priorität hoch optimieren,
 4. weiche Regeln mit Priorität mittel optimieren,
 5. weiche Regeln mit Priorität niedrig optimieren,
@@ -306,10 +321,10 @@ Die Stufen werden durch getrennte Optimierungsläufe oder nachweisbar dominante 
 
 Jede an den Solver übertragene Bedingung erhält eine fachliche Kennung. Diese enthält mindestens Regel, Tag, Dienst, Einsatzort und betroffene Mitarbeiter beziehungsweise Mitarbeitergruppe.
 
-Für einen unbesetzten Platz führt die Diagnose kontrollierte Prüfungen durch und liefert:
+Für einen vollständig oder teilweise ungedeckten Bedarf führt die Diagnose kontrollierte Prüfungen durch und liefert:
 
-- den nicht besetzten Dienst,
-- den konkreten Bedarf,
+- den verlangten Diensttyp,
+- den konkreten Bedarf einschließlich des tatsächlich ungedeckten Zeitraums,
 - ausgeschlossene Personen und die jeweils entscheidenden Gründe,
 - betroffene Wünsche und Prioritäten,
 - mögliche Änderungen, die eine Besetzung erlauben könnten.
@@ -340,6 +355,8 @@ Lösungsvorschläge sind Hinweise. Sie verändern niemals automatisch Stammdaten
 5. Es findet keine automatische vollständige Neugenerierung statt.
 
 Die bestätigte manuelle Sonderzuweisung außerhalb einer normalen Einsatzfreigabe ist ein eigener, ausdrücklich zu bestätigender Vorgang. Sie ändert die Einsatzfreigabe in den Stammdaten nicht, bleibt als Warnung sichtbar und ist für die automatische Planerzeugung weiterhin unzulässig.
+
+Standardänderungen an Diensttypen oder Bedarfen wirken nur auf neu erzeugte zukünftige Vorgaben. Eine Datums-Ausnahme verändert nur das ausgewählte Datum. Bereits gespeicherte und insbesondere abgenommene Planversionen bewahren ihre tatsächlichen Zeiten, Bezeichnungen und Anzeigedaten unverändert.
 
 ### Abnahme und erneute Änderung
 
@@ -378,6 +395,7 @@ Die genauen Pfade werden im Datenhaltungs-System festgelegt und getestet. Progra
 - Eine fehlgeschlagene Migration darf die letzte funktionierende Datenbank nicht überschreiben.
 - Manuelle Korrekturen an Zeitkonten werden mit altem Wert, neuem Wert, Zeitpunkt und optionalem Grund gespeichert.
 - Archivierte Pläne und abgenommene Versionen werden nicht automatisch gelöscht.
+- Wird ein Einsatzort oder Diensttyp später aus dem aktuellen Stammdatenkatalog gelöscht, bleiben die in unveränderlichen Planversionen eingebetteten damaligen Bezeichnungen, Farben, Diensttypen und tatsächlichen Zeiten erhalten.
 
 ## Datensicherung und Wiederherstellung
 
@@ -412,6 +430,7 @@ ClosedXML wird zuerst geprüft. Falls es Bestandteile nicht zuverlässig erhält
 - Eine zweite Ansicht zeigt die Besetzung je Einsatzort.
 - Konflikte erscheinen farblich im Plan und zusätzlich in einer Liste.
 - Farbe ist nie der einzige Informationsträger; Text und Symbole erklären denselben Zustand.
+- Cafeteria wird in der ersten Fassung gelb, das zusammengefasste Restaurant rot und der Springer-Einsatz `Spr` blau gekennzeichnet; konkrete barrierearme Farbtöne werden im UI-Schritt abgenommen.
 - Manuelle Bearbeitung benötigt einen ausdrücklichen Start- und Speichervorgang.
 - Zwingende Verstöße werden blockiert; bewusst erlaubte Abweichungen werden bestätigt und sichtbar markiert.
 - Lange Planungs- oder Exportvorgänge blockieren die Oberfläche nicht.
