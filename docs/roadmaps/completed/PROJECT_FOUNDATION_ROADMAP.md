@@ -1,6 +1,6 @@
 # Teil-Roadmap: Projektgrundlage
 
-Status: Aktiv – PF-07 umgesetzt und geprüft, wartet auf Abnahme
+Status: Abgeschlossen und archiviert am 2026-09-13
 
 ## Ziel
 
@@ -231,7 +231,7 @@ Tatsächlich umgesetzt:
 
 ### PF-07 – Arbeitsanweisungen in `AGENTS.md` festlegen
 
-Status: `[~]` – umgesetzt und geprüft, wartet auf Abnahme
+Status: `[x]` – abgenommen am 2026-09-13
 
 Geplantes Ergebnis:
 
@@ -261,7 +261,7 @@ Tatsächlich umgesetzt:
 
 ### PF-08 – Systemübersicht in `MASTER_ROADMAP.md` anlegen
 
-Status: `[ ]`
+Status: `[x]` – abgenommen am 2026-09-13
 
 Geplantes Ergebnis:
 
@@ -270,22 +270,24 @@ Geplantes Ergebnis:
 - Die Master-Roadmap bleibt bewusst grob und enthält keine versteckte Detailimplementierung.
 - Zeitkonten werden sichtbar als spätere, nicht vorrangige Ausbaustufe eingeordnet.
 
-Voraussichtliche Systembereiche:
+In der Master-Roadmap festgelegte Systembereiche:
 
 1. Projektgrundlage
-2. Mitarbeiter-, Arbeitszeitmodell- und Qualifikationsverwaltung
-3. Einsatzorte, Diensttypen und Doppeldienste
-4. Personal- und Schichtbedarf
-5. Verfügbarkeiten und Abwesenheiten
-6. Regelkatalog mit zwingenden und priorisierten weichen Regeln
-7. automatische Plangenerierung
-8. Konflikterklärung und Lösungsvorschläge
-9. Planansicht, manuelle Bearbeitung und Sperren
-10. Planhistorie, Versionen und Abnahme
-11. Excel-Export nach Vorlage
-12. lokale Datensicherung und Wiederherstellung
-13. Zeitkonten als spätere Ausbaustufe
-14. portable Windows-Auslieferung und Endabnahme
+2. Technisches App-Grundgerüst
+3. Mitarbeitende, Arbeitszeitmodelle und Qualifikationen
+4. Einsatzorte, Diensttypen und Doppeldienste
+5. Personal-, Schicht- und Stundenbedarf
+6. Verfügbarkeiten und Abwesenheiten
+7. Regelkatalog und Prioritäten
+8. Planmodell und Planungszeiträume
+9. Automatische Plangenerierung
+10. Konflikterklärung und Lösungsvorschläge
+11. Planansichten, manuelle Bearbeitung und Sperren
+12. Planhistorie, Versionen und Abnahme
+13. Excel-Export nach Vorlage
+14. Lokale Datensicherung und Wiederherstellung
+15. Portable Windows-Auslieferung und Endabnahme der Kernversion
+16. Zeitkonten als spätere Ausbaustufe
 
 Prüfung:
 
@@ -293,9 +295,20 @@ Prüfung:
 - Abhängigkeiten und Reihenfolge sind plausibel.
 - Kein System wird ohne eigene freigegebene Teil-Roadmap zur Umsetzung freigegeben.
 
+Tatsächlich umgesetzt:
+
+- `MASTER_ROADMAP.md` als grobe Systemübersicht mit Statuszeichen und verbindlichen Steuerungsregeln angelegt.
+- Die bestätigten Funktionsbereiche in 16 voneinander abgegrenzte Systeme eingeordnet.
+- Ein eigenes technisches App-Grundgerüst vor den fachlichen Systemen vorgesehen, damit Modul- und Teststruktur nicht nebenbei entstehen.
+- Abhängigkeiten als Diagramm und je System dokumentiert.
+- Orientierungspunkte von der Projektgrundlage bis zur auslieferbaren Kernversion festgelegt.
+- Zeitkonten als spätere Ausbaustufe eingeordnet, die die erste Kernversion nicht blockiert.
+- Für jedes System vor seiner Umsetzung eine eigene abgenommene Teil-Roadmap vorgeschrieben.
+- Keine Teil-Roadmap für ein Fachsystem und keine Implementierung vorweggenommen.
+
 ### PF-09 – Zentralen Stand in `STATUS.md` anlegen
 
-Status: `[ ]`
+Status: `[x]` – abgenommen am 2026-09-13
 
 Geplantes Ergebnis:
 
@@ -310,9 +323,19 @@ Prüfung:
 - Es werden keine geplanten Funktionen als umgesetzt dargestellt.
 - Das Dokument nennt genau einen nächsten Minimalschritt.
 
+Tatsächlich umgesetzt:
+
+- `STATUS.md` als kompakte zentrale Übersicht angelegt.
+- Aktive Projektphase, aktives System, aktive Teil-Roadmap und aktueller Schritt dokumentiert.
+- PF-08 als zuletzt abgenommenen Schritt ausgewiesen.
+- Fertige Grundlagen klar von noch nicht begonnenen App-Systemen getrennt.
+- Spätere offene Entscheidungen, echte Blockaden und ausstehende Prüf- und Abnahmegates getrennt dargestellt.
+- Genau einen nächsten minimalen Schritt benannt.
+- Keine geplante App-Funktion als umgesetzt dargestellt.
+
 ### PF-10 – Leitdokumente gemeinsam prüfen und Projektgrundlage abschließen
 
-Status: `[ ]`
+Status: `[x]` – abgenommen am 2026-09-13
 
 Geplantes Ergebnis:
 
@@ -326,6 +349,17 @@ Prüfung:
 - Eine Suche findet keine veralteten Dateinamen oder Statusangaben.
 - `git diff --check` meldet keine Whitespace-Fehler.
 - Es existiert weiterhin noch keine fachliche Implementierung der App.
+
+Tatsächlich umgesetzt:
+
+- `AGENTS.md`, `CLEANCODE.md`, `ARCHITECTURE.md`, `MASTER_ROADMAP.md`, `STATUS.md`, die Grundlagen und der Service-Leitungsbereich gemeinsam abgeglichen.
+- Den Begriff „abgenommene Planversionen“ in der Architektur vereinheitlicht.
+- Die bestätigte manuelle Sonderzuweisung außerhalb normaler Einsatzfreigaben in der Architektur eindeutig von der automatischen Planung abgegrenzt.
+- Im Grundlagenpapier klargestellt, dass Planungsmethode und technische Architektur inzwischen festgelegt und abgenommen sind.
+- Projekt-Roadmap, Master-Roadmap, zentralen Status und Service-Leitungsstand auf denselben Abschlussstand gebracht.
+- Lokale Markdown-Links, Dokumentpfade, Statusangaben, ausgeschlossene Begriffe und Whitespace geprüft.
+- Bestätigt, dass weiterhin keine App-Projekte oder fachliche Implementierung existieren.
+- Nach der Abschlussabnahme die Roadmap archiviert und System 01 in den übergeordneten Übersichten als abgeschlossen gekennzeichnet.
 
 ## Berichtsschema nach jedem Schritt
 
@@ -346,4 +380,4 @@ Nach jedem einzelnen Schritt enthält der Bericht:
 
 ## Nächster minimaler Schritt
 
-Nach Abnahme von PF-07: PF-08 – Systemübersicht in `MASTER_ROADMAP.md` anlegen.
+Die Projektgrundlage ist abgeschlossen. Der nächste Schritt außerhalb dieser Roadmap ist der Entwurf einer eigenen Teil-Roadmap für System 02 – Technisches App-Grundgerüst. Vor deren Abnahme wird noch keine Implementierung begonnen.

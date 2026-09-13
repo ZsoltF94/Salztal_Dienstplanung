@@ -20,12 +20,18 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 - Oberfläche, lokale Datenspeicherung, automatische Planung und Excel-Ausgabe werden als getrennte Bausteine entwickelt.
 - Die App soll zuerst als entpackbarer Ordner bereitgestellt werden. Ob auf dem Klinikrechner noch eine kleine Windows-Zusatzkomponente benötigt wird, muss später praktisch geprüft werden.
 - Verbindliche Qualitätsregeln für verständlichen, wartbaren und prüfbaren Programmcode sind festgelegt.
+- Klare Arbeitsanweisungen schreiben kleine einzeln abnehmbare Schritte, ehrliche Prüfberichte und den Schutz vorhandener Änderungen vor.
+- Eine abgenommene Gesamtübersicht ordnet alle geplanten Systeme und zeigt ihre wichtigsten Vorarbeiten.
+- Für jedes System muss vor seiner Umsetzung zusätzlich eine eigene kleinschrittige Roadmap erstellt und abgenommen werden.
+- Eine zentrale Statusseite zeigt den aktiven Arbeitsschritt, spätere offene Entscheidungen, Blockaden und ausstehende Prüfungen an einer Stelle.
+- Alle Leitdokumente wurden gemeinsam geprüft und kleinere Unklarheiten berichtigt.
+- Die gesamte Projektgrundlage ist abgenommen und abgeschlossen.
 
 ## Gerade in Arbeit
 
-- Klare Arbeitsanweisungen für alle weiteren Entwicklungsschritte wurden dokumentiert.
-- Sie schreiben unter anderem kleine einzeln abnehmbare Schritte, ehrliche Prüfberichte und den Schutz vorhandener Änderungen vor.
-- Diese Arbeitsanweisungen warten auf Abnahme. Die App selbst wurde noch nicht programmiert.
+- Zurzeit wird noch kein App-System umgesetzt.
+- Als Nächstes wird eine eigene kleinschrittige Roadmap für das technische App-Grundgerüst vorbereitet und zur Abnahme vorgelegt.
+- Die App selbst wurde noch nicht programmiert.
 
 ## Noch nicht gebaut
 
@@ -43,4 +49,4 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 
 ## Nächster geplanter Schritt
 
-Nach Abnahme der Arbeitsanweisungen wird eine grobe Übersicht über alle geplanten Systeme der App erstellt. Für die spätere Umsetzung erhält jedes System zusätzlich eine eigene kleinschrittige Roadmap. Es wurde weiterhin noch keine Funktion der App programmiert.
+Als Nächstes entsteht zunächst nur der Entwurf der Roadmap für das technische App-Grundgerüst. Erst nach dessen Abnahme dürfen die leere Windows-App, ihre technischen Bausteine und die ersten Architekturprüfungen angelegt werden. Es wurde weiterhin noch keine Funktion der App programmiert.

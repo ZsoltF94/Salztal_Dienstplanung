@@ -208,7 +208,7 @@ Diese Versionsverwaltung ist bestätigt.
    - dem nächsten minimalen Schritt.
 8. Vor dem nächsten Schritt wird auf die Abnahme der Service-Leitung beziehungsweise des Auftraggebers gewartet.
 
-## Bewusst noch nicht festgelegt
+## Zum Zeitpunkt der Grundlagenklärung noch nicht festgelegt
 
 - konkrete Mitarbeitertypen und Vertragsmodelle,
 - konkrete Diensttypen und Dienstzeiten,
@@ -220,3 +220,5 @@ Diese Versionsverwaltung ist bestätigt.
 - verwendete Planungs- beziehungsweise Optimierungsmethode,
 - endgültige technische Architektur,
 - Aufbau der Excel-Vorlage.
+
+Die Planungs- beziehungsweise Optimierungsmethode und die technische Architektur wurden anschließend in `ARCHITECTURE.md` festgelegt und abgenommen. Die übrigen fachlichen Detailpunkte werden weiterhin erst vor den jeweils betroffenen Systemen gemeinsam geklärt.

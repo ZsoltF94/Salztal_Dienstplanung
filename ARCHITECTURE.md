@@ -21,7 +21,7 @@ Die Architektur muss:
 - trotz nicht besetzbarer Dienste einen brauchbaren Restplan erzeugen,
 - Konflikte fachlich verständlich erklären,
 - manuelle Änderungen ohne ungefragte Neugenerierung unterstützen,
-- angenommene Planversionen unveränderlich erhalten,
+- abgenommene Planversionen unveränderlich erhalten,
 - die spätere Excel-Vorlage exakt und überprüfbar befüllen,
 - neue Einsatzorte, Dienste und Regeln ohne grundlegenden Umbau zulassen,
 - echte Mitarbeiter- und Plandaten vollständig aus Git heraushalten.
@@ -338,6 +338,8 @@ Lösungsvorschläge sind Hinweise. Sie verändern niemals automatisch Stammdaten
 3. Fachliche Prüfungen kennzeichnen unzulässige oder bewusst übergangene Einteilungen.
 4. Beim Speichern werden Stunden, Bedarf und Konflikte neu berechnet.
 5. Es findet keine automatische vollständige Neugenerierung statt.
+
+Die bestätigte manuelle Sonderzuweisung außerhalb einer normalen Einsatzfreigabe ist ein eigener, ausdrücklich zu bestätigender Vorgang. Sie ändert die Einsatzfreigabe in den Stammdaten nicht, bleibt als Warnung sichtbar und ist für die automatische Planerzeugung weiterhin unzulässig.
 
 ### Abnahme und erneute Änderung
 
