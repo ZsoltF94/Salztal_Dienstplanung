@@ -4,7 +4,7 @@
 
 Dieses Dokument hält das gemeinsam bestätigte Grundverständnis, bereits getroffene Entscheidungen und noch offene Grundsatzfragen fest. Es ist noch keine technische Spezifikation und enthält bewusst noch nicht die später zu erfassenden Detailregeln für Mitarbeitertypen, Dienste und Einsatzorte.
 
-Status: Abgenommen am 2026-09-13
+Status: Grundfassung abgenommen am 2026-09-13; Mitarbeiter-Ergänzung fachlich bestätigt am 2026-09-14
 
 ## Ziel der App
 
@@ -35,12 +35,17 @@ Nach manueller Prüfung wird ein Plan abgenommen. Erst danach kann er in eine no
 - Die Anzahl vollständig gespeicherter zurückliegender Wochen soll konfigurierbar sein.
 - Fehlende historische Wochen dürfen die Generierung eines neuen Plans nicht verhindern.
 
-### Mitarbeitende und Verfügbarkeit
+### Mitarbeitende, Mitarbeitertypen und Verfügbarkeit
 
-- Mitarbeitende werden mit ihrem Namen erfasst.
+- Mitarbeitende werden mit getrenntem Vor- und Nachnamen sowie einer unsichtbaren stabilen Kennung erfasst. Gleiche menschliche Namen sind zulässig; eine Personalnummer wird zunächst nicht benötigt.
+- Jeder Mitarbeiter verweist auf genau einen gemeinsam definierten, bindenden Mitarbeitertyp.
+- Der Mitarbeitertyp besitzt das Wochen-Soll und strukturierte Einsatzfreigaben. Diese Werte werden nicht als unabhängige Kopien beim Mitarbeiter gespeichert.
+- Eine spätere Änderung eines Typs gilt für alle ihm zugeordneten Mitarbeitenden und für nachfolgende Planungen. Bereits abgenommene Pläne bleiben unveränderliche Momentaufnahmen.
+- Die Starttypen sind `Typ1`, `Typ25`, `Typ30`, `Typ30a`, `Typ35`, `Typ35a`, `TypAH1` und `TypAH2`.
+- Für die erste Fassung werden keine zusätzlichen Qualifikationen benötigt. Die Einsatzmöglichkeiten werden über die Mitarbeitertypen abgebildet.
 - Vor einer Generierung kann festgelegt werden, welche Mitarbeitenden im gewählten Zeitraum zur Verfügung stehen.
 - Urlaub, Krankheit, Fortbildung, Wunschfrei und eingeschränkte Verfügbarkeiten sollen berücksichtigt werden können.
-- Arbeitszeitmodell, Qualifikationen und zulässige Einsatzorte sollen fachlich getrennt modelliert werden. Dadurch ist beispielsweise eine 35-Stunden-Woche nicht untrennbar mit der Einsatzfreigabe für die Cafeteria verbunden.
+- Bei Abwesenheiten wird das wirksame Wochen-Soll später reduziert. Die genaue Formel wird erst mit dem Verfügbarkeits- und Abwesenheitssystem festgelegt.
 
 ### Dienste und Einsatzorte
 
@@ -94,8 +99,8 @@ Nach manueller Prüfung wird ein Plan abgenommen. Erst danach kann er in eine no
 Die folgenden Bereiche sollen getrennt bleiben, damit spätere Änderungen ohne grundlegenden Umbau möglich sind:
 
 1. Mitarbeiter
-2. Arbeitszeitmodell beziehungsweise Vertragsstunden
-3. Qualifikationen und zulässige Einsatzorte
+2. bindende Mitarbeitertypen mit Wochen-Soll
+3. Einsatzfreigaben der Mitarbeitertypen
 4. Verfügbarkeiten und Abwesenheiten
 5. Diensttypen und Doppeldienste
 6. Einsatzorte
@@ -219,7 +224,7 @@ Diese Versionsverwaltung ist bestätigt.
 
 ## Zum Zeitpunkt der Grundlagenklärung noch nicht festgelegt
 
-- konkrete Mitarbeitertypen und Vertragsmodelle,
+- konkrete Mitarbeitertypen und Vertragsmodelle; diese wurden am 2026-09-14 für System 03 fachlich bestätigt,
 - vollständige Regeln je Einsatzort,
 - gesetzliche und betriebliche zwingende Regeln,
 - Prioritäten der weichen Regeln,
@@ -228,4 +233,4 @@ Diese Versionsverwaltung ist bestätigt.
 - endgültige technische Architektur,
 - Aufbau der Excel-Vorlage.
 
-Die Planungs- beziehungsweise Optimierungsmethode und die technische Architektur wurden anschließend in `ARCHITECTURE.md` festgelegt und abgenommen. Konkrete Einsatzorte, Diensttypen, Doppeldienst und Springer-Einsatz wurden am 2026-09-13 für System 04 bestätigt. Die übrigen fachlichen Detailpunkte werden weiterhin erst vor den jeweils betroffenen Systemen gemeinsam geklärt.
+Die Planungs- beziehungsweise Optimierungsmethode und die technische Architektur wurden anschließend in `ARCHITECTURE.md` festgelegt und abgenommen. Konkrete Einsatzorte, Diensttypen, Doppeldienst und Springer-Einsatz wurden am 2026-09-13 für System 04 bestätigt. Bindende Mitarbeitertypen, ihre Wochen-Sollwerte und Einsatzfreigaben wurden am 2026-09-14 für System 03 bestätigt und stehen in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`. Die übrigen fachlichen Detailpunkte werden weiterhin erst vor den jeweils betroffenen Systemen gemeinsam geklärt.

@@ -1,5 +1,5 @@
-using Salztal.Dienstplanung.Domain.ShiftTypes;
 using Salztal.Dienstplanung.Domain.ShiftPatterns;
+using Salztal.Dienstplanung.Domain.ShiftTypes;
 
 namespace Salztal.Dienstplanung.Application.ServiceCatalog;
 

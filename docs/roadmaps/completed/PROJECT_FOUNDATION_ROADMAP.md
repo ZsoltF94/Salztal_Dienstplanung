@@ -31,7 +31,7 @@ Diese Roadmap erzeugt noch keine funktionsfähige Dienstplan-App.
 
 ## Nicht Bestandteil dieser Roadmap
 
-- konkrete Mitarbeiter- oder Arbeitszeitmodelle
+- konkrete Mitarbeiter- oder Mitarbeitertypmodelle
 - echte Diensttypen und Dienstzeiten
 - konkrete Bedarfs- und Planungsregeln
 - Benutzeroberfläche der App
@@ -274,7 +274,7 @@ In der Master-Roadmap festgelegte Systembereiche:
 
 1. Projektgrundlage
 2. Technisches App-Grundgerüst
-3. Mitarbeitende, Arbeitszeitmodelle und Qualifikationen
+3. Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben
 4. Einsatzorte, Diensttypen und Doppeldienste
 5. Personal-, Schicht- und Stundenbedarf
 6. Verfügbarkeiten und Abwesenheiten

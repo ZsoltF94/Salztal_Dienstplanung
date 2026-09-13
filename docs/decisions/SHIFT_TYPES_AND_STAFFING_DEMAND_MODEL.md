@@ -1,6 +1,6 @@
 # Entscheidung: Diensttypen, tatsächliche Bedarfszeiten und Springer-Einsatz
 
-Status: Fachlich bestätigt am 2026-09-13; ED-01 bis ED-07 abgenommen
+Status: Fachlich bestätigt am 2026-09-13; System 04 abgeschlossen; Mitarbeiterfreigaben am 2026-09-14 durch die System-03-Entscheidung präzisiert
 
 ## Anlass
 
@@ -82,7 +82,7 @@ Nur die vier als Diensttyp gekennzeichneten Einträge besitzen eine eigene `Shif
 
 ## Systemgrenzen
 
-- System 03 ordnet Mitarbeitenden Einsatzorte und einzelne zulässige Diensttypen zu.
+- System 03 ordnet Mitarbeitenden einen bindenden Mitarbeitertyp zu. Der Typ referenziert zulässige Einsatzorte, normale Diensttypen und erforderliche kontextabhängige Einsatzmuster über deren stabile Kennungen.
 - System 04 verwaltet Einsatzorte, normale Diensttypen sowie die Musterdefinitionen für Doppeldienst und Springer.
 - System 05 verwaltet Standardbedarfe, tatsächliche Bedarfszeiten, Personenzahlen und datumsbezogene Ausnahmen.
 - System 07 legt die spätere Regelpriorität und Konfliktbewertung fest.
@@ -106,3 +106,9 @@ Die Aussage, dass die automatische Planung keine eigenen Diensttypen oder Arbeit
 - genaue Konfliktpriorisierung der Springer-Teilunterdeckung in den späteren Systemen 07 und 09.
 
 Diese Punkte blockieren noch keine Dokumentation des fachlichen Modells. Sie werden vor dem jeweils betroffenen Implementierungsschritt geklärt und abgenommen.
+
+## Nachtrag zum Mitarbeitertyp-Modell vom 2026-09-14
+
+`D` und `Spr` bleiben unverändert zusammengesetzte Muster aus System 04 und niemals Diensttypen eines einzelnen Bedarfs. System 03 darf jedoch eine kontextabhängige Freigabe auf ihre stabilen `ShiftPatternId`-Werte referenzieren, ohne die Musterdefinition zu kopieren.
+
+Diese Präzisierung ist für `TypAH2` erforderlich: Frühdienst ist innerhalb von `D` regulär zulässig, als einzelner Dienst aber nur eine manuell zu bestätigende Lösungsmöglichkeit. Die optionale Verwendung von `TypAH2` für `Spr` bleibt zusätzlich von einer ausdrücklichen, standardmäßig ausgeschalteten Planungslaufoption und der allgemeinen Springer-Notfallbedingung abhängig. Die vollständige Entscheidung steht in `EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`.

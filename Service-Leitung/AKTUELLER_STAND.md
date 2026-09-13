@@ -1,10 +1,10 @@
 # Aktueller Stand
 
-Stand: 13. September 2026
+Stand: 14. September 2026
 
 ## Wo steht das Projekt?
 
-Das erste fachliche System mit Einsatzorten und Diensttypen ist abgeschlossen. Als Nächstes wird die Grundlage für Mitarbeitende, Arbeitszeitmodelle und Qualifikationen vorbereitet; eine eigentliche Dienstplanung wurde noch nicht gebaut.
+Das erste fachliche System mit Einsatzorten und Diensttypen ist abgeschlossen. Die Roadmap für Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben sowie der erste kleine Programmierschritt für die Grundwerte eines Mitarbeitertyps sind bestätigt. Ein zusätzlich eingefügter technischer Aufräumschritt für einheitliche Dateizeilen ist umgesetzt und geprüft; er wartet jetzt auf Bestätigung. Eine eigentliche Dienstplanung wurde noch nicht gebaut.
 
 Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam besprochen, aufgeschrieben und abgenommen. Das Projekt ist außerdem mit einem GitHub-Repository verbunden, damit der Entwicklungsstand nachvollziehbar gespeichert werden kann.
 
@@ -68,21 +68,24 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 - Der Doppeldienst `D` und der Springer `Spr` werden getrennt von den normalen Diensttypen verständlich erklärt. Beide sind feste Muster; freie neue Kombinationen oder eine feste Springer-Wechselzeit werden nicht angeboten.
 - Die Service-Leitung hat Diensttyp-Zuordnung, Zeitänderung mit erneutem Laden sowie die Darstellung von `D` und `Spr` bestätigt.
 - Cafeteria wird zusätzlich zum Text gelb, Restaurant rot und `Spr` blau dargestellt.
-- Der noch nicht bestätigte Entwurf für Mitarbeitende, Arbeitszeitmodelle und Qualifikationen war während System 04 pausiert, damit keine Namen, Zeiten oder Kennungen doppelt angelegt werden.
+- Der frühere Entwurf für Mitarbeitende war während System 04 pausiert, damit keine Einsatzorte, Dienste oder Kennungen doppelt angelegt werden.
 - Das gesamte technische Grundgerüst wurde noch einmal gemeinsam abgeglichen und abgenommen.
 - Alle 13 App- und Testbausteine lassen sich ohne Warnungen oder Fehler technisch erstellen; alle 13 Architekturprüfungen bestehen.
 - Die leere Windows-App startete technisch mit einem reagierenden Hauptfenster und wurde danach regulär beendet.
 - Fenstertitel und Hinweistexte wurden beim sichtbaren lokalen Start bestätigt.
 - Die internen Fachmodelle, die Anwendungsabläufe aus ED-06, die SQLite-Speicherung aus ED-07, die Einsatzortverwaltung aus ED-08 und die Diensttyp- und Einsatzmusteransicht aus ED-09 sind bestätigt.
 - Die gemeinsame Abschlussprüfung von ED-10 hat die technischen Bausteine, Dokumente und die spätere Übergabe an die Mitarbeiterverwaltung abgeglichen. System 04 ist ausdrücklich abgenommen und archiviert.
-- Die spätere Mitarbeiterverwaltung verwendet die vorhandenen Kennungen der Einsatzorte und normalen Diensttypen. Sie kopiert keine Namen, Farben oder Standardzeiten und führt keine eigenen Freigaben für `D` oder `Spr` ein.
+- Die spätere Mitarbeiterverwaltung verwendet die vorhandenen Kennungen der Einsatzorte, normalen Diensttypen und Einsatzmuster. Sie kopiert keine Namen, Farben, Standardzeiten oder Musterbestandteile. Eine kontextabhängige Freigabe kann aber festhalten, dass TypAH2 den Frühdienst innerhalb von `D`, nicht jedoch automatisch als einzelnen Frühdienst übernehmen darf.
 - Die App besitzt noch keine Mitarbeiter- oder Dienstplanbedienung, automatische Planung oder Excel-Verarbeitung.
 - Das zuvor unversionierte Beispielbild mit echten Namen und konkreten Plandaten ist nicht mehr im Projektordner vorhanden. Die benötigten Fachinformationen wurden nur ohne personenbezogene Daten übernommen.
 
 ## Gerade in Arbeit
 
-- Der aktualisierte Roadmap-Entwurf für Mitarbeitende, Arbeitszeitmodelle und Qualifikationen ist wieder aktiv und wartet auf gemeinsame Prüfung und Abnahme.
-- Mitarbeiterdaten, Mitarbeiteroberfläche und Mitarbeiter-Datenbanktabellen werden vor dieser Roadmap- und Fachmodellabnahme noch nicht programmiert.
+- Die Fachfragen zu Mitarbeitenden und Mitarbeitertypen sind beantwortet. Die App startet später mit acht gemeinsam verwendeten Typen und ihren bestätigten Wochenstunden und Einsatzmöglichkeiten.
+- Die überarbeitete Roadmap für „Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben“ ist bestätigt.
+- Der erste Domain-Schritt ist bestätigt. Er bildet eine feste interne Typkennung, einen sichtbaren Code, einen verständlichen Namen und ein minutengenaues Wochen-Soll ab. Leere Angaben, eine leere Kennung und unmögliche Wochenwerte werden abgelehnt.
+- Die Textdateien des Projekts besitzen nun eine einheitlich durch Git abgesicherte Zeilenform. Diese technische Bereinigung hat keine Fachfunktion verändert; alle automatischen Prüfungen bestehen.
+- Mitarbeiterdaten, Einsatzfreigaben, Starttypenkatalog, Mitarbeiteroberfläche und Mitarbeiter-Datenbanktabellen sind noch nicht programmiert.
 
 ## Noch nicht gebaut
 
@@ -100,4 +103,4 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 
 ## Nächster geplanter Schritt
 
-Als Nächstes wird der wieder aktivierte Roadmap-Entwurf für Mitarbeitende, Arbeitszeitmodelle und Qualifikationen gemeinsam geprüft und bestätigt oder angepasst. Anschließend werden die offenen Fachfragen organisiert beantwortet; Mitarbeiter- und Dienstplanfunktionen existieren weiterhin nicht.
+Als Nächstes wird der technische Aufräumschritt für einheitliche Dateizeilen bestätigt oder angepasst. Erst danach folgen die Einsatzfreigaben und der Starttypenkatalog; Mitarbeiter- und Dienstplanfunktionen existieren weiterhin nicht.

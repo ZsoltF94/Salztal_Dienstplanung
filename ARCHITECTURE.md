@@ -1,14 +1,14 @@
 # Architektur der Salztal-Dienstplanung
 
-Status: Abgenommen am 2026-09-13
+Status: Grundarchitektur abgenommen am 2026-09-13; Mitarbeiter-Modell fachlich ergänzt am 2026-09-14
 
-Stand: 2026-09-13
+Stand: 2026-09-14
 
 ## Zweck
 
 Nach seiner Abnahme legt dieses Dokument die technische Grundarchitektur der Anwendung verbindlich fest. Es beschreibt Grenzen und Verantwortlichkeiten, aber noch keine konkrete Implementierung einzelner Fachsysteme.
 
-Fachliche Grundlage ist `GRUNDLAGEN_FRAGEN_UND_ENTSCHEIDUNGEN.md`. Die begründete Technologieauswahl und ihre Primärquellen stehen in `docs/decisions/ARCHITECTURE_PROPOSAL.md`. Die bestätigte Trennung zwischen Diensttyp-Standardzeit und tatsächlicher Bedarfszeit sowie der Springer-Sonderfall stehen in `docs/decisions/SHIFT_TYPES_AND_STAFFING_DEMAND_MODEL.md`.
+Fachliche Grundlage ist `GRUNDLAGEN_FRAGEN_UND_ENTSCHEIDUNGEN.md`. Die begründete Technologieauswahl und ihre Primärquellen stehen in `docs/decisions/ARCHITECTURE_PROPOSAL.md`. Die bestätigte Trennung zwischen Diensttyp-Standardzeit und tatsächlicher Bedarfszeit sowie der Springer-Sonderfall stehen in `docs/decisions/SHIFT_TYPES_AND_STAFFING_DEMAND_MODEL.md`. Das bindende Mitarbeitertyp- und Einsatzfreigabemodell steht in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`.
 
 ## Architekturziele
 
@@ -77,8 +77,8 @@ Die Namen werden beim späteren Grundgerüst verwendet, sofern dessen Teil-Roadm
 Enthält das reine Fachmodell und fachliche Prüfungen:
 
 - Mitarbeiter,
-- Arbeitszeitmodelle,
-- Qualifikationen und Einsatzfreigaben,
+- bindende Mitarbeitertypen und Wochen-Sollwerte,
+- reguläre, kontextabhängige und nur vorschlagsfähige Einsatzfreigaben,
 - Einsatzorte,
 - Diensttypen, Doppeldienste und standortübergreifende Springer-Einsätze,
 - Verfügbarkeiten und Abwesenheiten,
@@ -216,18 +216,25 @@ Planungs- und Exportadapter dürfen keine zusätzlichen Daten selbst nachladen. 
 
 ## Fachliche Modellgrenzen
 
-### Mitarbeiter und Arbeitsmodell
+### Mitarbeiter und Mitarbeitertyp
 
-Ein Mitarbeiter ist nicht selbst ein „Mitarbeitertyp“. Folgende Informationen bleiben getrennt kombinierbar:
+Jeder Mitarbeiter besitzt eine stabile Identität, getrennten Vor- und Nachnamen, einen Aktivstatus und genau eine Referenz auf einen gemeinsam definierten Mitarbeitertyp.
 
-- Person und Anzeigename,
-- Wochenstunden beziehungsweise Arbeitszeitmodell,
-- Qualifikationen,
-- zulässige Einsatzorte,
-- zulässige Diensttypen,
-- individuelle Verfügbarkeiten und Abwesenheiten.
+Ein Mitarbeitertyp ist eine bindende Fachdefinition mit:
 
-Dadurch können neue Kombinationen angelegt werden, ohne für jede Kombination einen neuen festen Typ programmieren zu müssen. Vordefinierte Profile dürfen später die Eingabe erleichtern, bleiben aber nur Vorlagen für diese getrennten Eigenschaften.
+- stabiler Kennung und sichtbarem Code,
+- verständlichem Namen,
+- ungekürztem Wochen-Soll in ganzen Minuten,
+- regulären Einsatzfreigaben,
+- ausdrücklich modellierten kontextabhängigen oder nur vorschlagsfähigen Einsatzmöglichkeiten.
+
+Wochen-Soll und Freigaben bleiben innerhalb der Typdefinition getrennte fachliche Werte. Sie werden nicht als unabhängige Kopien beim Mitarbeiter gespeichert. Ändert sich eine Typdefinition, gilt sie für alle aktuell zugeordneten Mitarbeitenden und nachfolgende Planungen. Abgenommene Planversionen bewahren dagegen die damals verwendeten Werte als unveränderliche Momentaufnahme.
+
+System 04 bleibt Eigentümer von Einsatzorten, normalen Diensttypen und Einsatzmustern. Mitarbeitertypen referenzieren deren stabile Kennungen und duplizieren weder Namen noch Zeiten oder Musterbestandteile. Kontextabhängige Freigaben erlauben insbesondere, dass `TypAH2` Frühdienst innerhalb von `D` übernehmen darf, ohne für einen einzelnen Frühdienst automatisch zulässig zu sein.
+
+Individuelle Verfügbarkeiten und Abwesenheiten bleiben getrennte spätere Planungsdaten. Ein wegen Abwesenheit reduziertes Wochen-Soll wird nicht im Mitarbeiterstammsatz gespeichert, sondern später aus der bestätigten Abwesenheitsregel berechnet.
+
+Für die erste Fassung existiert kein zusätzlicher Qualifikationskatalog. Neue Typkombinationen werden später als Daten ergänzt und nicht als UI- oder Solver-Sondercode programmiert.
 
 ### Zeitdarstellung
 

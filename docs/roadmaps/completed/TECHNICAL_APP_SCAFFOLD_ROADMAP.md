@@ -48,7 +48,7 @@ Diese Feststellungen beschreiben nur die aktuelle Entwicklungsumgebung. Sie sind
 
 ## Nicht Bestandteil dieser Roadmap
 
-- Mitarbeiter, Arbeitszeitmodelle, Qualifikationen oder Einsatzfreigaben
+- Mitarbeiter, Mitarbeitertypen oder Einsatzfreigaben
 - Einsatzorte, Diensttypen, Bedarfe oder konkrete Planungsregeln
 - Anwendungsfälle oder fachliche Datenmodelle
 - produktive Datenbank, `DbContext`, Migrationen oder Sicherungslogik

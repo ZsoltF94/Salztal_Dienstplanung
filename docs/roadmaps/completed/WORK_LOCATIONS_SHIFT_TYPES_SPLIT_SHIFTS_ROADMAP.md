@@ -4,6 +4,8 @@ Status: Abgeschlossen und archiviert am 2026-09-13
 
 Stand: 2026-09-13
 
+Nachtrag vom 2026-09-14: Die spätere System-03-Entscheidung führt bindende Mitarbeitertypen und eine kontextabhängige Musterfreigabe für `TypAH2` ein. System 04 bleibt weiterhin alleinige Quelle für Definition, Kennung und Bestandteile von `D` und `Spr`; der historische Abschluss dieses Systems wird dadurch nicht verändert. Siehe `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`.
+
 ## Ziel und Nutzen
 
 Diese Roadmap beschreibt System 04 der `MASTER_ROADMAP.md`. Am Ende sollen erweiterbare Einsatzorte, Diensttypen mit bearbeitbaren Standardzeiten, der feste Restaurant-Doppeldienst und der samstägliche Springer-Einsatz `Spr` fachlich gültig angezeigt, bearbeitet und lokal gespeichert werden können.
@@ -70,7 +72,7 @@ System 04 schafft damit die eindeutige Quelle für Einsatzorte und Diensttypen. 
 
 - echte Mitarbeiter-, Dienstplan- oder Betriebsdaten
 - Zuordnung von Einsatzorten, Qualifikationen oder Diensttypen zu Mitarbeitenden
-- Mitarbeiterverwaltung, Arbeitszeitmodelle, Verfügbarkeiten oder Abwesenheiten
+- Mitarbeiterverwaltung, Mitarbeitertypen, Verfügbarkeiten oder Abwesenheiten
 - konkreter Personalbedarf nach Wochentag und Dienst
 - Umsetzung von Standardbedarfen, tatsächlichen Bedarfszeiten, Personenzahlen und Datums-Ausnahmen; diese gehört zu System 05
 - gesetzliche oder betriebliche Arbeitszeit- und Ruhezeitregeln

@@ -1,18 +1,18 @@
 # Projektstatus
 
-Stand: 2026-09-13
+Stand: 2026-09-14
 
-Status dieses Dokuments: Aktuell – System 04 abgeschlossen; MA-01 von System 03 wartet auf Roadmap-Abnahme
+Status dieses Dokuments: Aktuell – MA-02 abgenommen; Hygiene-Schritt MA-02A umgesetzt und automatisch geprüft, wartet auf Abnahme
 
 ## Aktueller Überblick
 
 | Bereich | Aktueller Stand |
 |---|---|
-| Projektphase | Vorbereitung des nächsten Fachsystems |
-| Aktives System | System 03 – Mitarbeitende, Arbeitszeitmodelle und Qualifikationen |
-| Aktive Teil-Roadmap | noch nicht abgenommener Entwurf unter `docs/roadmaps/active/EMPLOYEES_WORK_MODELS_QUALIFICATIONS_ROADMAP.md` |
-| Aktueller Stand | MA-01 – nach Abschluss von System 04 wieder aufgenommener Roadmap-Entwurf wartet auf Abnahme |
-| Zuletzt abgenommener Schritt | ED-10 – System 04 gemeinsam abschließen |
+| Projektphase | Umsetzung von System 03 |
+| Aktives System | System 03 – Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben |
+| Aktive Teil-Roadmap | abgenommene Roadmap unter `docs/roadmaps/active/EMPLOYEES_EMPLOYEE_TYPES_SHIFT_ELIGIBILITY_ROADMAP.md` |
+| Aktueller Stand | MA-02A – repositoryweite Zeilenenden konsolidiert und automatisch geprüft; wartet auf Abnahme |
+| Zuletzt abgenommener Schritt | MA-02 – Mitarbeitertyp-Grundwerte fachlich modellieren |
 | Funktionsfähige App | Einsatzorte und Diensttyp-Standardzeiten können angezeigt und bearbeitet werden; noch keine Dienstplanfunktion |
 | Echte Mitarbeiter- oder Plandaten im Repository | Keine festgestellt; das zuvor vorhandene sensible Beispielbild ist nicht mehr im Arbeitsordner |
 
@@ -31,6 +31,16 @@ Status dieses Dokuments: Aktuell – System 04 abgeschlossen; MA-01 von System 0
 
 ## Aktuell
 
+- Die Mitarbeiterfragen und Folgefragen sind vollständig beantwortet. Die fachlichen Entscheidungen stehen in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`.
+- Jeder Mitarbeiter erhält genau einen gemeinsam referenzierten bindenden Mitarbeitertyp. Wochen-Soll und Einsatzfreigaben gehören zum Typ und werden nicht als unabhängige Mitarbeiterkopien gespeichert.
+- Die acht Starttypen, ihre Wochen-Sollwerte, regulären Einsatzmöglichkeiten sowie die Typ1- und AH-Sonderfälle sind festgehalten.
+- Für die erste Fassung wird kein zusätzlicher Qualifikationskatalog benötigt. System 03 heißt deshalb künftig „Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben“.
+- Die überarbeitete Teil-Roadmap enthält die bestätigten Code-Anker, eine eigene Absicherung der bestehenden SQLite-Migrationsfolge und eindeutige Übergaben an die späteren Planungs- und Konfliktsysteme.
+- MA-01 und MA-02 sind ausdrücklich abgenommen. MA-02 führt ausschließlich die stark typisierten, unveränderlichen Domain-Grundwerte für Mitarbeitertypkennung, Code, Name und Wochen-Soll ein.
+- Ein Wochen-Soll wird minutengenau als ganze Zahl gespeichert, muss positiv sein und kann die vollständige Wochenlänge von 10.080 Minuten nicht überschreiten. Es werden weder `double` noch `float` verwendet.
+- MA-02A ergänzt `.gitattributes` und gleicht die Repository-Textdateien einmalig an die bereits bestätigte CRLF-Regel aus `.editorconfig` an. Shell-Skripte bleiben ausdrücklich auf LF.
+- Der zeilenendenunabhängige Inhaltsfingerabdruck von 169 geprüften Textdateien war vor und nach der Normalisierung identisch. Die vollständige Formatprüfung, der Build und alle 109 automatischen Tests bestehen.
+- Mitarbeiterobjekt, Starttypenkatalog, Einsatzfreigaben, Mitarbeiter-Tabellen und Mitarbeiteroberfläche existieren noch nicht.
 - System 04 – Einsatzorte, Diensttypen und Doppeldienste – ist als erstes Fachsystem ausgewählt, damit System 03 später vorhandene stabile Kennungen zuordnen kann.
 - Die beantwortete Fragen-Datei bestätigt Einsatzorte, Diensttypen, Standardzeiten, tatsächliche Bedarfszeiten, Doppeldienst, Springer und den minimalen Bedienumfang.
 - Die frühere Annahme einer stets festen Diensttypzeit ist ersetzt: Jeder Bedarf verlangt genau einen Diensttyp, besitzt aber seine tatsächliche, ausdrücklich bearbeitbare Zeit.
@@ -71,11 +81,10 @@ Status dieses Dokuments: Aktuell – System 04 abgeschlossen; MA-01 von System 0
 - `D` wird mit Restaurant, Früh- und Spätdienst, Unterbrechung ohne Arbeitszeit sowie Standardarbeitszeit angezeigt. `Spr` wird zusätzlich blau und als samstägliche Abfolge von Cafeteria-Dienst B zum Spätdienst dargestellt; eine feste Wechselzeit und freie Musterbearbeitung werden nicht angeboten.
 - Die sichtbaren Diensttyp-, Doppeldienst- und Springer-Abläufe aus ED-09 wurden vom Auftraggeber geprüft und am 2026-09-13 ausdrücklich abgenommen.
 - ED-10 hat Domain, Application, Infrastructure und Desktop gegen den bestätigten Umfang von System 04 abgeglichen. Die stabilen Kennungen und unveränderlichen Katalogmomentaufnahmen bilden eine eindeutige Übergabe an das spätere System 03.
-- Der System-03-Entwurf speichert später nur `WorkLocationId`- und `ShiftTypeId`-Freigaben und übernimmt keine Katalogdaten. `D` und `Spr` erhalten keine eigenen Mitarbeiterfreigaben; ihre Voraussetzungen ergeben sich aus den referenzierten normalen Diensten und Einsatzorten.
+- Der damalige System-03-Entwurf plante nur `WorkLocationId`- und `ShiftTypeId`-Freigaben. Die am 2026-09-14 bestätigte Mitarbeitertyp-Entscheidung ergänzt strukturierte kontextabhängige Musterfreigaben, ohne Katalogdaten oder Musterdefinitionen aus System 04 zu kopieren.
 - ED-10 und damit System 04 sind am 2026-09-13 ausdrücklich abgenommen. Die Roadmap und ihre beantwortete Fragen-Datei sind unter `docs/roadmaps/completed` archiviert.
 - Der weiterhin nicht abgenommene System-03-Entwurf wurde nach dieser Archivierung unter `docs/roadmaps/active` wieder aufgenommen. Noch existiert kein Mitarbeiter-Fachcode.
 - 14 Application-Tests, 46 Domain-Tests, 6 Infrastructure-Tests, 13 Desktop-Tests und 13 Architekturtests bestehen. Die vollständige Solution kompiliert mit 0 Warnungen und 0 Fehlern.
-- Der noch nicht abgenommene System-03-Entwurf liegt begründet unter `docs/roadmaps/paused` und wird erst nach System 04 erneut geprüft.
 - TG-07 mit den sieben getrennten Testprojekten für die sechs Produktionsmodule und die Architektur ist abgenommen.
 - TG-08 mit zwölf Architekturtests und den drei nachgewiesenen Fehlermutationen ist abgenommen.
 - TG-09 und damit System 02 sind nach dem manuellen sichtbaren Starttest vollständig abgenommen und archiviert.
@@ -121,27 +130,36 @@ Die genaue Einordnung steht in der [Master-Roadmap](MASTER_ROADMAP.md). Vor jede
 - samstäglicher Springer `Spr` nur als Notfall mit sichtbar verbleibender Teilunterdeckung vor dem Restaurantwechsel,
 - erste Bedienfassung mit Anzeigen und Bearbeiten auf einer gemeinsamen Seite; weitere Stammdatenfunktionen später.
 
-Die Antworten sind in der Fragen-Datei und im Entscheidungsdokument festgehalten. Roadmap, Fachmodell und die Implementierungsschritte ED-01 bis ED-09 sind abgenommen; ED-10 benötigt noch die ausdrückliche Abschlussabnahme von System 04.
+Die Antworten sind in der Fragen-Datei und im Entscheidungsdokument festgehalten. Roadmap, Fachmodell und die Implementierungsschritte ED-01 bis ED-10 sind abgenommen; System 04 ist abgeschlossen und archiviert.
 
 ## Offene Detailentscheidungen für spätere Schritte
 
 - Verhalten beim späteren Löschen noch aktiv referenzierter Stammdaten,
 - genaue Regelpriorität der Springer-Teilunterdeckung.
 
-## Offene Entscheidungen für das zurückgestellte System 03
+## Bestätigte Entscheidungen für System 03
 
-- Namensaufteilung, optionale Personalnummer und Umgang mit gleichen Namen,
-- Löschen oder Deaktivieren von Mitarbeitenden,
-- Aufbau und konkrete Werte der Arbeitszeitmodelle,
-- konkrete Qualifikationen und notwendige Eigenschaften des Qualifikationskatalogs,
-- notwendige Felder und Funktionen der ersten Mitarbeiteroberfläche.
+- getrennte Vor- und Nachnamen, stabile unsichtbare Mitarbeiterkennung, gleiche Namen erlaubt und keine Personalnummer,
+- genau ein gemeinsam referenzierter bindender Mitarbeitertyp je Mitarbeiter,
+- acht datengetriebene Starttypen mit 40, 25, 30, 30, 35, 35, 10 beziehungsweise 10 Wochenstunden,
+- Änderungen einer Typdefinition wirken auf alle aktuell zugeordneten Mitarbeitenden und nachfolgende Generierungen,
+- höchstens eine aktive Typ1-Person; vor einer späteren Planung wird genau eine aktive Person verlangt,
+- Typ1 wird manuell vorgetragen, automatisch geschützt und nur als letzte manuelle Lösung vorgeschlagen,
+- kontextabhängige Doppeldienstfreigabe für TypAH2 sowie standardmäßig ausgeschaltete Planungslaufoption für dessen Springer-Verwendung,
+- zwingender Wochenkorridor von plus/minus drei Stunden für Typ25, Typ30, Typ30a, Typ35 und Typ35a; Typ1 wird nur bewertet und gemeldet; besonderer AH-Korridor von sieben bis zwölf Stunden,
+- unveränderlicher Wochenstundenbericht als Bestandteil jedes späteren Planungsergebnisses,
+- Mitarbeitende werden deaktiviert; verwendete Typen können erst nach bewusster Neuzuordnung aller betroffenen Personen entfernt werden,
+- kein zusätzlicher Qualifikationskatalog in der ersten Fassung,
+- erste Mitarbeiteroberfläche mit Übersicht, Anlegen, Bearbeiten, Typwechsel und Deaktivieren; noch ohne Suche, Filter und Typenkatalogpflege.
 
-Die Grenze ist bereits bestätigt: System 04 besitzt Einsatzorte und Diensttypen; System 03 ordnet Mitarbeitenden einzelne Einsatzort- und Diensttypfreigaben zu. Die übrigen Fragen stehen im wieder aktivierten Roadmap-Entwurf und werden in MA-02 vor jeder Implementierung von System 03 gemeinsam beantwortet und abgenommen.
+Die vollständige Entscheidung steht in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`. MA-01 ist abgenommen; MA-02 setzt zunächst nur die gemeinsamen Domain-Grundwerte um.
 
 ## Offene Entscheidungen für spätere Systeme
 
 - weitere, noch nicht bestätigte Personal- und Stundenbedarfe außerhalb der jetzt festgelegten Startwerte,
 - vollständige zwingende und priorisierte weiche Regeln,
+- genaue Reduktionsformel des Wochen-Solls bei Abwesenheiten,
+- Verhalten der Typ1-Generierungsvoraussetzung bei einer vollständig abwesenden Woche,
 - Inhalt und Aufbau der noch bereitzustellenden Excel-Vorlage,
 - endgültige Bestätigung der Excel-Bibliothek nach dem Vorlagentest,
 - praktische Voraussetzungen der portablen Ausgabe auf dem vorgesehenen Windows-11-Rechner.
@@ -150,7 +168,7 @@ Diese Entscheidungen sind für den Abschluss der Dokumentationsgrundlage noch ni
 
 ## Echte Blockaden
 
-Für MA-01 besteht keine technische Blockade. Der aktualisierte System-03-Roadmap-Entwurf benötigt vor MA-02 und jeder Implementierung die ausdrückliche Abnahme.
+Für MA-02A besteht keine technische Blockade. Der umgesetzte und automatisch geprüfte Hygiene-Schritt wartet auf die Abnahme.
 
 Das zuvor unversionierte Beispielbild mit echten Namen und konkreten Plandaten ist nicht mehr im Arbeitsordner vorhanden. Die daraus benötigten Fachinformationen sind nur abstrahiert und ohne personenbezogene Daten dokumentiert.
 
@@ -158,7 +176,7 @@ Die fehlende Excel-Vorlage blockiert später den Excel-Vorlagentest und System 1
 
 ## Offene Prüf- und Abnahmegates
 
-- Alle 13 Produktions- und Testprojekte kompilieren erfolgreich; 14 von 14 Application-Tests, 46 von 46 Domain-Tests, 6 von 6 Infrastructure-Tests, 13 von 13 Desktop-Tests und 13 von 13 Architekturtests bestehen.
+- Alle 13 Produktions- und Testprojekte kompilieren erfolgreich; 14 von 14 Application-Tests, 63 von 63 Domain-Tests, 6 von 6 Infrastructure-Tests, 13 von 13 Desktop-Tests und 13 von 13 Architekturtests bestehen.
 - Der vollständige sichtbare Einsatzort-, Diensttyp-, Doppeldienst- und Springer-Ablauf wurde schrittweise manuell geprüft und durch den Auftraggeber bestätigt.
 - Die Paketwiederherstellung und der Build bestätigen noch keinen OR-Tools-Lauf auf einem sauberen Zielsystem. Die Visual-C++-x64-Laufzeitvoraussetzung wird erst bei der portablen Auslieferung praktisch geprüft.
 - Die SQLite-Katalogspeicherung ist mit temporären Testdateien geprüft und die lokale App-Datenbank wurde beim sichtbaren Start angelegt. Planungsengine und Excel-Export wurden noch nicht implementiert.
@@ -169,4 +187,4 @@ Keines dieser späteren Gates wird vorzeitig als bestanden geführt.
 
 ## Nächster minimaler Schritt
 
-MA-01 mit dem wieder aktivierten System-03-Roadmap-Entwurf ausdrücklich abnehmen oder Änderungswünsche nennen. Danach werden in MA-02 die offenen Mitarbeiterfragen geklärt; System-03-Fachcode beginnt weiterhin erst nach diesen Freigaben.
+MA-02A mit der repositoryweiten Zeilenendenregel ausdrücklich abnehmen oder Änderungswünsche nennen. Erst danach beginnt MA-03 mit Einsatzfreigaben und dem initialen Typenkatalog.

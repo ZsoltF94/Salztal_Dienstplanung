@@ -15,22 +15,29 @@ Die Service-Leitung trägt die Mitarbeitenden und ihre Einsatzmöglichkeiten ein
 - Wenn möglich, soll die App ohne Installation aus einem entpackten Ordner gestartet werden können.
 - Die Bedienung der App wird auf Deutsch sein.
 
-## Mitarbeitende
+## Mitarbeitende und Mitarbeitertypen
 
-Für jeden Mitarbeiter werden später der Name und die für die Planung notwendigen Eigenschaften eingetragen. Dazu gehören zum Beispiel:
+Für jeden Mitarbeiter werden Vorname und Nachname getrennt eingetragen. Zusätzlich wird genau einer der gemeinsam festgelegten Mitarbeitertypen ausgewählt. Der Typ bestimmt:
 
 - die vereinbarten Wochenstunden,
 - mögliche Einsatzorte,
-- erlaubte Dienste,
+- regulär erlaubte Dienste,
+- besondere Dienste, die nur innerhalb einer Kombination erlaubt sind,
+- Dienste, die nur als manuelle Notlösung vorgeschlagen werden dürfen.
+
+Urlaub und andere persönliche Planungsangaben bleiben davon getrennt. Dazu gehören später:
+
 - Urlaub,
 - Krankheit,
 - Fortbildungen,
 - Wunschfrei,
 - andere Einschränkungen der Verfügbarkeit.
 
-Wochenstunden und Einsatzmöglichkeiten werden getrennt gespeichert. Eine Person mit 35 Wochenstunden kann dadurch unabhängig davon für die Cafeteria, das Restaurant oder beide Bereiche freigegeben werden. Zusätzlich wird später je Diensttyp festgelegt, welche Person ihn übernehmen darf; Cafeteria-Dienst A und B sind dabei getrennte Freigaben.
+Die App startet mit `Typ1`, `Typ25`, `Typ30`, `Typ30a`, `Typ35`, `Typ35a`, `TypAH1` und `TypAH2`. Die Zahl steht grundsätzlich für die Wochenstunden; `Typ1` besitzt 40 Stunden und AH besitzt 10 Stunden. Die Varianten mit `a` dürfen alle Dienste übernehmen. Die übrigen genauen Einsatzmöglichkeiten sind verbindlich in der Mitarbeiter-Roadmap festgehalten.
 
-Die genauen Mitarbeitertypen und Regeln werden erst in einem späteren eigenen Schritt festgelegt.
+Ein Mitarbeitertyp wird gemeinsam verwendet. Ändert die Service-Leitung später einen Typ, gilt die Änderung für alle ihm zugeordneten Mitarbeitenden. Für eine einzelne Person wird stattdessen bewusst ein anderer Typ ausgewählt. Bereits abgenommene Pläne bleiben unverändert.
+
+Für die erste Fassung werden keine zusätzlichen Qualifikationen benötigt. Neue Mitarbeitertypen können später ergänzt werden; die erste Mitarbeiterbedienung zeigt und verwendet zunächst nur die bestätigten Starttypen.
 
 ## Einsatzorte und Dienste
 

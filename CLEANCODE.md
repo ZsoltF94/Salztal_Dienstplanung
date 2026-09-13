@@ -1,8 +1,8 @@
 # Clean-Code- und Qualitätsregeln
 
-Status: Abgenommen am 2026-09-13
+Status: Grundfassung abgenommen am 2026-09-13; Fachbegriffe und reproduzierbare Zeilenenden für System 03 ergänzt am 2026-09-14
 
-Stand: 2026-09-13
+Stand: 2026-09-14
 
 ## Zweck und Geltung
 
@@ -43,7 +43,9 @@ Vorgesehene Begriffe:
 | Fachbegriff | Codebegriff |
 |---|---|
 | Mitarbeiter | `Employee` |
-| Arbeitszeitmodell | `WorkModel` |
+| Mitarbeitertyp | `EmployeeType` |
+| Wochen-Soll | `WeeklyWorkTarget` |
+| Einsatzfreigabe | `ShiftEligibility` |
 | Einsatzort | `WorkLocation` |
 | Diensttyp | `ShiftType` |
 | Einsatzmuster | `ShiftPattern` |
@@ -71,6 +73,7 @@ Beim späteren Projektgerüst gelten mindestens:
 - Vorab-Sprachversionen und experimentelle Compilerfunktionen sind nicht erlaubt.
 - Implizite globale `using`-Direktiven werden bewusst und einheitlich konfiguriert.
 - Formatierung und grundlegende Stilregeln werden über eine eingecheckte `.editorconfig` erzwungen.
+- `.gitattributes` erzwingt für relevante Repository-Textdateien unabhängig von der lokalen Git-Konfiguration die in `.editorconfig` festgelegten CRLF-Zeilenenden; Shell-Skripte bleiben auf LF.
 - Gemeinsame Build-Einstellungen liegen zentral in `Directory.Build.props`.
 - Paketversionen liegen zentral in `Directory.Packages.props`.
 - Reproduzierbare Paketwiederherstellung wird beim Projektgerüst festgelegt und geprüft.

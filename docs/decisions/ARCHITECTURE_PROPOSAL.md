@@ -132,7 +132,7 @@ Ein selbstständiger Ordner ist zuverlässiger als das frühe Versprechen einer 
 Die endgültigen Projekt- und Ordnernamen werden erst beim späteren App-Grundgerüst festgelegt. Fachlich werden folgende Grenzen vorgeschlagen:
 
 1. **Domain**
-   - Mitarbeiter, Arbeitszeitmodelle, Einsatzorte, Dienste, Bedarfe, Regeln, Pläne und Konflikte
+   - Mitarbeiter, Mitarbeitertypen, Einsatzorte, Dienste, Bedarfe, Regeln, Pläne und Konflikte
    - keine Abhängigkeit von Oberfläche, Datenbank, Excel oder OR-Tools
 2. **Application**
    - Anwendungsabläufe wie Plan erzeugen, manuell speichern, abnehmen, archivieren und exportieren

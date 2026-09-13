@@ -1,8 +1,8 @@
 # Master-Roadmap der Salztal-Dienstplanung
 
-Status: Abgenommen am 2026-09-13
+Status: Grundfassung abgenommen am 2026-09-13; System 03 am 2026-09-14 fachlich neu eingeordnet
 
-Stand: 2026-09-13
+Stand: 2026-09-14
 
 ## Zweck
 
@@ -33,8 +33,9 @@ Ein System wird in dieser Übersicht erst als `[x]` markiert, wenn seine Teil-Ro
 ```mermaid
 flowchart TD
     S01[01 Projektgrundlage] --> S02[02 Technisches App-Grundgerüst]
-    S02 --> S03[03 Mitarbeitende und Arbeitszeitmodelle]
+    S02 --> S03[03 Mitarbeitende und Mitarbeitertypen]
     S02 --> S04[04 Einsatzorte und Diensttypen]
+    S04 --> S03
     S04 --> S05[05 Personal- und Stundenbedarf]
     S03 --> S06[06 Verfügbarkeiten und Abwesenheiten]
     S03 --> S07[07 Regelkatalog]
@@ -77,15 +78,15 @@ Teil-Roadmap: `docs/roadmaps/completed/TECHNICAL_APP_SCAFFOLD_ROADMAP.md`
 
 Abhängigkeiten: 01
 
-### 03 – Mitarbeitende, Arbeitszeitmodelle und Qualifikationen
+### 03 – Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben
 
-Status: `[~]` – Roadmap-Entwurf nach Abschluss von System 04 wieder aktiviert; MA-01 wartet auf Abnahme
+Status: `[~]` – MA-02 abgenommen; MA-02A zur Zeilenenden-Hygiene umgesetzt und geprüft, wartet auf Abnahme
 
-Ziel: Mitarbeitende, Vertragsstunden, Qualifikationen, zulässige Einsatzorte und Freigaben für einzelne Diensttypen getrennt erfassen und lokal speichern können.
+Ziel: Mitarbeitende mit getrennten Namen, Aktivstatus und genau einem gemeinsam referenzierten Mitarbeitertyp erfassen und lokal speichern. Jeder Typ stellt sein Wochen-Soll sowie reguläre, kontextabhängige und nur vorschlagsfähige Einsatzfreigaben als strukturierte Fachwerte bereit.
 
-Teil-Roadmap: noch nicht abgenommener Entwurf unter `docs/roadmaps/active/EMPLOYEES_WORK_MODELS_QUALIFICATIONS_ROADMAP.md`
+Teil-Roadmap: abgenommene aktive Roadmap unter `docs/roadmaps/active/EMPLOYEES_EMPLOYEE_TYPES_SHIFT_ELIGIBILITY_ROADMAP.md`
 
-Abhängigkeiten: 02
+Abhängigkeiten: 02 und 04
 
 ### 04 – Einsatzorte, Diensttypen und Doppeldienste
 
@@ -257,4 +258,4 @@ System 16 ergänzt Zeitkonten nach gesonderter Priorisierung, ohne den Abschluss
 
 ## Nächster übergeordneter Schritt
 
-System 04 – Einsatzorte, Diensttypen und Doppeldienste – ist mit ED-01 bis ED-10 abgenommen und archiviert. Als Nächstes wird MA-01 des wieder aktivierten, noch nicht abgenommenen System-03-Entwurfs gemeinsam geprüft. Mitarbeiter-Fachcode beginnt erst nach Roadmap-Abnahme und der anschließenden Bestätigung der offenen Fachfragen in MA-02.
+System 04 – Einsatzorte, Diensttypen und Doppeldienste – ist mit ED-01 bis ED-10 abgenommen und archiviert. MA-01 und MA-02 von System 03 sind abgenommen. Der eingefügte Hygiene-Schritt MA-02A mit repositoryweit reproduzierbaren Zeilenenden ist umgesetzt und automatisch geprüft; als Nächstes wird er abgenommen oder korrigiert. MA-03 beginnt erst nach dieser Abnahme.
