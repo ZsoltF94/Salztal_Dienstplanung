@@ -196,6 +196,10 @@ Tatsächlich umgesetzt:
 - Fachmodell, Anwendungsabläufe, Planung, Konflikterklärung, Speicherung, Excel und Desktop-Oberfläche als getrennte Module definiert.
 - Datenflüsse für Generierung, manuelle Bearbeitung, Abnahme und Excel-Export dokumentiert.
 - Portable Auslieferung, Visual-C++-Voraussetzung, Excel-Vorlagentest und Windows-11-Gerätetest als getrennte Nachweise festgehalten.
+- Eine unveränderliche fachliche Regeldefinition als einzige Quelle für Prüfung, Solver-Übersetzung und Konfliktdiagnose festgelegt.
+- Strukturierte Konfliktdaten von deutscher Meldungsdarstellung getrennt.
+- Unveränderliche Übergabemodelle für Planung und Excel-Export festgelegt; technische Bibliotheksobjekte dürfen Modulgrenzen nicht überschreiten.
+- Automatisierte Architekturtests und interne Grenzen für Datenbank, Sicherung, Dateisystem und Protokollierung vorgeschrieben.
 - `ARCHITECTURE.md` angelegt, ohne App-Projekte oder Abhängigkeiten zu erstellen.
 
 ### PF-06 – Qualitätsregeln in `CLEANCODE.md` festlegen

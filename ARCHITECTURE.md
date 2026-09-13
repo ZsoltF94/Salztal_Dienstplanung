@@ -60,7 +60,6 @@ flowchart LR
     Infrastructure --> Application
     Infrastructure --> Domain
     Excel --> Application
-    Excel --> Domain
 
     Planning --> OrTools[OR-Tools CP-SAT]
     Infrastructure --> SQLite[(SQLite)]
@@ -97,6 +96,7 @@ Enthält die Anwendungsabläufe und technischen Schnittstellen:
 - Stammdaten verwalten,
 - Verfügbarkeit für einen Zeitraum festlegen,
 - Plan erzeugen,
+- strukturierte Planungskonflikte in verständliche deutsche Meldungen übersetzen,
 - Plan manuell bearbeiten und speichern,
 - einzelne Zuweisungen sperren,
 - Plan abnehmen und erneut öffnen,
@@ -105,6 +105,8 @@ Enthält die Anwendungsabläufe und technischen Schnittstellen:
 - Sicherung und Wiederherstellung auslösen.
 
 Das Modul koordiniert das Fachmodell. Es enthält keine WPF-Fenster, Datenbankabfragen, OR-Tools-Aufrufe oder Excel-Zellzugriffe.
+
+Die Anwendungsschicht besitzt außerdem die unveränderlichen Ein- und Ausgabeverträge für Planung und Export. Technische Module erhalten dadurch fertige Momentaufnahmen und niemals einen `DbContext`, eine Datenbankabfrage oder veränderliche UI-Objekte.
 
 ### `Salztal.Dienstplanung.Planning`
 
@@ -115,9 +117,9 @@ Enthält die technische Umsetzung der automatischen Planung:
 - feste und dokumentierte Solver-Einstellungen,
 - Rückübersetzung in einen fachlichen Plan,
 - Diagnose unbesetzter Dienste,
-- fachliche Konfliktdaten für verständliche Meldungen.
+- strukturierte fachliche Konfliktdaten für verständliche Meldungen.
 
-OR-Tools bleibt vollständig in diesem Modul gekapselt.
+OR-Tools bleibt vollständig in diesem Modul gekapselt. Das Modul liefert keine fertig formulierten deutschen Oberflächentexte.
 
 ### `Salztal.Dienstplanung.Infrastructure`
 
@@ -130,6 +132,8 @@ Enthält lokale technische Dienste:
 - Wiederherstellung,
 - Dateisystem und technische Protokollierung.
 
+Diese Verantwortungen bleiben innerhalb des Projekts in den Bereichen `Persistence`, `Backup`, `FileSystem` und `Logging` getrennt. Sie verwenden eigene Schnittstellen und dürfen nicht über interne Abkürzungen voneinander abhängig werden. Erst wenn ein Bereich unabhängig wächst oder eine eigene externe Bibliothek nach außen abschirmen muss, wird er über eine abgenommene Architekturänderung in ein eigenes Projekt ausgelagert.
+
 ### `Salztal.Dienstplanung.Excel`
 
 Enthält ausschließlich die Excel-Verarbeitung:
@@ -140,7 +144,7 @@ Enthält ausschließlich die Excel-Verarbeitung:
 - Ausgabedatei technisch validieren,
 - Exportfehler verständlich zurückgeben.
 
-ClosedXML oder das Open XML SDK dürfen nur in diesem Modul verwendet werden.
+ClosedXML oder das Open XML SDK dürfen nur in diesem Modul verwendet werden. Das Modul erhält eine unveränderliche Exportmomentaufnahme aus `Application`; es lädt weder Pläne noch Mitarbeiter selbst aus der Datenbank.
 
 ### `Salztal.Dienstplanung.Desktop`
 
@@ -152,22 +156,63 @@ Enthält:
 - Navigation und Dialoge,
 - Zusammenbau der konkreten Module beim Programmstart.
 
-Fenster und ViewModels greifen nur über die Anwendungsschicht auf Funktionen zu.
+Fenster und ViewModels greifen nur über die Anwendungsschicht auf Funktionen zu. Konkrete technische Adapter dürfen ausschließlich im klar abgegrenzten Start- beziehungsweise `Composition`-Bereich des Desktop-Projekts referenziert werden.
 
 ### Testprojekte
 
-Für Domain, Application, Planning, Infrastructure und Excel werden getrennte Testprojekte vorgesehen. UI-Tests werden auf wenige wichtige Bedienabläufe begrenzt; Fachregeln gehören nicht in UI-Tests.
+Für Domain, Application, Planning, Infrastructure und Excel werden getrennte Testprojekte vorgesehen. Ein zusätzliches Architektur-Testprojekt erzwingt die Modulgrenzen. UI-Tests werden auf wenige wichtige Bedienabläufe begrenzt; Fachregeln gehören nicht in UI-Tests.
 
 ## Abhängigkeitsregeln
 
 1. `Domain` kennt kein anderes Projektmodul.
 2. `Application` darf nur `Domain` verwenden.
-3. Technische Module implementieren Schnittstellen aus `Application` und dürfen `Domain` verwenden.
-4. `Desktop` ist der einzige Ort, der konkrete technische Implementierungen zusammenstellt.
-5. `Desktop` enthält keine Planungs-, Datenbank- oder Excel-Fachlogik.
-6. Ein technisches Modul darf kein anderes technisches Modul direkt voraussetzen.
-7. Zirkuläre Projektabhängigkeiten sind untersagt.
-8. Externe Bibliotheken werden nur im jeweils zuständigen Modul referenziert.
+3. `Planning` und `Infrastructure` implementieren Schnittstellen aus `Application` und dürfen das Fachmodell verwenden.
+4. `Excel` erhält ein von `Application` definiertes Exportmodell und greift nicht direkt auf Datenbank oder UI zu.
+5. Der `Composition`-Bereich in `Desktop` ist der einzige Ort, der konkrete technische Implementierungen zusammenstellt.
+6. Fenster und ViewModels dürfen nur `Application`, UI-eigene Typen und bewusst freigegebene unveränderliche Anzeigemodelle verwenden.
+7. `Desktop` enthält keine Planungs-, Datenbank- oder Excel-Fachlogik.
+8. Ein technisches Modul darf kein anderes technisches Modul direkt voraussetzen.
+9. Zirkuläre Projektabhängigkeiten sind untersagt.
+10. Externe Bibliotheken werden nur im jeweils zuständigen Modul referenziert.
+11. Diese Regeln werden durch automatisierte Architekturtests geprüft und nicht nur durch Konvention erwartet.
+
+## Eine einzige fachliche Regelquelle
+
+Jede Planungsregel wird genau einmal als unveränderliche fachliche Regeldefinition in `Domain` beschrieben. Sie enthält mindestens:
+
+- eine stabile Regelkennung,
+- Regelart und Geltungsbereich,
+- zwingend oder weich,
+- bei weichen Regeln die Priorität hoch, mittel oder niedrig,
+- fachliche Parameter,
+- einen kurzen neutralen Beschreibungsschlüssel.
+
+`Application`, manuelle Planprüfung, Konfliktdiagnose und `Planning` verwenden dieselbe Regeldefinition. Zahlenwerte, Schwellen oder Ausnahmen dürfen nicht ein zweites Mal in ViewModels, Datenbankabfragen oder OR-Tools-Adaptern fest codiert werden.
+
+`Planning` besitzt für jede unterstützte Regelart genau eine technische Übersetzung in Solver-Bedingungen oder Optimierungsziele. Eine unbekannte oder noch nicht übersetzte Regel blockiert die Generierung mit einer verständlichen Meldung; sie darf niemals stillschweigend ignoriert werden.
+
+Für jede Regelart werden gemeinsame Beispielszenarien festgelegt. Dieselben Fälle prüfen sowohl die fachliche Bewertung eines vorhandenen Plans als auch die vom Solver erzeugte Planung. Dadurch wird erkannt, wenn fachliche Prüfung und technische Übersetzung auseinanderlaufen.
+
+## Unveränderliche Modulübergaben
+
+Planungs- und Excel-Adapter arbeiten ausschließlich mit ausdrücklich definierten Momentaufnahmen:
+
+- `PlanningRequest` enthält alle für einen Planungslauf benötigten Daten.
+- `PlanningResult` enthält Planvorschlag, Ergebnisstatus, Zielerfüllung und strukturierte Konflikte.
+- `ApprovedPlanExport` enthält ausschließlich die für einen abgenommenen Excel-Export benötigten Daten.
+- `ExportResult` enthält Erfolg, Zieldatei oder strukturierte Fehler.
+
+Die genauen Typnamen dürfen in der späteren Teil-Roadmap begründet angepasst werden; die Grenze selbst ist verbindlich.
+
+Über Modulgrenzen werden nicht weitergegeben:
+
+- `DbContext`, `IQueryable` oder andere verzögert ausgeführte Datenbankabfragen,
+- veränderliche Entity-Framework-Objekte,
+- WPF-Controls, ViewModels oder Dispatcher-Objekte,
+- OR-Tools-Variablen oder Solver-Objekte,
+- ClosedXML- oder Open-XML-Objekte.
+
+Planungs- und Exportadapter dürfen keine zusätzlichen Daten selbst nachladen. `Application` erstellt vor dem Aufruf eine vollständige, konsistente Momentaufnahme.
 
 ## Fachliche Modellgrenzen
 
@@ -268,6 +313,10 @@ Für einen unbesetzten Platz führt die Diagnose kontrollierte Prüfungen durch 
 - ausgeschlossene Personen und die jeweils entscheidenden Gründe,
 - betroffene Wünsche und Prioritäten,
 - mögliche Änderungen, die eine Besetzung erlauben könnten.
+
+Das Planungsergebnis enthält dafür strukturierte Daten mit stabilen Ursache- und Lösungscodes sowie den notwendigen fachlichen Parametern. Es enthält keine zusammengesetzten deutschen Sätze.
+
+Eine klar abgegrenzte Konfliktdarstellung in `Application` übersetzt diese Daten in verständliche deutsche Meldungen. `Desktop` stellt die fertigen Meldungen dar, entscheidet aber nicht selbst über Ursachen oder Lösungsmöglichkeiten. Dadurch bleiben Diagnose, Sprache und Anzeige getrennt testbar.
 
 Lösungsvorschläge sind Hinweise. Sie verändern niemals automatisch Stammdaten, Abwesenheiten, Regeln oder Sperren.
 
@@ -406,6 +455,22 @@ Eine Ein-Datei-Ausgabe ist ein späteres Komfortziel und kein Abnahmekriterium d
 - Eine fehlgeschlagene Planung überschreibt keinen vorhandenen Plan.
 - Globale, nichtssagende Ausnahmebehandlung ist untersagt.
 
+## Automatisierte Architekturprüfungen
+
+Sobald das App-Grundgerüst angelegt wird, entsteht ein eigenes Architektur-Testprojekt. Es prüft mindestens:
+
+- `Domain` referenziert kein anderes Produktionsprojekt und keine UI-, Datenbank-, Solver- oder Excel-Bibliothek.
+- `Application` referenziert außer `Domain` kein anderes Produktionsprojekt.
+- OR-Tools-Typen existieren ausschließlich in `Planning`.
+- Entity-Framework- und SQLite-Typen existieren ausschließlich in `Infrastructure`.
+- ClosedXML- und Open-XML-Typen existieren ausschließlich in `Excel`.
+- ViewModels und Fenster referenzieren keine konkreten Typen aus `Planning`, `Infrastructure` oder `Excel`.
+- Nur der abgegrenzte `Composition`-Bereich darf konkrete Adapter registrieren und erzeugen.
+- Es existieren keine zirkulären Projektabhängigkeiten.
+- Modulübergaben enthalten keine verbotenen technischen Typen.
+
+Zusätzlich wird die zulässige Projektreferenzstruktur in den Projektdateien geprüft. Ein Testfehler an einer Architekturgrenze blockiert den Abschluss des jeweiligen Entwicklungsschritts.
+
 ## Teststrategie und wahrheitsgemäße Gates
 
 Folgende Nachweise sind getrennt zu führen:
@@ -439,6 +504,7 @@ tests/
   Salztal.Dienstplanung.Infrastructure.Tests/
   Salztal.Dienstplanung.Excel.Tests/
   Salztal.Dienstplanung.Desktop.Tests/
+  Salztal.Dienstplanung.Architecture.Tests/
 docs/
   decisions/
   roadmaps/
