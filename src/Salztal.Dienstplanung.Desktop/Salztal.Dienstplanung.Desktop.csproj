@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Salztal.Dienstplanung.Application\Salztal.Dienstplanung.Application.csproj" />
+    <ProjectReference Include="..\Salztal.Dienstplanung.Excel\Salztal.Dienstplanung.Excel.csproj" />
+    <ProjectReference Include="..\Salztal.Dienstplanung.Infrastructure\Salztal.Dienstplanung.Infrastructure.csproj" />
+    <ProjectReference Include="..\Salztal.Dienstplanung.Planning\Salztal.Dienstplanung.Planning.csproj" />
+  </ItemGroup>
+</Project>

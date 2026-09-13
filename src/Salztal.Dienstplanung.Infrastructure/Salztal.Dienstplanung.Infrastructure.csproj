@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Salztal.Dienstplanung.Application\Salztal.Dienstplanung.Application.csproj" />
+    <ProjectReference Include="..\Salztal.Dienstplanung.Domain\Salztal.Dienstplanung.Domain.csproj" />
+  </ItemGroup>
+</Project>

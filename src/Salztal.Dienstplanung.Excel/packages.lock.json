@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "dependencies": {
+    "net10.0": {
+      "salztal.dienstplanung.application": {
+        "type": "Project",
+        "dependencies": {
+          "Salztal.Dienstplanung.Domain": "[1.0.0, )"
+        }
+      },
+      "salztal.dienstplanung.domain": {
+        "type": "Project"
+      }
+    }
+  }
+}

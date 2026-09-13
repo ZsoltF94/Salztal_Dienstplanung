@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\Salztal.Dienstplanung.Application\Salztal.Dienstplanung.Application.csproj" />
+  </ItemGroup>
+</Project>

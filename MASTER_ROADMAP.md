@@ -69,11 +69,11 @@ Abhängigkeiten: keine
 
 ### 02 – Technisches App-Grundgerüst
 
-Status: `[ ]`
+Status: `[x]` – abgeschlossen und archiviert am 2026-09-13
 
 Ziel: Die leere Windows-11-Anwendung, Projektmodule, Abhängigkeitsgrenzen, zentrale Paketverwaltung und erste Architekturtests als belastbares Gerüst anlegen.
 
-Teil-Roadmap: vor Beginn anzulegen und abzunehmen
+Teil-Roadmap: `docs/roadmaps/completed/TECHNICAL_APP_SCAFFOLD_ROADMAP.md`
 
 Abhängigkeiten: 01
 
@@ -257,4 +257,4 @@ System 16 ergänzt Zeitkonten nach gesonderter Priorisierung, ohne den Abschluss
 
 ## Nächster übergeordneter Schritt
 
-System 01 und seine Projektgrundlagen-Roadmap sind abgeschlossen und archiviert. Als Nächstes wird eine eigene kleinschrittige Teil-Roadmap für System 02 vorgeschlagen und vor jeder Implementierung abgenommen.
+Die Systeme 01 und 02 sind abgeschlossen und ihre Teil-Roadmaps archiviert. Als Nächstes wird entschieden, ob System 03 – Mitarbeitende, Arbeitszeitmodelle und Qualifikationen – oder System 04 – Einsatzorte und Diensttypen – vorbereitet wird. Vor jeder Implementierung entsteht dafür eine eigene kleinschrittige Teil-Roadmap und wird abgenommen.
