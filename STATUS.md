@@ -2,18 +2,18 @@
 
 Stand: 2026-09-14
 
-Status dieses Dokuments: Aktuell – System 03 vollständig abgenommen und archiviert
+Status dieses Dokuments: Aktuell – System 05 mit abgenommener Teil-Roadmap aktiv
 
 ## Aktueller Überblick
 
 | Bereich | Aktueller Stand |
 |---|---|
-| Projektphase | Auswahl und Vorbereitung des nächsten Fachsystems |
-| Aktives System | Keines; Systeme 03 und 04 sind abgeschlossen |
-| Aktive Teil-Roadmap | Keine |
-| Aktueller Stand | System 03 – vollständig geprüft, ausdrücklich abgenommen und unter `docs/roadmaps/completed` archiviert |
-| Zuletzt abgenommener Schritt | MA-11 – gemeinsamer Abschluss von System 03 |
-| Funktionsfähige App | Einsatzorte und Diensttyp-Standardzeiten können angezeigt und bearbeitet werden; Mitarbeitende können vollständig im bestätigten System-03-Umfang verwaltet werden; noch keine Dienstplanfunktion |
+| Projektphase | Beginn der kleinschrittigen System-05-Umsetzung |
+| Aktives System | System 05 – Personal-, Schicht- und Stundenbedarf |
+| Aktive Teil-Roadmap | `docs/roadmaps/active/STAFFING_DEMAND_ROADMAP.md` |
+| Aktueller Stand | BE-09B – wiederholte Standardkorrekturen und konsistente Wochenansicht implementiert und automatisch geprüft; Sichtprüfung offen |
+| Zuletzt abgenommener Schritt | BE-08 – sichtbare WPF-Wochenübersicht |
+| Funktionsfähige App | Einsatzorte, Diensttyp-Standardzeiten, Mitarbeitende und regelmäßige Wochenbedarfe können im jeweils bestätigten Umfang verwaltet werden; noch keine Dienstplanfunktion |
 | Echte Mitarbeiter- oder Plandaten im Repository | Keine festgestellt; das zuvor vorhandene sensible Beispielbild ist nicht mehr im Arbeitsordner |
 
 ## Nachweislich fertig und abgenommen
@@ -32,6 +32,60 @@ Status dieses Dokuments: Aktuell – System 03 vollständig abgenommen und archi
 
 ## Aktuell
 
+- System 05 – Personal-, Schicht- und Stundenbedarf – ist als nächstes Fachsystem ausgewählt.
+- Die aktive Teil-Roadmap `docs/roadmaps/active/STAFFING_DEMAND_ROADMAP.md` gliedert System 05 nach den Bedienkorrekturen in BE-01 bis BE-10 einschließlich BE-09A und BE-09B. BE-02 bis BE-08 sind umgesetzt und abgenommen. BE-09 wurde nach der Sichtprüfung nicht abgenommen; BE-09A und der daraus entstandene Korrekturschritt BE-09B sind umgesetzt und automatisch geprüft. Ihre gemeinsame Sichtprüfung ist offen.
+- Die vollständigen Startbedarfe, ab Montag wirksame Standardrevisionen, vollständige Datumsausnahmen, manuelle Feiertagsbehandlung und höchstens ein zusammenhängender Bedarfsblock je Einsatzort, Datum und Diensttyp sind fachlich bestätigt.
+- Die geplanten Code-Anker halten Bedarfs-Domain, Application-Verträge, `Persistence/StaffingDemands` und `Features/StaffingDemands` getrennt. Die bestehende gemeinsame SQLite-Migrationsfolge bleibt verbindlich.
+- BE-02 führt `StaffingDemandId`, `RequiredEmployeeCount`, `StaffingDemandTime` und `StaffingDemand` als unveränderliche Domain-Werte ein.
+- Ein einzelner Bedarf besitzt Datum, stabile Einsatzort- und Diensttypkennungen, tatsächliche Anfangs- und Endzeit sowie eine positive ganzzahlige Personenzahl.
+- Bedarfsdauer und Mitarbeiterbedarf werden ausschließlich daraus in ganzen Minuten berechnet. Die Gesamtberechnung verwendet `long` und bleibt auch beim technisch größten `int`-Personenwert überlaufsicher; ein unabhängiger Stundenwert kann nicht übergeben werden.
+- Leere Kennungen, nicht positive Personenzahlen, Sekunden, nicht halbstündige Eingaben sowie leere oder über Mitternacht reichende Zeiträume liefern strukturierte Domain-Fehler.
+- 18 neue BE-02-Tests bestehen. Insgesamt bestehen jetzt 113 Domain-Tests; der vollständige Solution-Build und alle 16 Architekturtests sind ebenfalls grün.
+- BE-03 ergänzt einen eindeutigen Standardschlüssel aus Wochentag, Einsatzort und normalem Diensttyp sowie unveränderliche, ab einem Montag wirksame Revisionen.
+- Ergänzen, Ersetzen und Aufheben sind getrennte Revisionsarten. BE-03 verhinderte zunächst doppelte Revisionen desselben Schlüssels am selben Wirksamkeitsmontag; BE-09B erweitert dieses Modell um fortlaufende unveränderliche Korrekturfassungen, von denen die höchste Folge gilt.
+- Der initiale Bedarfskatalog enthält alle 23 bestätigten Wochentagswerte. Cafeteria-Dienst A und B bleiben am Wochenende getrennt; `D` und `Spr` kommen nicht als einzelne Bedarfsdiensttypen vor.
+- Bei der späteren erstmaligen Anlage übernimmt der Katalog die dann aktuellen Standardzeiten der normalen Diensttypen, damit bereits bewusst geänderte Zeiten nicht zurückgesetzt werden.
+- 15 neue BE-03-Tests bestehen. Insgesamt bestehen jetzt 128 Domain-Tests; der vollständige Solution-Build, alle 16 Architekturtests und alle 254 Tests sind grün.
+- BE-03 mit Wochenvorlage, Wirksamkeitsprinzip und Startkatalog ist ausdrücklich abgenommen.
+- BE-04 ergänzt vollständige Datumsausnahmen zum Ergänzen, Ersetzen und Aufheben eines Bedarfs. Pro Datum, Einsatzort und normalem Diensttyp ist höchstens eine Ausnahme zulässig.
+- Die Domain löst eine ausgewählte Montag-bis-Sonntag-Woche deterministisch auf. Datumsausnahmen haben Vorrang vor dem wirksamen Standard und bleiben vollständige Momentaufnahmen ihrer tatsächlichen Zeit und Personenzahl.
+- Wird eine vorhandene Ausnahme aus der Menge entfernt, gilt wieder die aktuell wirksame Standardrevision. Fehlt die zu entfernende Ausnahme bereits, meldet BE-06 idempotent Erfolg; eine inzwischen andere Ausnahme unter demselben Schlüssel bleibt ein sichtbarer Konflikt.
+- Atomare Bedarfe enthalten ihre Quelle und berechneten Minuten. Daraus entstehen Tagessummen je Einsatzort, Wochensummen je Einsatzort und die Gesamtminuten der Woche.
+- 16 neue BE-04-Tests bestehen. Insgesamt bestehen jetzt 144 Domain-Tests; der vollständige Solution-Build, alle 16 Architekturtests und alle 270 Tests sind grün.
+- BE-04 mit Datumsausnahmen, Ausnahmevorrang, Rückkehr zum Wochenstandard und berechneter Wochenansicht ist ausdrücklich abgenommen.
+- BE-05 ergänzt einen schmalen Lesevertrag, der Standardrevisionen, Datumsausnahmen und den Dienstkatalog als einen konsistenten unveränderlichen Lesestand liefert.
+- Der Leseanwendungsfall löst eine ausdrücklich übergebene Montag-bis-Sonntag-Woche auf und gibt je Bedarf Quelle, Einsatzort, Diensttyp, tatsächliche Zeit, Personenzahl, Dauer und Mitarbeiterbedarf sowie bestätigte Tages-, Einsatzort- und Gesamtsummen zurück.
+- Widersprüchliche Bestandsdaten, unbekannte Katalogkennungen und falsche Diensttyp-Einsatzort-Zuordnungen werden als strukturierte deutsche Fehler sichtbar zurückgegeben. Abbruch ist vor und während des Lesens geprüft.
+- 16 neue BE-05-Application-Tests bestehen. Insgesamt bestehen jetzt 71 Application-Tests und alle 286 vorhandenen Tests; der vollständige Solution-Build bleibt bei 0 Warnungen und 0 Fehlern.
+- BE-05 mit Lesevertrag, unveränderlicher Wochenmomentaufnahme und sichtbaren Fehlergrenzen ist ausdrücklich abgenommen.
+- BE-06 ergänzt drei getrennte Schreibabläufe für Standardrevisionen, das Speichern einer vollständigen Datumsausnahme und das Entfernen einer vorhandenen Datumsausnahme.
+- Vor einem tatsächlichen Schreiben werden aktueller Lesestand, Dienstkatalog, Diensttyp-Einsatzort-Zuordnung und erwartete aktuelle Momentaufnahme geprüft. Der atomare Speichervertrag erhält denselben aktuellen Stand und kann eine zwischenzeitliche Änderung als Konflikt ablehnen.
+- Standard und Datumsausnahme unterstützen jeweils Ergänzen, Ersetzen und Aufheben. Fachlich ungültige Änderungen, nicht gefundene Referenzen, widersprüchliche Bestandsdaten, Konflikte und Abbruch werden deutsch und strukturiert gemeldet; abgelehnte Vorgänge schreiben nichts.
+- 26 neue BE-06-Application-Tests bestehen. Insgesamt bestehen jetzt 97 Application-Tests und alle 312 vorhandenen Tests; der vollständige Solution-Build bleibt bei 0 Warnungen und 0 Fehlern.
+- BE-06 mit den drei Schreibabläufen, ihren deutschen Ergebnissen und den atomaren Speichergrenzen ist ausdrücklich abgenommen.
+- BE-07 ergänzt zwei Bedarfstabellen und den getrennten `SqliteStaffingDemandStore` in der bestehenden gemeinsamen SQLite-Datenbank. Standardrevisionen werden unveränderlich angehängt; Datumsausnahmen werden atomar gespeichert, ersetzt und entfernt.
+- Die 23 Startbedarfe werden genau einmal anhand der bei der ersten Bedarfsinitialisierung aktuell gespeicherten Diensttyp-Standardzeiten angelegt. Bereits bewusst geänderte Zeiten werden nicht zurückgesetzt.
+- Datenbankbedingungen schützen eindeutige Fachschlüssel, Katalogbeziehungen, Montag, Änderungsarten, halbstündige Tageszeiten und positive Personenzahlen. Ein erzwungener Schreibfehler bestätigt die vollständige Rücknahme der Transaktion.
+- Upgrade-Tests von der ältesten System-04-Migration und vom aktuellen System-03-Stand erhalten synthetisch geänderte Katalogwerte sowie vorhandene synthetische Mitarbeiterdaten.
+- 9 neue BE-07-Infrastructure-Tests bestehen. Insgesamt bestehen jetzt 32 Infrastructure-Tests, 16 Architekturtests und alle 321 vorhandenen Tests; der vollständige Solution-Build bleibt bei 0 Warnungen und 0 Fehlern.
+- BE-07 mit gemeinsamer Migration, dynamischen Startwerten und atomarem SQLite-Adapter ist ausdrücklich abgenommen.
+- BE-08 ergänzt den Reiter „Bedarf“ mit Kalenderauswahl, eindeutiger Montag-bis-Sonntag-Woche und Wechsel zur vorherigen oder nächsten Woche.
+- Bedarfe werden nach Einsatzort und Tageszeile gruppiert. Diensttyp, tatsächliche Zeit, Personenzahl, berechnete Stunden und Quelle bleiben je atomarem Bedarf sichtbar; Datumsausnahmen sind textlich und gestalterisch vom Wochenstandard unterschieden.
+- Tagessummen je Einsatzort, Wochensummen je Einsatzort und die Gesamtstundenzahl stammen aus derselben Application-Momentaufnahme. Für die Ausgangswoche zeigt die Ansicht 57, 280 und insgesamt 337 Stunden.
+- Lade-, Leer-, Fehler-, Wiederholungs- und Abbruchzustände sind umgesetzt. Alle atomaren Werte bleiben im ViewModel für spätere abgestimmte Darstellungen und Bearbeitung erhalten.
+- 8 neue BE-08-Desktop-Tests bestehen. Insgesamt bestehen jetzt 40 Desktop-Tests, 16 Architekturtests und alle 329 vorhandenen Tests; der vollständige Solution-Build bleibt bei 0 Warnungen und 0 Fehlern.
+- Die sichtbare WPF-Wochenübersicht aus BE-08 ist vom Auftraggeber bestätigt und ausdrücklich abgenommen.
+- BE-09 ergänzt die Bearbeitung regelmäßiger Wochenstandards mit sichtbar gewähltem Wirksamkeitsmontag, Einsatzort, Wochentag, normalem Diensttyp, tatsächlicher Zeit und Personenzahl.
+- Fehlende Standards können ergänzt, bestehende ersetzt und ab der gewählten Woche aufgehoben werden. Die Oberfläche lädt den historischen Ausgangsstand, erhält abgelehnte Eingaben und lädt nach Erfolg Woche und Summen aus der gespeicherten Quelle neu.
+- Die Auswahl ist auf normale Diensttypen des Einsatzortes begrenzt; `D` und `Spr` werden nicht angeboten. Eine historische Aufhebung bleibt als erwarteter aktueller Revisionsstand erhalten, damit auch späteres Ergänzen konfliktgeschützt erfolgt.
+- 12 neue BE-09-Desktop-Tests bestehen. Insgesamt bestehen jetzt 52 Desktop-Tests, 16 Architekturtests und alle 341 vorhandenen Tests; der vollständige Solution-Build bleibt bei 0 Warnungen und 0 Fehlern.
+- Die Sichtprüfung von BE-09 hat einen Änderungsbedarf ergeben. BE-09A hat den regelmäßigen Standardeditor aus dem Reiter „Bedarf“ entfernt und in die Unterteilung „Einsatzorte“, „Diensttypen“ und „Regelmäßiger Bedarf“ im Reiter „Einsatzorte und Dienste“ verschoben.
+- Der Reiter „Bedarf“ bearbeitet nun nur konkrete Kalendertage über „Nur diesen Tag ändern“. Eine solche „Einmalige Änderung“ kann wiederholt bearbeitet, für „kein Bedarf“ verwendet oder auf den dann wirksamen regelmäßigen Standard zurückgesetzt werden.
+- Diensttyp-Standardzeit und regelmäßiger Personalbedarf bleiben getrennte Speichervorgänge. Regelmäßige Bedarfsänderungen gelten weiterhin ausschließlich ab einem gewählten Montag und verändern frühere Wochen nicht.
+- BE-09A ist umgesetzt und automatisch geprüft. 8 neue Desktop-Tests und 1 zusätzlicher Architekturtest erhöhen den Gesamtstand auf 350 erfolgreiche Tests; das sichtbare Abnahmegate bleibt offen.
+- BE-09B erlaubt nun eine zweite und weitere Änderung desselben regelmäßigen Bedarfs am selben Wirksamkeitsmontag. Fortlaufende unveränderliche Korrekturfassungen bleiben erhalten; für den jeweiligen Montag gilt die zuletzt gespeicherte Fassung.
+- Der regelmäßige Bedarfsbereich zeigt den links gewählten Einsatzort vollständig von Montag bis Sonntag. Die zusätzliche Einsatzortauswahl im rechten Editor ist entfallen; vorhandene und fehlende Bedarfe können aus der Woche zur Bearbeitung gewählt werden.
+- Die neue verlustfreie Migration `20260914185047_AddStandardDemandCorrectionSequence` übernimmt bestehende Revisionen mit Folge `1` und sichert positive, je Bedarfsschlüssel und Montag eindeutige Korrekturfolgen.
 - Die Mitarbeiterfragen und Folgefragen sind vollständig beantwortet. Die fachlichen Entscheidungen stehen in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`.
 - Jeder Mitarbeiter erhält genau einen gemeinsam referenzierten bindenden Mitarbeitertyp. Wochen-Soll und Einsatzfreigaben gehören zum Typ und werden nicht als unabhängige Mitarbeiterkopien gespeichert.
 - Die acht Starttypen, ihre Wochen-Sollwerte, regulären Einsatzmöglichkeiten sowie die Typ1- und AH-Sonderfälle sind festgehalten.
@@ -135,7 +189,7 @@ Status dieses Dokuments: Aktuell – System 03 vollständig abgenommen und archi
 
 ## Noch nicht begonnen
 
-- Systeme 05 bis 14
+- Systeme 06 bis 14
 - System 15 – Portable Windows-Auslieferung und Endabnahme der Kernversion
 - System 16 – Zeitkonten als spätere Ausbaustufe
 
@@ -161,6 +215,22 @@ Die Antworten sind in der Fragen-Datei und im Entscheidungsdokument festgehalten
 - Verhalten beim späteren Löschen noch aktiv referenzierter Stammdaten,
 - genaue Regelpriorität der Springer-Teilunterdeckung.
 
+## Bestätigte Entscheidungen für System 05
+
+- Die bekannten Startbedarfe für Cafeteria und Restaurant sind für die erste Fassung vollständig.
+- Cafeteria benötigt Montag bis Freitag eine Person von 13:30 bis 20:30 Uhr. Samstag und Sonntag werden eine Person von 13:30 bis 20:30 Uhr und zusätzlich eine zweite Person von 13:30 bis 17:30 Uhr benötigt.
+- Restaurant benötigt täglich vier Personen im Frühdienst von 06:30 bis 13:30 Uhr und vier Personen im Spätdienst von 16:30 bis 19:30 Uhr.
+- Je Einsatzort, Datum und normalem Diensttyp genügt ein zusammenhängender Bedarfsblock mit konstanter Personenzahl. Verschiedene Diensttypen dürfen sich zeitlich überschneiden.
+- Eine Standardänderung gilt ab einer bewusst gewählten Planungswoche und damit ab deren Montag. Frühere Wochen und bereits angelegte Datumsausnahmen bleiben unverändert.
+- Derselbe regelmäßige Bedarf darf am selben Wirksamkeitsmontag wiederholt korrigiert werden. Ältere Fassungen bleiben nachvollziehbar und die zuletzt gespeicherte Korrektur ist wirksam.
+- Die regelmäßige Bedarfsansicht soll den links gewählten Einsatzort vollständig von Montag bis Sonntag zeigen.
+- Eine Datumsausnahme kann Personenzahl und tatsächliche Zeit ersetzen, einen Bedarf aufheben oder einen sonst fehlenden Bedarf ergänzen. Entfernen stellt den dann wirksamen Standard wieder her.
+- Feiertage werden zunächst manuell als Datumsausnahmen erfasst.
+- Stunden werden aus tatsächlicher Dauer mal Personenzahl in ganzen Minuten berechnet und nicht unabhängig eingegeben.
+- Die erste Übersicht soll Bedarf, Tagessummen je Einsatzort, Wochensummen je Einsatzort und die Gesamtsumme der Woche darstellen; die atomaren Daten bleiben für spätere abgestimmte Summen verfügbar.
+
+Diese Entscheidungen und die umgesetzten Code-Anker stehen in `docs/roadmaps/active/STAFFING_DEMAND_ROADMAP.md`. BE-01 bis BE-08 sind ausdrücklich abgenommen. BE-09 wurde nach der Sichtprüfung nicht abgenommen; BE-09A und BE-09B sind umgesetzt und automatisch geprüft. Ihre gemeinsame sichtbare Abnahme ist offen.
+
 ## Bestätigte Entscheidungen für System 03
 
 - getrennte Vor- und Nachnamen, stabile unsichtbare Mitarbeiterkennung, gleiche Namen erlaubt und keine Personalnummer,
@@ -182,7 +252,6 @@ Die vollständige Fachentscheidung steht in `docs/decisions/EMPLOYEE_TYPES_AND_S
 
 ## Offene Entscheidungen für spätere Systeme
 
-- weitere, noch nicht bestätigte Personal- und Stundenbedarfe außerhalb der jetzt festgelegten Startwerte,
 - vollständige zwingende und priorisierte weiche Regeln,
 - genaue Reduktionsformel des Wochen-Solls bei Abwesenheiten,
 - Verhalten der Typ1-Generierungsvoraussetzung bei einer vollständig abwesenden Woche,
@@ -194,7 +263,7 @@ Diese Entscheidungen sind für den Abschluss der Dokumentationsgrundlage noch ni
 
 ## Echte Blockaden
 
-Für das abgeschlossene System 03 besteht keine technische Blockade. Für ein nachfolgendes System ist noch keine Teil-Roadmap ausgewählt oder freigegeben.
+Für das abgeschlossene System 03 und die bisherige Umsetzung von System 05 besteht keine technische Blockade. Für BE-09A und BE-09B steht die gemeinsame sichtbare Bedienprüfung noch aus.
 
 Das zuvor unversionierte Beispielbild mit echten Namen und konkreten Plandaten ist nicht mehr im Arbeitsordner vorhanden. Die daraus benötigten Fachinformationen sind nur abstrahiert und ohne personenbezogene Daten dokumentiert.
 
@@ -202,7 +271,8 @@ Die fehlende Excel-Vorlage blockiert später den Excel-Vorlagentest und System 1
 
 ## Offene Prüf- und Abnahmegates
 
-- Alle 13 Produktions- und Testprojekte kompilieren erfolgreich; 55 von 55 Application-Tests, 95 von 95 Domain-Tests, 23 von 23 Infrastructure-Tests, 32 von 32 Desktop-Tests und 16 von 16 Architekturtests bestehen. Insgesamt bestehen alle 221 vorhandenen Tests.
+- Alle 13 Produktions- und Testprojekte kompilieren erfolgreich; 98 von 98 Application-Tests, 148 von 148 Domain-Tests, 34 von 34 Infrastructure-Tests, 64 von 64 Desktop-Tests und 17 von 17 Architekturtests bestehen. Insgesamt bestehen alle 361 vorhandenen Tests. Planning- und Excel-Testprojekte enthalten im aktuellen Ausbauzustand noch keine Tests; ihr Exitcode 8 wird beim Gesamtlauf ausdrücklich als „keine Tests vorhanden“ behandelt.
+- Die korrigierten BE-09A- und BE-09B-Abläufe sind programmiert und automatisch geprüft. Offen ist die gemeinsame Sichtprüfung der wiederholten Bearbeitung desselben Wirksamkeitsmontags sowie der Wochen- und Einsatzortführung.
 - Der vollständige sichtbare Einsatzort-, Diensttyp-, Doppeldienst- und Springer-Ablauf wurde schrittweise manuell geprüft und durch den Auftraggeber bestätigt.
 - Die Paketwiederherstellung und der Build bestätigen noch keinen OR-Tools-Lauf auf einem sauberen Zielsystem. Die Visual-C++-x64-Laufzeitvoraussetzung wird erst bei der portablen Auslieferung praktisch geprüft.
 - Die gemeinsame SQLite-Speicherung für Servicekatalog, Mitarbeitertypen, Einsatzfreigaben und Mitarbeitende ist mit leeren sowie vom System-04-Stand aktualisierten temporären Testdateien geprüft. Übersicht, Bearbeitung, Reaktivierung und referenzgeschütztes Löschen sind implementiert und sichtbar bestätigt; Planungsengine und Excel-Export stehen noch aus.
@@ -214,4 +284,4 @@ Keines dieser späteren Gates wird vorzeitig als bestanden geführt.
 
 ## Nächster minimaler Schritt
 
-Gemeinsam auswählen, ob als Nächstes System 05 – Personal-, Schicht- und Stundenbedarf, System 06 – Verfügbarkeiten und Abwesenheiten oder System 07 – Regelkatalog und Prioritäten vorbereitet wird. Danach wird zunächst ausschließlich die passende Teil-Roadmap entworfen und abgenommen.
+BE-09B sichtbar prüfen: Cafeteria und Restaurant über die linke Einsatzortliste wechseln, die vollständige Woche kontrollieren und denselben regelmäßigen Bedarf zweimal für denselben Wirksamkeitsmontag speichern. Danach BE-09A und BE-09B ausdrücklich abnehmen oder Abweichungen melden.

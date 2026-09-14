@@ -1,11 +1,14 @@
 using System.IO;
 using Salztal.Dienstplanung.Application.Employees;
 using Salztal.Dienstplanung.Application.ServiceCatalog;
+using Salztal.Dienstplanung.Application.StaffingDemands;
 using Salztal.Dienstplanung.Desktop.Features.Employees;
 using Salztal.Dienstplanung.Desktop.Features.ServiceCatalog;
+using Salztal.Dienstplanung.Desktop.Features.StaffingDemands;
 using Salztal.Dienstplanung.Desktop.Shared;
 using Salztal.Dienstplanung.Infrastructure.Persistence.Employees;
 using Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog;
+using Salztal.Dienstplanung.Infrastructure.Persistence.StaffingDemands;
 
 namespace Salztal.Dienstplanung.Desktop.Composition;
 
@@ -55,8 +58,34 @@ internal static class MainWindowComposition
                 dependencies.EmployeeReader,
                 dependencies.DeleteEmployeeStore),
             errorReporter);
+        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+        DateOnly currentWeekMonday = GetWeekMonday(today);
+        StaffingDemandOverviewViewModel staffingDemands = new(
+            new GetStaffingDemandWeekQuery(dependencies.StaffingDemandReader),
+            new SaveStaffingDemandDateExceptionCommand(
+                dependencies.StaffingDemandReader,
+                dependencies.StaffingDemandDateExceptionStore),
+            new RemoveStaffingDemandDateExceptionCommand(
+                dependencies.StaffingDemandReader,
+                dependencies.RemoveStaffingDemandDateExceptionStore),
+            currentWeekMonday,
+            errorReporter);
+        StandardStaffingDemandEditorViewModel standardStaffingDemands = new(
+            new GetStaffingDemandWeekQuery(dependencies.StaffingDemandReader),
+            new ChangeStandardStaffingDemandCommand(
+                dependencies.StaffingDemandReader,
+                dependencies.StandardStaffingDemandRevisionStore),
+            currentWeekMonday,
+            staffingDemands.LoadAsync,
+            errorReporter);
+        serviceCatalog.SelectedWorkLocationChanged +=
+            standardStaffingDemands.SelectWorkLocation;
 
-        return new MainWindow(serviceCatalog, employees);
+        return new MainWindow(
+            serviceCatalog,
+            employees,
+            staffingDemands,
+            standardStaffingDemands);
     }
 
     public static async Task<MainWindowDependencies> CreateInitializedAsync(
@@ -66,6 +95,8 @@ internal static class MainWindowComposition
         SqliteServiceCatalogStore serviceCatalogStore = new(databasePath);
         await serviceCatalogStore.InitializeAsync(cancellationToken);
         SqliteEmployeeStore employeeStore = new(databasePath);
+        SqliteStaffingDemandStore staffingDemandStore = new(databasePath);
+        await staffingDemandStore.InitializeAsync(cancellationToken);
 
         return new MainWindowDependencies(
             serviceCatalogStore,
@@ -77,6 +108,16 @@ internal static class MainWindowComposition
             employeeStore,
             employeeStore,
             employeeStore,
-            employeeStore);
+            employeeStore,
+            staffingDemandStore,
+            staffingDemandStore,
+            staffingDemandStore,
+            staffingDemandStore);
+    }
+
+    private static DateOnly GetWeekMonday(DateOnly date)
+    {
+        int daysSinceMonday = ((int)date.DayOfWeek + 6) % 7;
+        return date.AddDays(-daysSinceMonday);
     }
 }

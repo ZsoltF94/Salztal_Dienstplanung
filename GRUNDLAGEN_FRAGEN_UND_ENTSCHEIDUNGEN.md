@@ -4,7 +4,7 @@
 
 Dieses Dokument hält das gemeinsam bestätigte Grundverständnis, bereits getroffene Entscheidungen und noch offene Grundsatzfragen fest. Es ist noch keine technische Spezifikation und enthält bewusst noch nicht die später zu erfassenden Detailregeln für Mitarbeitertypen, Dienste und Einsatzorte.
 
-Status: Grundfassung abgenommen am 2026-09-13; Mitarbeiter-Ergänzung fachlich bestätigt am 2026-09-14
+Status: Grundfassung abgenommen am 2026-09-13; Mitarbeiter- und Bedarfs-Ergänzungen fachlich bestätigt am 2026-09-14
 
 ## Ziel der App
 
@@ -126,6 +126,12 @@ Die folgenden Bereiche sollen getrennt bleiben, damit spätere Änderungen ohne 
 - Ein Diensttyp besitzt eine bearbeitbare Standardzeit. Neue Bedarfsvorgaben übernehmen diese zunächst, dürfen aber durch eine ausdrücklich eingegebene Standardänderung oder Datums-Ausnahme abweichen.
 - Die reguläre Cafeteria-Belegung beträgt Montag bis Freitag eine Person von 13:30 bis 20:30 Uhr. Samstag und Sonntag werden eine Person von 13:30 bis 20:30 Uhr und eine zweite Person von 13:30 bis 17:30 Uhr benötigt.
 - Die reguläre Restaurant-Belegung beträgt Montag bis Sonntag vier Personen von 06:30 bis 13:30 Uhr und vier Personen von 16:30 bis 19:30 Uhr.
+- Diese Startbedarfe sind für die erste Fassung vollständig. Je Einsatzort, Datum und normalem Diensttyp genügt ein zusammenhängender Bedarfsblock mit konstanter Personenzahl; verschiedene Diensttypen dürfen sich zeitlich überschneiden.
+- Eine Änderung des regelmäßigen Standardbedarfs gilt ab einer bewusst ausgewählten Planungswoche und damit ab deren Montag. Frühere Wochen und bereits angelegte Datumsausnahmen bleiben unverändert.
+- Derselbe regelmäßige Standardbedarf darf für denselben Wirksamkeitsmontag wiederholt korrigiert werden. Frühere gespeicherte Fassungen bleiben intern nachvollziehbar; fachlich wirksam ist die zuletzt gespeicherte Korrektur dieses Montags.
+- In der Bedienung wird der Einsatzort für „Einsatzorte“, „Diensttypen“ und „Regelmäßiger Bedarf“ einheitlich über die linke Einsatzortliste gewählt. Der regelmäßige Bedarf des gewählten Einsatzortes wird rechts als vollständige Woche von Montag bis Sonntag dargestellt.
+- Eine Datumsausnahme darf Personenzahl und tatsächliche Zeit vollständig ersetzen, einen Bedarf für dieses Datum aufheben oder einen sonst fehlenden Bedarf ergänzen. Wird sie entfernt, gilt wieder der dann wirksame Standard.
+- Feiertage und andere besondere Tage werden in der ersten Fassung manuell als Datumsausnahmen erfasst; eine automatische Feiertagserkennung ist nicht vorgesehen.
 - Die automatische Planung darf ausschließlich vorher definierte Diensttypen und ausdrücklich festgelegte tatsächliche Bedarfszeiten verwenden. Sie erfindet keine Diensttypen oder Zeitabweichungen.
 - Sie darf keine Überbesetzung erzeugen und den vorgegebenen Bedarf nicht überschreiten.
 
@@ -231,9 +237,9 @@ Diese Versionsverwaltung ist bestätigt.
 - vollständige Regeln je Einsatzort,
 - gesetzliche und betriebliche zwingende Regeln,
 - Prioritäten der weichen Regeln,
-- genaue Personal- und Stundenbedarfe,
+- genaue Personal- und Stundenbedarfe; die Startbedarfe und Änderungsgrundsätze wurden am 2026-09-14 für System 05 fachlich bestätigt,
 - verwendete Planungs- beziehungsweise Optimierungsmethode,
 - endgültige technische Architektur,
 - Aufbau der Excel-Vorlage.
 
-Die Planungs- beziehungsweise Optimierungsmethode und die technische Architektur wurden anschließend in `ARCHITECTURE.md` festgelegt und abgenommen. Konkrete Einsatzorte, Diensttypen, Doppeldienst und Springer-Einsatz wurden am 2026-09-13 für System 04 bestätigt. Bindende Mitarbeitertypen, ihre Wochen-Sollwerte und Einsatzfreigaben wurden am 2026-09-14 für System 03 bestätigt und stehen in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`. Die übrigen fachlichen Detailpunkte werden weiterhin erst vor den jeweils betroffenen Systemen gemeinsam geklärt.
+Die Planungs- beziehungsweise Optimierungsmethode und die technische Architektur wurden anschließend in `ARCHITECTURE.md` festgelegt und abgenommen. Konkrete Einsatzorte, Diensttypen, Doppeldienst und Springer-Einsatz wurden am 2026-09-13 für System 04 bestätigt. Bindende Mitarbeitertypen, ihre Wochen-Sollwerte und Einsatzfreigaben wurden am 2026-09-14 für System 03 bestätigt und stehen in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`. Die vollständigen Startbedarfe, ihre Änderungswirkung und die Datumsausnahmen wurden am 2026-09-14 für System 05 bestätigt und stehen in der abgenommenen Teil-Roadmap `docs/roadmaps/active/STAFFING_DEMAND_ROADMAP.md`. Die übrigen fachlichen Detailpunkte werden weiterhin erst vor den jeweils betroffenen Systemen gemeinsam geklärt.

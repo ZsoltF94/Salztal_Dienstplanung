@@ -9,6 +9,8 @@ namespace Salztal.Dienstplanung.Desktop.Features.ServiceCatalog;
 
 internal sealed class ServiceCatalogViewModel : ObservableObject
 {
+    internal event Action<Guid?>? SelectedWorkLocationChanged;
+
     private readonly GetServiceCatalogQuery _query;
     private readonly UpdateWorkLocationCommand _updateCommand;
     private readonly UpdateShiftTypeStandardTimeCommand _updateShiftTypeCommand;
@@ -57,7 +59,13 @@ internal sealed class ServiceCatalogViewModel : ObservableObject
     public WorkLocationEditorViewModel? SelectedWorkLocation
     {
         get => _selectedWorkLocation;
-        set => SetProperty(ref _selectedWorkLocation, value);
+        set
+        {
+            if (SetProperty(ref _selectedWorkLocation, value))
+            {
+                SelectedWorkLocationChanged?.Invoke(value?.Id);
+            }
+        }
     }
 
     public bool IsLoading

@@ -1,0 +1,218 @@
+<UserControl x:Class="Salztal.Dienstplanung.Desktop.Features.StaffingDemands.StandardStaffingDemandEditorView"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d:DesignHeight="680"
+             d:DesignWidth="950"
+             mc:Ignorable="d">
+  <UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+  </UserControl.Resources>
+
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <Border Margin="24"
+            Padding="24"
+            Background="White"
+            BorderBrush="#D8DEE7"
+            BorderThickness="1"
+            CornerRadius="10">
+      <Grid MaxWidth="1040"
+            HorizontalAlignment="Stretch">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="1.15*" />
+          <ColumnDefinition Width="28" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel>
+          <TextBlock FontSize="22"
+                     FontWeight="SemiBold"
+                     Text="Regelmäßiger Bedarf – Wochenansicht" />
+          <TextBlock Margin="0,6,0,14"
+                     Foreground="#526174"
+                     Text="Die linke Einsatzort-Auswahl gilt auch hier. Wählen Sie einen Bedarf der Woche aus, um ihn rechts zu bearbeiten."
+                     TextWrapping="Wrap" />
+
+          <Border Margin="0,0,0,14"
+                  Padding="12,9"
+                  Background="#EDF3F8"
+                  CornerRadius="6">
+            <StackPanel>
+              <TextBlock Foreground="#526174"
+                         FontSize="12"
+                         Text="Ausgewählter Einsatzort" />
+              <TextBlock Margin="0,2,0,0"
+                         FontSize="17"
+                         FontWeight="SemiBold"
+                         Text="{Binding SelectedWorkLocation.Name, TargetNullValue=Bitte links einen Einsatzort wählen}" />
+            </StackPanel>
+          </Border>
+
+          <ItemsControl AutomationProperties.Name="Wochenansicht des regelmäßigen Bedarfs"
+                        ItemsSource="{Binding WeekDays}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Margin="0,0,0,8"
+                        Padding="10,8"
+                        Background="#F8FAFC"
+                        BorderBrush="#D8DEE7"
+                        BorderThickness="1"
+                        CornerRadius="6">
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="82" />
+                      <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock VerticalAlignment="Top"
+                               FontWeight="SemiBold"
+                               Text="{Binding DayName}" />
+                    <ItemsControl Grid.Column="1"
+                                  ItemsSource="{Binding Items}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <Button Margin="0,0,0,4"
+                                  Padding="8,5"
+                                  HorizontalContentAlignment="Left"
+                                  AutomationProperties.Name="{Binding ShiftTypeName, StringFormat={}{0} auswählen}"
+                                  Command="{Binding DataContext.SelectWeekItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                  CommandParameter="{Binding}">
+                            <StackPanel>
+                              <TextBlock>
+                                <Run FontWeight="SemiBold"
+                                     Text="{Binding ShiftTypeName}" />
+                                <Run Text=" · " />
+                                <Run Text="{Binding DemandDisplay}" />
+                              </TextBlock>
+                              <TextBlock Margin="0,2,0,0"
+                                         Foreground="#526174"
+                                         FontSize="11"
+                                         Text="{Binding RevisionDisplay}"
+                                         TextWrapping="Wrap" />
+                            </StackPanel>
+                          </Button>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <StackPanel Grid.Column="2">
+          <TextBlock FontSize="18"
+                     FontWeight="SemiBold"
+                     Text="Bedarf bearbeiten" />
+          <TextBlock Margin="0,6,0,16"
+                     Foreground="#526174"
+                     Text="Die allgemeine Standardzeit eines Diensttyps bleibt von diesem tatsächlichen Personalbedarf getrennt."
+                     TextWrapping="Wrap" />
+
+          <TextBlock FontWeight="SemiBold"
+                     Text="Wirksam ab" />
+          <DatePicker Margin="0,5,0,8"
+                      AutomationProperties.Name="Wirksamkeitsmontag des regelmäßigen Bedarfs"
+                      SelectedDate="{Binding EffectiveFromMonday, UpdateSourceTrigger=PropertyChanged}" />
+          <Button Margin="0,0,0,6"
+                  AutomationProperties.Name="Wirksamkeitswoche des regelmäßigen Bedarfs laden"
+                  Command="{Binding LoadEffectiveWeekCommand}"
+                  Content="Wirksamkeitswoche laden" />
+          <TextBlock Margin="0,0,0,14"
+                     Foreground="#526174"
+                     FontSize="12"
+                     Text="Bitte wählen Sie einen Montag und laden Sie zuerst den dann geltenden Ausgangsstand."
+                     TextWrapping="Wrap" />
+
+          <TextBlock FontWeight="SemiBold"
+                     Text="Wochentag" />
+          <ComboBox Margin="0,5,0,10"
+                    AutomationProperties.Name="Wochentag des regelmäßigen Bedarfs"
+                    DisplayMemberPath="DisplayName"
+                    ItemsSource="{Binding Days}"
+                    SelectedItem="{Binding SelectedDay}" />
+
+          <TextBlock FontWeight="SemiBold"
+                     Text="Normaler Diensttyp" />
+          <ComboBox Margin="0,5,0,4"
+                    AutomationProperties.Name="Diensttyp des regelmäßigen Bedarfs"
+                    DisplayMemberPath="Name"
+                    ItemsSource="{Binding ShiftTypes}"
+                    SelectedItem="{Binding SelectedShiftType}" />
+          <TextBlock Margin="0,0,0,12"
+                     Foreground="#526174"
+                     FontSize="12"
+                     Text="D und Spr sind keine auswählbaren Einzelbedarfe."
+                     TextWrapping="Wrap" />
+
+          <Grid Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="12" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+              <TextBlock FontWeight="SemiBold"
+                         Text="Beginn" />
+              <ComboBox Margin="0,5,0,0"
+                        AutomationProperties.Name="Beginn des regelmäßigen Bedarfs"
+                        DisplayMemberPath="DisplayName"
+                        ItemsSource="{Binding TimeOptions}"
+                        SelectedItem="{Binding SelectedStartTime}" />
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+              <TextBlock FontWeight="SemiBold"
+                         Text="Ende" />
+              <ComboBox Margin="0,5,0,0"
+                        AutomationProperties.Name="Ende des regelmäßigen Bedarfs"
+                        DisplayMemberPath="DisplayName"
+                        ItemsSource="{Binding TimeOptions}"
+                        SelectedItem="{Binding SelectedEndTime}" />
+            </StackPanel>
+          </Grid>
+
+          <TextBlock FontWeight="SemiBold"
+                     Text="Benötigte Personen" />
+          <TextBox Margin="0,5,0,14"
+                   AutomationProperties.Name="Personenzahl des regelmäßigen Bedarfs"
+                   Text="{Binding RequiredEmployeeCountInput, UpdateSourceTrigger=PropertyChanged}" />
+
+          <Border Margin="0,0,0,14"
+                  Padding="11"
+                  Background="#EDF3F8"
+                  CornerRadius="6">
+            <TextBlock Foreground="#334155"
+                       Text="{Binding EditStateDisplay}"
+                       TextWrapping="Wrap" />
+          </Border>
+
+          <TextBlock Margin="0,0,0,12"
+                     Foreground="#8B1E1E"
+                     Text="{Binding ErrorMessage}"
+                     TextWrapping="Wrap"
+                     Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+          <TextBlock Margin="0,0,0,12"
+                     Foreground="#17663A"
+                     Text="{Binding SuccessMessage}"
+                     TextWrapping="Wrap"
+                     Visibility="{Binding HasSuccessMessage, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+          <Button Margin="0,0,0,8"
+                  AutomationProperties.Name="Regelmäßigen Bedarf ab Montag speichern"
+                  Command="{Binding SaveCommand}"
+                  Content="{Binding PrimaryActionDisplay}" />
+          <Button AutomationProperties.Name="Ab Montag keinen regelmäßigen Bedarf festlegen"
+                  Command="{Binding RemoveCommand}"
+                  Content="Ab diesem Montag kein regelmäßiger Bedarf" />
+          <TextBlock Margin="0,10,0,0"
+                     HorizontalAlignment="Center"
+                     Foreground="#526174"
+                     Text="Regelmäßiger Bedarf wird gespeichert …"
+                     Visibility="{Binding IsSaving, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        </StackPanel>
+      </Grid>
+    </Border>
+  </ScrollViewer>
+</UserControl>

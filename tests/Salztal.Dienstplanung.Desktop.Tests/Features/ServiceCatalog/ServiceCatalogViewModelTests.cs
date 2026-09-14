@@ -7,6 +7,27 @@ namespace Salztal.Dienstplanung.Desktop.Tests.Features.ServiceCatalog;
 public sealed class ServiceCatalogViewModelTests
 {
     [Fact]
+    public async Task SelectedWorkLocationChangePublishesSelectedId()
+    {
+        ServiceCatalogViewModel viewModel = CreateViewModel(
+            new FakeServiceCatalogReader(),
+            new FakeWorkLocationUpdateStore(),
+            new CollectingUnexpectedErrorReporter());
+        List<Guid?> selectedIds = [];
+        viewModel.SelectedWorkLocationChanged += selectedIds.Add;
+
+        await viewModel.LoadCommand.ExecuteAsync(null);
+        WorkLocationEditorViewModel restaurant = Assert.Single(
+            viewModel.WorkLocations,
+            location => location.Id == InitialWorkLocationCatalog.Restaurant.Id.Value);
+        viewModel.SelectedWorkLocation = restaurant;
+
+        Assert.Equal(
+            [InitialWorkLocationCatalog.Cafeteria.Id.Value, restaurant.Id],
+            selectedIds);
+    }
+
+    [Fact]
     public async Task LoadCommandWhenCatalogExistsShowsLocationsAndSelectsFirstEntry()
     {
         FakeServiceCatalogReader reader = new();

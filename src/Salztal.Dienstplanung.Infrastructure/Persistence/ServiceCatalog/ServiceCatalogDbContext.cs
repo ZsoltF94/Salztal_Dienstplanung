@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Salztal.Dienstplanung.Infrastructure.Persistence.Employees;
+using Salztal.Dienstplanung.Infrastructure.Persistence.StaffingDemands;
 
 namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog;
 
@@ -19,6 +20,12 @@ internal sealed class ServiceCatalogDbContext(DbContextOptions<ServiceCatalogDbC
 
     public DbSet<EmployeeEntity> Employees => Set<EmployeeEntity>();
 
+    public DbSet<StandardStaffingDemandRevisionEntity> StandardStaffingDemandRevisions =>
+        Set<StandardStaffingDemandRevisionEntity>();
+
+    public DbSet<StaffingDemandDateExceptionEntity> StaffingDemandDateExceptions =>
+        Set<StaffingDemandDateExceptionEntity>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new WorkLocationEntityConfiguration());
@@ -27,5 +34,8 @@ internal sealed class ServiceCatalogDbContext(DbContextOptions<ServiceCatalogDbC
         modelBuilder.ApplyConfiguration(new EmployeeTypeEntityConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeTypeShiftEligibilityEntityConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeEntityConfiguration());
+        modelBuilder.ApplyConfiguration(
+            new StandardStaffingDemandRevisionEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new StaffingDemandDateExceptionEntityConfiguration());
     }
 }

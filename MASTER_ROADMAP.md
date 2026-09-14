@@ -1,6 +1,6 @@
 # Master-Roadmap der Salztal-Dienstplanung
 
-Status: Grundfassung abgenommen am 2026-09-13; Systeme 03 und 04 abgeschlossen
+Status: Grundfassung abgenommen am 2026-09-13; System 05 mit abgenommener Teil-Roadmap aktiv
 
 Stand: 2026-09-14
 
@@ -100,11 +100,11 @@ Abhängigkeiten: 02
 
 ### 05 – Personal-, Schicht- und Stundenbedarf
 
-Status: `[ ]`
+Status: `[~]` – BE-08 abgenommen; BE-09A und BE-09B automatisch geprüft; gemeinsame Sichtprüfung offen
 
 Ziel: Standardbedarfe und datumsbezogene Ausnahmen je Einsatzort und genau einem verlangten Diensttyp mit tatsächlicher Zeit und Personenzahl erfassen; daraus Personen- und Stundenbedarf nachvollziehbar berechnen.
 
-Teil-Roadmap: vor Beginn anzulegen und abzunehmen
+Teil-Roadmap: `docs/roadmaps/active/STAFFING_DEMAND_ROADMAP.md`
 
 Abhängigkeiten: 04
 
@@ -262,4 +262,4 @@ System 16 ergänzt Zeitkonten nach gesonderter Priorisierung, ohne den Abschluss
 
 ## Nächster übergeordneter Schritt
 
-System 03 – Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben – ist mit MA-01 bis MA-11 einschließlich MA-02A abgenommen und archiviert. System 04 ist ebenfalls abgeschlossen. Als Nächstes wird bewusst entschieden, ob System 05, 06 oder 07 vorbereitet wird; vor jeder Umsetzung entsteht zuerst eine eigene Teil-Roadmap und wird ausdrücklich abgenommen.
+System 05 – Personal-, Schicht- und Stundenbedarf – ist aktiv. Die Wochenübersicht aus BE-08 ist sichtbar geprüft und ausdrücklich abgenommen. BE-09A trennt regelmäßige Bedarfe unter „Einsatzorte und Dienste“ von konkreten Tagesänderungen im Reiter „Bedarf“. BE-09B ergänzt wiederholbare unveränderliche Korrekturfassungen desselben Wirksamkeitsmontags, die einheitliche linke Einsatzortauswahl und eine vollständige Montag-bis-Sonntag-Ansicht. BE-09A und BE-09B sind implementiert und automatisch geprüft; als nächstes steht ihre gemeinsame sichtbare Bedienprüfung aus.

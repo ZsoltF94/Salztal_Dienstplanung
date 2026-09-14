@@ -72,15 +72,67 @@ public sealed class DesktopCompositionBoundaryTests
             "src",
             "Salztal.Dienstplanung.Desktop",
             "Features");
-        string employeeDirectory = Path.Combine(featureDirectory, "Employees");
-        string serviceCatalogDirectory = Path.Combine(featureDirectory, "ServiceCatalog");
+        string[] featureNames =
+        [
+            "Employees",
+            "ServiceCatalog",
+            "StaffingDemands",
+        ];
 
-        AssertFeatureDoesNotReference(
-            employeeDirectory,
-            "Salztal.Dienstplanung.Desktop.Features.ServiceCatalog");
-        AssertFeatureDoesNotReference(
-            serviceCatalogDirectory,
-            "Salztal.Dienstplanung.Desktop.Features.Employees");
+        foreach (string featureName in featureNames)
+        {
+            string currentFeatureDirectory = Path.Combine(featureDirectory, featureName);
+
+            foreach (string otherFeatureName in featureNames.Where(
+                         candidate => !candidate.Equals(
+                             featureName,
+                             StringComparison.Ordinal)))
+            {
+                AssertFeatureDoesNotReference(
+                    currentFeatureDirectory,
+                    $"Salztal.Dienstplanung.Desktop.Features.{otherFeatureName}");
+            }
+        }
+    }
+
+    [Fact]
+    public void StaffingDemandEditorsArePlacedInTheirApprovedMainAreas()
+    {
+        string desktopDirectory = Path.Combine(
+            RepositoryLayout.Root.FullName,
+            "src",
+            "Salztal.Dienstplanung.Desktop");
+        string mainWindow = File.ReadAllText(Path.Combine(desktopDirectory, "MainWindow.xaml"));
+        string demandOverview = File.ReadAllText(Path.Combine(
+            desktopDirectory,
+            "Features",
+            "StaffingDemands",
+            "StaffingDemandOverviewView.xaml"));
+        string standardEditor = File.ReadAllText(Path.Combine(
+            desktopDirectory,
+            "Features",
+            "StaffingDemands",
+            "StandardStaffingDemandEditorView.xaml"));
+        string composition = File.ReadAllText(Path.Combine(
+            desktopDirectory,
+            "Composition",
+            "MainWindowComposition.cs"));
+
+        Assert.Contains("Header=\"Regelmäßiger Bedarf\"", mainWindow, StringComparison.Ordinal);
+        Assert.Contains("StandardStaffingDemandEditorView", mainWindow, StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "StandardStaffingDemandEditorView",
+            demandOverview,
+            StringComparison.Ordinal);
+        Assert.Contains("Nur diesen Tag ändern", demandOverview, StringComparison.Ordinal);
+        Assert.Contains("Einmalige Änderung", demandOverview, StringComparison.Ordinal);
+        Assert.Contains("ItemsSource=\"{Binding WeekDays}\"", standardEditor, StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "Einsatzort des regelmäßigen Bedarfs",
+            standardEditor,
+            StringComparison.Ordinal);
+        Assert.Contains("SelectedWorkLocationChanged", composition, StringComparison.Ordinal);
+        Assert.Contains("SelectWorkLocation", composition, StringComparison.Ordinal);
     }
 
     private static void AssertFeatureDoesNotReference(

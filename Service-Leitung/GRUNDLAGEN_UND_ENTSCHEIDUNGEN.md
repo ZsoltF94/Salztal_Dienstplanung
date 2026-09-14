@@ -68,11 +68,19 @@ Für jeden Einsatzort wird je Wochentag beziehungsweise konkretem Datum festgele
 
 Beispiel: Werden vier Personen im Frühdienst von 06:30 bis 13:30 Uhr gebraucht, erkennt die App daraus automatisch einen Bedarf von 28 Arbeitsstunden. Wird die tatsächliche Zeit für ein einzelnes Datum auf 06:30 bis 12:30 Uhr verkürzt, berechnet die App für dieses Datum 24 Stunden. Die Service-Leitung muss die Summe nicht zusätzlich eintragen.
 
-Standardbedarfe können dauerhaft für zukünftige Wochen geändert werden. Zusätzlich sind Ausnahmen nur für ein ausgewähltes Datum möglich. Frühere und abgenommene Pläne behalten ihre damaligen Zeiten.
+Standardbedarfe können ab einer bewusst ausgewählten Planungswoche dauerhaft geändert werden. Die Änderung gilt ab dem Montag dieser Woche; frühere Wochen bleiben unverändert. Ein Standardbedarf darf auch für denselben Wirksamkeitsmontag mehrfach korrigiert werden. Die jeweils letzte Korrektur gilt, während ältere Fassungen intern nachvollziehbar bleiben.
+
+Unter „Einsatzorte und Dienste“ wird der zu bearbeitende Einsatzort für „Einsatzorte“, „Diensttypen“ und „Regelmäßiger Bedarf“ einheitlich links gewählt. Beim regelmäßigen Bedarf zeigt die rechte Seite anschließend die vollständige Woche von Montag bis Sonntag für diesen Einsatzort.
+
+Zusätzlich sind Ausnahmen nur für ein ausgewähltes Datum möglich. Eine solche Ausnahme kann Personenzahl und Zeit ändern, einen Bedarf für diesen Tag aufheben oder einen sonst fehlenden Bedarf ergänzen. Wird die Ausnahme entfernt, gilt wieder der aktuelle Standard.
+
+Feiertage und andere besondere Tage werden in der ersten Fassung bewusst als Datumsausnahme eingetragen. Die App erkennt Feiertage zunächst nicht automatisch.
+
+Für denselben Einsatzort, dasselbe Datum und denselben Diensttyp genügt zunächst ein zusammenhängender Zeitraum mit gleichbleibender Personenzahl. Verschiedene Diensttypen dürfen gleichzeitig gebraucht werden.
 
 Die automatische Planung darf nicht mehr Personen als benötigt einplanen.
 
-Bestätigte Startwerte sind: Cafeteria Montag bis Freitag eine Person von 13:30 bis 20:30 Uhr, am Wochenende zusätzlich eine zweite Person von 13:30 bis 17:30 Uhr; Restaurant täglich vier Frühdienste von 06:30 bis 13:30 Uhr und vier Spätdienste von 16:30 bis 19:30 Uhr.
+Die für die erste Fassung vollständigen Startwerte sind: Cafeteria Montag bis Freitag eine Person von 13:30 bis 20:30 Uhr; Samstag und Sonntag eine Person von 13:30 bis 20:30 Uhr und zusätzlich eine zweite Person von 13:30 bis 17:30 Uhr; Restaurant täglich vier Frühdienste von 06:30 bis 13:30 Uhr und vier Spätdienste von 16:30 bis 19:30 Uhr.
 
 ## Regeln für den Wochenplan
 

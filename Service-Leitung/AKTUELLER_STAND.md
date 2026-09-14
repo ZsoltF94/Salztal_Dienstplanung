@@ -4,7 +4,7 @@ Stand: 14. September 2026
 
 ## Wo steht das Projekt?
 
-Die beiden ersten fachlichen Systeme sind abgeschlossen: Einsatzorte und Diensttypen sowie Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben. Die vollständige Mitarbeiterbedienung mit Anlegen, Bearbeiten, Typwechsel, Deaktivieren, Reaktivieren und sicherem endgültigem Löschen ist programmiert, automatisch geprüft und sichtbar bestätigt. Der gemeinsame Abschlussabgleich von System 03 ist abgenommen und seine Roadmap archiviert. Eine Dienstplanung wurde noch nicht gebaut.
+Die beiden ersten fachlichen Systeme sind abgeschlossen: Einsatzorte und Diensttypen sowie Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben. Die vollständige Mitarbeiterbedienung mit Anlegen, Bearbeiten, Typwechsel, Deaktivieren, Reaktivieren und sicherem endgültigem Löschen ist programmiert, automatisch geprüft und sichtbar bestätigt. Beim nächsten System für Personal-, Schicht- und Stundenbedarf sind Bedarfsgrundwerte, Wochenvorlage, einzelne Datumsausnahmen, Lese- und Schreibabläufe sowie die lokale Datenbankspeicherung intern programmiert und bestätigt. Die sichtbare Wochenübersicht ist ebenfalls bestätigt. Die nach der ersten Sichtprüfung gewünschte klarere Trennung ist nun programmiert und automatisch geprüft; ihre sichtbare Abnahme steht noch aus.
 
 Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam besprochen, aufgeschrieben und abgenommen. Das Projekt ist außerdem mit einem GitHub-Repository verbunden, damit der Entwicklungsstand nachvollziehbar gespeichert werden kann.
 
@@ -110,6 +110,7 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 
 - die fachlich nutzbare Windows-App,
 - das Anlegen, Löschen oder Deaktivieren von Einsatzorten und Diensttypen,
+- die sichtbare Bearbeitung einzelner Datumsausnahmen,
 - die Eingabe von Urlaub, Krankheit und Verfügbarkeit,
 - die automatische Erstellung eines Wochenplans,
 - die Erklärung nicht besetzbarer Dienste,
@@ -119,6 +120,57 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 - die Datensicherung,
 - die spätere Verwaltung von Über- und Minusstunden.
 
+## System 05 – derzeit in Arbeit
+
+- Ein einzelner Bedarf kann intern mit Datum, Einsatzort, normalem Diensttyp, tatsächlicher Zeit und positiver Personenzahl gültig beschrieben werden.
+- Die App-Grundlage berechnet daraus minutengenau die Dauer und die insgesamt benötigten Mitarbeiterstunden. Ein zusätzlicher, möglicherweise widersprüchlicher Stundenwert wird nicht eingegeben.
+- Ungültige Kennungen, Personenzahlen und Zeiten werden strukturiert abgelehnt.
+- Die bestätigten Beispiele mit vier Personen ergeben bei 06:30 bis 13:30 Uhr 28 Stunden und bei 06:30 bis 12:30 Uhr 24 Stunden.
+- Dieser erste interne Schritt ist automatisch geprüft und abgenommen.
+- Die regelmäßige Wochenvorlage enthält alle 23 bestätigten Bedarfe für Montag bis Sonntag. Die beiden Cafeteria-Dienste am Wochenende bleiben dabei getrennt.
+- Eine spätere Änderung kann einen Standard ab einer ausgewählten Woche ergänzen, ersetzen oder aufheben. Sie gilt ab dem Montag dieser Woche; frühere Stände bleiben erhalten.
+- Bereits geänderte Diensttyp-Standardzeiten werden bei der erstmaligen Anlage übernommen und nicht durch alte Ausgangszeiten überschrieben.
+- Dieser zweite interne Schritt ist automatisch geprüft und bestätigt.
+- Für ein einzelnes Datum kann ein Bedarf intern vollständig ersetzt, ergänzt oder aufgehoben werden. Eine solche Ausnahme behält ihre eigene tatsächliche Zeit und Personenzahl.
+- Wird eine vorhandene Ausnahme entfernt, verwendet die Berechnung wieder den zu diesem Zeitpunkt geltenden Wochenstandard.
+- Eine ausgewählte Woche wird von Montag bis Sonntag eindeutig berechnet. Die Ausgangswoche umfasst 57 Cafeteria-Stunden, 280 Restaurant-Stunden und insgesamt 337 benötigte Mitarbeiterstunden.
+- Feiertage besitzen keine versteckte Sonderautomatik, sondern werden wie vereinbart als normale manuelle Datumsausnahme behandelt.
+- Dieser dritte interne Schritt ist automatisch geprüft und bestätigt.
+- Der neue Leseablauf sammelt Wochenstandards, Datumsausnahmen und den Dienstkatalog in einem festen Lesestand und berechnet daraus genau eine Montag-bis-Sonntag-Woche.
+- Die vorbereitete Wochenansicht enthält für jeden Bedarf seine Herkunft, Einsatzort, Diensttyp, tatsächliche Zeit, Personenzahl und benötigte Minuten. Dazu kommen Tages-, Einsatzort- und Gesamtsummen.
+- Fehlende oder falsch zugeordnete Katalogeinträge und widersprüchliche gespeicherte Werte werden verständlich gemeldet und nicht stillschweigend ausgelassen. Auch ein Abbruch vor oder während des Lesens ist geprüft.
+- Dieser vierte interne Schritt ist automatisch geprüft und bestätigt.
+- Drei getrennte Schreibabläufe bereiten Änderungen an Wochenstandards, das Speichern einer Datumsausnahme und das Entfernen einer Datumsausnahme vor.
+- Vor dem Speichern werden der aktuelle Stand, Einsatzort, Diensttyp und ihre richtige Zuordnung geprüft. Wenn der Stand zwischenzeitlich geändert wurde, erscheint ein verständlicher Konflikt statt einer unbemerkten Überschreibung.
+- Ergänzen, Ersetzen und Aufheben sind bei Wochenstandard und Datumsausnahme getrennt erkennbar. Ungültige Eingaben und nicht mehr vorhandene Werte lösen keinen Schreibversuch aus.
+- Ist eine zu entfernende Datumsausnahme bereits weg, gilt das als erfolgreich erreicht. Wurde sie inzwischen durch eine andere Ausnahme ersetzt, muss dagegen neu geladen und bewusst entschieden werden.
+- Dieser fünfte interne Schritt ist automatisch geprüft und bestätigt.
+- Die regelmäßigen Bedarfe und einzelnen Datumsausnahmen können nun in derselben lokalen Datenbank wie Einsatzorte, Diensttypen und Mitarbeitende gespeichert werden.
+- Beim ersten Einrichten werden die 23 bestätigten regelmäßigen Bedarfe genau einmal angelegt. Dabei verwendet die App die dann aktuellen Diensttyp-Standardzeiten und setzt eine bereits bewusst geänderte Zeit nicht zurück.
+- Frühere Wochenstände bleiben als aufeinanderfolgende Änderungen erhalten. Einzelne Datumsausnahmen werden vollständig und gemeinsam gespeichert, ersetzt oder entfernt; ein zwischenzeitlich geänderter Stand wird nicht unbemerkt überschrieben.
+- Automatische Prüfungen haben sowohl eine neue Datenbank als auch vorhandene ältere synthetische Datenbanken mit geänderten Dienstzeiten und erfundenen Mitarbeiterdaten erfolgreich aktualisiert. Die vorhandenen Werte blieben erhalten.
+- Die Datenbank weist doppelte Bedarfe, unbekannte Zuordnungen, ungültige Zeiten und ungültige Personenzahlen zusätzlich selbst zurück. Auch ein absichtlich ausgelöster Fehler während des Speicherns hat den vorherigen Stand vollständig erhalten.
+- Dieser sechste interne Schritt ist automatisch geprüft und bestätigt.
+- Ein neuer Reiter „Bedarf“ zeigt die ausgewählte Woche immer von Montag bis Sonntag. Eine Woche kann über ein Datum gewählt oder mit „Vorherige Woche“ und „Nächste Woche“ gewechselt werden.
+- Cafeteria und Restaurant werden getrennt dargestellt. Darunter zeigt jede Tageszeile den Diensttyp, die tatsächlich benötigte Zeit, die Personenzahl, die daraus berechneten Mitarbeiterstunden und die Herkunft als Wochenstandard oder Datumsausnahme.
+- Die Ansicht nennt zusätzlich die Tagessumme je Einsatzort, die Wochensumme jedes Einsatzortes und die Gesamtsumme. Mit den bestätigten Ausgangswerten sind dies 57 Cafeteria-Stunden, 280 Restaurant-Stunden und insgesamt 337 Stunden.
+- Gelb und Rot werden weiterhin zusätzlich als Text genannt. Eine einzelne Datumsausnahme ist gegenüber dem Wochenstandard sowohl beschriftet als auch gestalterisch hervorgehoben.
+- Während des Ladens sowie bei leerem Bestand oder einem Fehler erscheinen eigene verständliche Zustände. Die automatische Prüfung umfasst auch Wochenwechsel, erneutes Laden und Abbruch.
+- Dieser siebte interne Schritt ist programmiert, automatisch geprüft und nach dem sichtbaren Test ausdrücklich bestätigt.
+- Ein neuer Bearbeitungsbereich erlaubt nun, einen regelmäßigen Wochenstandard ab einem bewusst gewählten Montag zu ersetzen, zu ergänzen oder aufzuheben. Frühere Wochen bleiben dabei unverändert.
+- Einsatzort, Wochentag, normaler Diensttyp, tatsächliche Zeit und Personenzahl sind vor dem Speichern sichtbar. Zum gewählten Einsatzort werden nur dessen normale Diensttypen angeboten; `D` und `Spr` sind keine auswählbaren Bedarfe.
+- Ungültige Eingaben und zwischenzeitliche Änderungen werden verständlich gemeldet und bleiben zur Korrektur stehen. Nach erfolgreichem Speichern lädt die App die Woche erneut aus der lokalen Datenbank und berechnet die sichtbaren Summen neu.
+- Dieser achte interne Schritt ist programmiert und automatisch geprüft. Bei der sichtbaren Beurteilung wurde er in dieser Form nicht abgenommen: Regelmäßige Standards sollen nicht in der Wochenübersicht bearbeitet werden.
+- Die Bedienung ist nun klarer getrennt. Unter „Einsatzorte und Dienste“ sind die drei Bereiche „Einsatzorte“, „Diensttypen“ und „Regelmäßiger Bedarf“ auswählbar.
+- Im Reiter „Bedarf“ wird ausschließlich ein konkreter Kalendertag über „Nur diesen Tag ändern“ angepasst. Diese „Einmalige Änderung“ darf erneut bearbeitet, auf „kein Bedarf“ gesetzt oder wieder auf den regelmäßigen Standard zurückgesetzt werden.
+- Die allgemeine Standardzeit eines Diensttyps und der regelmäßige Personalbedarf bleiben getrennt. Ein regelmäßiger Bedarf erhält weiterhin einen bewusst gewählten Wirksamkeitsmontag, damit frühere Wochen unverändert bleiben.
+- Nach jedem Speichern oder Zurücksetzen wird die Woche aus der lokalen Datenbank neu geladen und alle sichtbaren Summen werden neu berechnet. Auch ein zuvor fehlender Tagesbedarf kann ergänzt werden.
+- Die Korrektur ist programmiert und automatisch geprüft. Als offener Nachweis bleibt die gemeinsame sichtbare Bedienprüfung.
+- Der weitere Änderungsbedarf aus der Sichtprüfung ist programmiert: Ein bereits geänderter regelmäßiger Bedarf kann nun erneut für denselben Wirksamkeitsmontag gespeichert, auf „kein regelmäßiger Bedarf“ gesetzt oder wieder ergänzt werden.
+- Jede weitere Speicherung erzeugt intern eine neue unveränderliche Korrekturfassung. Ältere Fassungen bleiben erhalten; sichtbar und fachlich gilt für diesen Montag immer die zuletzt gespeicherte Fassung.
+- Der Einsatzort wird auch beim regelmäßigen Bedarf über die linke Einsatzortliste gewählt. Die Bedarfsansicht zeigt anschließend alle sieben Tage von Montag bis Sonntag sowie vorhandene und fehlende Bedarfe der normalen Diensttypen.
+- BE-09B ist programmiert und automatisch geprüft. Offen ist die sichtbare Prüfung beider Einsatzorte und zweier aufeinanderfolgender Korrekturen desselben Bedarfs am selben Montag.
+
 ## Nächster geplanter Schritt
 
-Als Nächstes wird gemeinsam entschieden, ob Personal- und Stundenbedarf, Verfügbarkeiten und Abwesenheiten oder der Regelkatalog vorbereitet wird. Für das ausgewählte System wird zuerst eine eigene Roadmap entworfen und abgenommen. Dienstplanfunktionen bleiben weiterhin späteren Systemen vorbehalten.
+Als Nächstes werden die einheitliche linke Einsatzortauswahl, die vollständige Wochenansicht und zwei aufeinanderfolgende Korrekturen desselben regelmäßigen Bedarfs sichtbar geprüft. Danach können BE-09A und BE-09B gemeinsam abgenommen werden.

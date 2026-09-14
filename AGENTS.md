@@ -307,10 +307,12 @@ Der Bericht enthält kurz und konkret:
 1. tatsächlich geändert,
 2. bewusst nicht geändert,
 3. ausgeführte Prüfungen und Ergebnis,
-4. offene Gates, Risiken oder Blockaden,
-5. Git-Status; Commit und Push nur wenn ausdrücklich beauftragt,
-6. nächster minimaler Roadmap-Schritt,
-7. Bitte um Abnahme.
+4. kritische Meldungen mit Auswirkung und Dringlichkeit; wenn keine bestehen, wird dies ausdrücklich genannt,
+5. konkreter Handlungsbedarf des Auftraggebers; wenn keiner besteht, wird dies ausdrücklich genannt,
+6. offene Gates, Risiken oder Blockaden,
+7. Git-Status; Commit und Push nur wenn ausdrücklich beauftragt,
+8. nächster minimaler Roadmap-Schritt,
+9. Bitte um Abnahme.
 
 Der Bericht behauptet niemals, dass ein offenes Gate bestanden wurde.
 
