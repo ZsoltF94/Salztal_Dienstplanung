@@ -1,4 +1,6 @@
 using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Salztal.Dienstplanung.Application.ServiceCatalog;
 using Salztal.Dienstplanung.Domain.ShiftTypes;
 using Salztal.Dienstplanung.Domain.WorkLocations;
@@ -8,6 +10,11 @@ namespace Salztal.Dienstplanung.Infrastructure.Tests.ServiceCatalog;
 
 public sealed class SqliteServiceCatalogStoreTests
 {
+    private const string InitialServiceCatalogMigration =
+        "20260913202156_InitialServiceCatalog";
+    private const string EmployeeMigration =
+        "20260914005039_AddEmployeesAndEmployeeTypes";
+
     [Fact]
     public async Task InitializeAsyncOnEmptyDatabaseCreatesMigrationAndCompleteInitialCatalog()
     {
@@ -51,7 +58,7 @@ public sealed class SqliteServiceCatalogStoreTests
         await store.InitializeAsync(TestContext.Current.CancellationToken);
         await store.InitializeAsync(TestContext.Current.CancellationToken);
 
-        Assert.Equal(1L, await ExecuteScalarAsync(
+        Assert.Equal(2L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM __EFMigrationsHistory;"));
         Assert.Equal(2L, await ExecuteScalarAsync(
@@ -63,6 +70,67 @@ public sealed class SqliteServiceCatalogStoreTests
         Assert.Equal(2L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM ShiftPatterns;"));
+    }
+
+    [Fact]
+    public async Task PublishedSystem04MigrationTargetCreatesExactOriginalSchema()
+    {
+        using TemporarySqliteDatabase database = new();
+
+        await MigrateToSystem04Async(database.Path);
+
+        Assert.Equal(
+            [InitialServiceCatalogMigration],
+            await ExecuteStringColumnAsync(
+                database.Path,
+                "SELECT MigrationId FROM __EFMigrationsHistory ORDER BY MigrationId;"));
+        Assert.Equal(
+            [
+                "ShiftPatterns",
+                "ShiftTypes",
+                "WorkLocations",
+                "__EFMigrationsHistory",
+                "__EFMigrationsLock",
+            ],
+            await ExecuteStringColumnAsync(
+                database.Path,
+                "SELECT name FROM sqlite_schema "
+                + "WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name;"));
+    }
+
+    [Fact]
+    public async Task ExistingSystem04DatabaseWhenUpgradedKeepsCatalogSchemaAndValuesReadable()
+    {
+        using TemporarySqliteDatabase database = new();
+        await MigrateToSystem04Async(database.Path);
+        await ExecuteNonQueryAsync(
+            database.Path,
+            "UPDATE WorkLocations SET Name = 'Synthetischer Bestand' "
+            + $"WHERE lower(Id) = lower('{InitialWorkLocationCatalog.Cafeteria.Id.Value:D}');");
+        IReadOnlyList<string> schemaBefore = await ReadServiceCatalogSchemaAsync(database.Path);
+        IReadOnlyList<string> migrationHistoryBefore = await ReadMigrationHistoryAsync(database.Path);
+
+        SqliteServiceCatalogStore restartedStore = new(database.Path);
+        await restartedStore.InitializeAsync(TestContext.Current.CancellationToken);
+        ServiceCatalogData reloaded = await restartedStore.LoadAsync(
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(schemaBefore, await ReadServiceCatalogSchemaAsync(database.Path));
+        Assert.Equal([InitialServiceCatalogMigration + "|10.0.12"], migrationHistoryBefore);
+        Assert.Equal(
+            [
+                InitialServiceCatalogMigration + "|10.0.12",
+                EmployeeMigration + "|10.0.12",
+            ],
+            await ReadMigrationHistoryAsync(database.Path));
+        Assert.Equal(
+            "Synthetischer Bestand",
+            Assert.Single(
+                reloaded.WorkLocations,
+                location => location.Id == InitialWorkLocationCatalog.Cafeteria.Id).Name.Value);
+        Assert.Equal(4, reloaded.ShiftTypes.Count);
+        Assert.Equal("D", reloaded.SplitShiftPattern.DisplayCode);
+        Assert.Equal("Spr", reloaded.ReliefShiftPattern.DisplayCode);
     }
 
     [Fact]
@@ -216,6 +284,53 @@ public sealed class SqliteServiceCatalogStoreTests
 
         object? value = await command.ExecuteScalarAsync(TestContext.Current.CancellationToken);
         return Convert.ToInt64(value, System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    private static Task<IReadOnlyList<string>> ReadMigrationHistoryAsync(string databasePath)
+    {
+        return ExecuteStringColumnAsync(
+            databasePath,
+            "SELECT MigrationId || '|' || ProductVersion "
+            + "FROM __EFMigrationsHistory ORDER BY MigrationId;");
+    }
+
+    private static Task<IReadOnlyList<string>> ReadServiceCatalogSchemaAsync(string databasePath)
+    {
+        return ExecuteStringColumnAsync(
+            databasePath,
+            "SELECT type || '|' || name || '|' || coalesce(sql, '') "
+            + "FROM sqlite_schema WHERE tbl_name IN "
+            + "('WorkLocations', 'ShiftTypes', 'ShiftPatterns') ORDER BY type, name;");
+    }
+
+    private static async Task MigrateToSystem04Async(string databasePath)
+    {
+        await using ServiceCatalogDbContext context =
+            new ServiceCatalogDbContextFactory(databasePath).Create();
+        IMigrator migrator = context.GetService<IMigrator>();
+        await migrator.MigrateAsync(
+            InitialServiceCatalogMigration,
+            TestContext.Current.CancellationToken);
+    }
+
+    private static async Task<IReadOnlyList<string>> ExecuteStringColumnAsync(
+        string databasePath,
+        string commandText)
+    {
+        await using SqliteConnection connection = CreateConnection(databasePath);
+        await connection.OpenAsync(TestContext.Current.CancellationToken);
+        await using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = commandText;
+        await using SqliteDataReader reader = await command.ExecuteReaderAsync(
+            TestContext.Current.CancellationToken);
+        List<string> values = [];
+
+        while (await reader.ReadAsync(TestContext.Current.CancellationToken))
+        {
+            values.Add(reader.GetString(0));
+        }
+
+        return values;
     }
 
     private static async Task ExecuteNonQueryAsync(string databasePath, string commandText)

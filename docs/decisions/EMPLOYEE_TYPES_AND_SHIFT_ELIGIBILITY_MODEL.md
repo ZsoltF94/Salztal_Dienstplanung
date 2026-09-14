@@ -42,6 +42,15 @@ Die acht Typen sind stabile Startwerte. Das Modell bleibt datengetrieben, damit 
 
 Ein Typ kann später nur entfernt werden, wenn ihm keine aktive oder deaktivierte Person mehr zugeordnet ist. Die Anwendung nennt die noch zugeordneten Personen; eine automatische Umstellung findet nicht statt.
 
+### Mitarbeiterlebenszyklus
+
+- Eine deaktivierte Person kann mit derselben stabilen Kennung, denselben Namen und demselben Mitarbeitertyp reaktiviert werden.
+- Die Reaktivierung einer Typ1-Person wird zusammen mit der Speicherung atomar gegen die Grenze von höchstens einer aktiven Typ1-Person geprüft. Bei einem Konflikt bleibt die Person deaktiviert; ein automatischer Typwechsel findet nicht statt.
+- Nur eine bereits deaktivierte Person kann endgültig gelöscht werden. Eine aktive Person muss zuerst bewusst deaktiviert werden.
+- Endgültiges Löschen ist nur zulässig, solange die Person noch in keinem Plan, keiner Verfügbarkeit, keiner Abwesenheit, keinem Zeitkonto und keinen anderen Fachdaten verwendet wird. Andernfalls bleibt sie deaktiviert erhalten und die Anwendung erklärt den blockierenden Bezug verständlich.
+- Vor dem endgültigen Löschen zeigt die Oberfläche den vollständigen Namen, eine deutliche Unwiderruflichkeitswarnung und die getrennten Aktionen „Abbrechen“ und „Endgültig löschen“. Das erneute Eintippen des Namens wird nicht verlangt.
+- Eine gelöschte Mitarbeiterkennung wird nicht erneut vergeben. Historische Planmomentaufnahmen werden durch den Vorgang weder verändert noch gelöscht.
+
 ### Bezug zu System 04
 
 - System 04 bleibt die einzige Quelle für Einsatzorte, normale Diensttypen sowie die Definitionen von `D` und `Spr`.

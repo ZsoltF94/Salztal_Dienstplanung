@@ -55,6 +55,14 @@ public sealed class SqliteServiceCatalogStore :
 
         await transaction.CommitAsync(cancellationToken);
 
+        return CreateData(locationEntities, shiftTypeEntities, patternEntities);
+    }
+
+    internal static ServiceCatalogData CreateData(
+        IEnumerable<WorkLocationEntity> locationEntities,
+        IEnumerable<ShiftTypeEntity> shiftTypeEntities,
+        IEnumerable<ShiftPatternEntity> patternEntities)
+    {
         WorkLocation[] locations = locationEntities.Select(MapWorkLocation).ToArray();
         Dictionary<Guid, ShiftType> shiftTypes = shiftTypeEntities
             .Select(MapShiftType)

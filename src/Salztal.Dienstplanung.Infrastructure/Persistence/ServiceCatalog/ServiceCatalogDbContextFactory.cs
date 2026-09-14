@@ -1,5 +1,6 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Salztal.Dienstplanung.Infrastructure.Persistence;
 
 namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog;
 
@@ -11,7 +12,11 @@ internal sealed class ServiceCatalogDbContextFactory(string databasePath)
     {
         DbContextOptions<ServiceCatalogDbContext> options =
             new DbContextOptionsBuilder<ServiceCatalogDbContext>()
-                .UseSqlite(_connectionString)
+                .UseSqlite(
+                    _connectionString,
+                    sqliteOptions => sqliteOptions
+                        .MigrationsAssembly(SharedDatabaseMigrationBoundary.AssemblyName)
+                        .MigrationsHistoryTable(SharedDatabaseMigrationBoundary.HistoryTableName))
                 .Options;
 
         return new ServiceCatalogDbContext(options);

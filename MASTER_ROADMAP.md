@@ -80,7 +80,7 @@ Abhängigkeiten: 01
 
 ### 03 – Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben
 
-Status: `[~]` – MA-02 abgenommen; MA-02A zur Zeilenenden-Hygiene umgesetzt und geprüft, wartet auf Abnahme
+Status: `[~]` – MA-09 sichtbar abgenommen; MA-10 und MA-10A umgesetzt und automatisch geprüft, gemeinsamer sichtbarer Ablauf offen
 
 Ziel: Mitarbeitende mit getrennten Namen, Aktivstatus und genau einem gemeinsam referenzierten Mitarbeitertyp erfassen und lokal speichern. Jeder Typ stellt sein Wochen-Soll sowie reguläre, kontextabhängige und nur vorschlagsfähige Einsatzfreigaben als strukturierte Fachwerte bereit.
 
@@ -256,6 +256,10 @@ System 16 ergänzt Zeitkonten nach gesonderter Priorisierung, ohne den Abschluss
 - Zeitkonten bleiben nachrangig.
 - App-Code, Pakete oder Datenbankstrukturen werden durch dieses Dokument nicht freigegeben oder erzeugt.
 
+## Vorgemerkte Wartungsmaßnahmen
+
+- Der historisch eng benannte `ServiceCatalogDbContext` ist seit MA-07 der einzige Context der gemeinsamen lokalen Anwendungsdatenbank. Eine spätere Umbenennung ist nur in einem eigenen abgenommenen Wartungs- und Migrationsschritt zulässig. Dieser Schritt muss vorhandene Datenbanken vom veröffentlichten System-04-Stand und vom dann aktuellen Stand nachweislich aktualisieren können, ohne Migrationshistorie oder Daten zu verlieren. Bis dahin werden alle Schemaänderungen bewusst in derselben Context- und Migrationsfolge fortgeführt.
+
 ## Nächster übergeordneter Schritt
 
-System 04 – Einsatzorte, Diensttypen und Doppeldienste – ist mit ED-01 bis ED-10 abgenommen und archiviert. MA-01 und MA-02 von System 03 sind abgenommen. Der eingefügte Hygiene-Schritt MA-02A mit repositoryweit reproduzierbaren Zeilenenden ist umgesetzt und automatisch geprüft; als Nächstes wird er abgenommen oder korrigiert. MA-03 beginnt erst nach dieser Abnahme.
+System 04 – Einsatzorte, Diensttypen und Doppeldienste – ist mit ED-01 bis ED-10 abgenommen und archiviert. MA-01 bis MA-09 einschließlich des Hygiene-Schritts MA-02A von System 03 sind abgenommen. MA-10 ergänzt Anlegen, Bearbeiten, Typwechsel und Deaktivieren; MA-10A ergänzt Reaktivieren und referenzgeschütztes endgültiges Löschen deaktivierter Mitarbeitender. Beide Schritte sind umgesetzt und automatisch geprüft. Als Nächstes wird ihr vollständiger sichtbarer Ablauf gemeinsam abgenommen; MA-11 beginnt erst danach.

@@ -2,7 +2,7 @@
 
 Stand: 2026-09-14
 
-Status dieses Dokuments: Aktuell – MA-02 abgenommen; Hygiene-Schritt MA-02A umgesetzt und automatisch geprüft, wartet auf Abnahme
+Status dieses Dokuments: Aktuell – MA-09 sichtbar abgenommen; MA-10 und MA-10A umgesetzt und automatisch geprüft, gemeinsamer sichtbarer Ablauf offen
 
 ## Aktueller Überblick
 
@@ -11,9 +11,9 @@ Status dieses Dokuments: Aktuell – MA-02 abgenommen; Hygiene-Schritt MA-02A um
 | Projektphase | Umsetzung von System 03 |
 | Aktives System | System 03 – Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben |
 | Aktive Teil-Roadmap | abgenommene Roadmap unter `docs/roadmaps/active/EMPLOYEES_EMPLOYEE_TYPES_SHIFT_ELIGIBILITY_ROADMAP.md` |
-| Aktueller Stand | MA-02A – repositoryweite Zeilenenden konsolidiert und automatisch geprüft; wartet auf Abnahme |
-| Zuletzt abgenommener Schritt | MA-02 – Mitarbeitertyp-Grundwerte fachlich modellieren |
-| Funktionsfähige App | Einsatzorte und Diensttyp-Standardzeiten können angezeigt und bearbeitet werden; noch keine Dienstplanfunktion |
+| Aktueller Stand | MA-10 und MA-10A – vollständige Mitarbeiter-Stammdatenbedienung einschließlich Reaktivieren und sicherem Löschen umgesetzt und automatisch geprüft; gemeinsamer sichtbarer Ablauf offen |
+| Zuletzt abgenommener Schritt | MA-09 – getrennte Mitarbeiterübersicht in WPF |
+| Funktionsfähige App | Einsatzorte und Diensttyp-Standardzeiten können angezeigt und bearbeitet werden; Mitarbeitende können in einem getrennten Reiter gelesen werden; noch keine Dienstplanfunktion |
 | Echte Mitarbeiter- oder Plandaten im Repository | Keine festgestellt; das zuvor vorhandene sensible Beispielbild ist nicht mehr im Arbeitsordner |
 
 ## Nachweislich fertig und abgenommen
@@ -36,11 +36,35 @@ Status dieses Dokuments: Aktuell – MA-02 abgenommen; Hygiene-Schritt MA-02A um
 - Die acht Starttypen, ihre Wochen-Sollwerte, regulären Einsatzmöglichkeiten sowie die Typ1- und AH-Sonderfälle sind festgehalten.
 - Für die erste Fassung wird kein zusätzlicher Qualifikationskatalog benötigt. System 03 heißt deshalb künftig „Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben“.
 - Die überarbeitete Teil-Roadmap enthält die bestätigten Code-Anker, eine eigene Absicherung der bestehenden SQLite-Migrationsfolge und eindeutige Übergaben an die späteren Planungs- und Konfliktsysteme.
-- MA-01 und MA-02 sind ausdrücklich abgenommen. MA-02 führt ausschließlich die stark typisierten, unveränderlichen Domain-Grundwerte für Mitarbeitertypkennung, Code, Name und Wochen-Soll ein.
+- MA-01 bis MA-09 einschließlich MA-02A sind ausdrücklich abgenommen. MA-02 führt ausschließlich die stark typisierten, unveränderlichen Domain-Grundwerte für Mitarbeitertypkennung, Code, Name und Wochen-Soll ein.
 - Ein Wochen-Soll wird minutengenau als ganze Zahl gespeichert, muss positiv sein und kann die vollständige Wochenlänge von 10.080 Minuten nicht überschreiten. Es werden weder `double` noch `float` verwendet.
 - MA-02A ergänzt `.gitattributes` und gleicht die Repository-Textdateien einmalig an die bereits bestätigte CRLF-Regel aus `.editorconfig` an. Shell-Skripte bleiben ausdrücklich auf LF.
 - Der zeilenendenunabhängige Inhaltsfingerabdruck von 169 geprüften Textdateien war vor und nach der Normalisierung identisch. Die vollständige Formatprüfung, der Build und alle 109 automatischen Tests bestehen.
-- Mitarbeiterobjekt, Starttypenkatalog, Einsatzfreigaben, Mitarbeiter-Tabellen und Mitarbeiteroberfläche existieren noch nicht.
+- MA-03 ergänzt die acht Starttypen mit stabilen Kennungen, verständlichen Namen und strukturierten Freigaben für normale Diensttypen und Einsatzmuster.
+- Reguläre Freigaben, manuelle Lösungsvorschläge und eine ausdrücklich vor dem Planungslauf zu aktivierende Musterfreigabe sind getrennte Fachwerte. TypAH2 darf dadurch `D` regulär, einen einzelnen Frühdienst nur als Vorschlag und `Spr` nur nach aktivierter Laufoption übernehmen.
+- Typ1 trägt eine strukturierte Richtlinie: keine automatische Einteilung, mindestens eine spätere manuelle Wochenzuweisung, Schutz vorhandener manueller Zuweisungen und letzte Vorschlagspriorität.
+- Freigaben speichern ausschließlich stabile System-04-Kennungen und keine kopierten Namen, Farben, Standardzeiten oder Musterbestandteile.
+- MA-04 ergänzt ein unveränderliches Mitarbeiterobjekt mit stabiler Kennung, getrenntem Vor- und Nachnamen, verständlichem Anzeigenamen, Aktivstatus und genau einer `EmployeeTypeId`.
+- Namensänderung, Typwechsel und Deaktivierung erzeugen neue gültige Fassungen und lassen den vorherigen Stand unverändert. Gleiche menschliche Namen bleiben zulässig, weil die technische Identität über `EmployeeId` gesichert ist.
+- Das Mitarbeiterobjekt enthält weder ein kopiertes Wochen-Soll noch eigene Einsatzfreigaben. Die Prüfung, ob eine Typkennung im gemeinsamen Katalog existiert, und die Grenze von höchstens einer aktiven Typ1-Person folgen erst in Application.
+- MA-05 stellt getrennte Leseabfragen für Mitarbeiterübersicht, Mitarbeiterdetails und den verständlichen Mitarbeitertypkatalog bereit.
+- Die unveränderlichen Ausgaben enthalten getrennte und zusammengesetzte Namen, Aktivstatus, aktuelle Typangaben, Wochenstunden sowie verständliche deutsche Freigabetexte. Gleiche Anzeigenamen bleiben als getrennte Kennungen erhalten.
+- Typangaben werden bei jedem Lesen aus der gemeinsam gelieferten aktuellen Typdefinition aufgelöst und nicht aus Mitarbeiterkopien übernommen. Leere Ergebnisse und Abbruch vor dem Lesen sind geprüft.
+- MA-06 stellt getrennte Schreibabläufe für Anlegen, Namen bearbeiten, Typ wechseln und Deaktivieren bereit. Ergebnisse besitzen stabile Codes und verständliche deutsche Meldungen für Validierung, nicht gefundene Daten, ungültige Typbezüge, Typ1- und Änderungskonflikte.
+- Anlegen und Typwechsel verlangen über eigene Speicherverträge eine atomare Prüfung auf höchstens eine aktive Typ1-Person. Die Deaktivierung der letzten aktiven Typ1-Person bleibt während der Stammdateneinrichtung zulässig; eine spätere Planung wird den fehlenden Zielzustand blockieren.
+- MA-07 legt den bestehenden `ServiceCatalogDbContext`, die Infrastructure-Assembly, `__EFMigrationsHistory` und den vorhandenen Migrationsordner als einzige gemeinsame SQLite-Migrationsfolge fest. Der historische Context-Name bleibt bewusst erhalten, damit die veröffentlichte System-04-Migration nicht umgeschrieben wird.
+- Charakterisierungstests sichern das exakte leere System-04-Ausgangsschema und das unveränderte erneute Öffnen einer bereits initialisierten, synthetisch geänderten Datenbank. Zwei zusätzliche Architekturtests verhindern einen zweiten `DbContext` oder Migrationsordner.
+- MA-08 ergänzt die acht Mitarbeitertypen, ihre 38 Einsatzfreigaben und die Mitarbeitertabelle über eine zweite generierte Migration in derselben gemeinsamen Folge. Es werden keine realen Mitarbeiter vorbefüllt.
+- `SqliteEmployeeStore` implementiert die bestätigten Lese- und Schreibverträge. Namen, Typwechsel, Deaktivierung und erneutes Laden bleiben über Store-Neustarts erhalten; Typwerte werden aus dem gemeinsam gespeicherten Katalog aufgelöst.
+- Fremdschlüssel, Prüfregeln und ein eindeutiger gefilterter Datenbankindex verhindern unbekannte Referenzen, das Entfernen verwendeter Typen und mehr als eine aktive Typ1-Person. Optimistische Vergleiche schützen vor dem Überschreiben zwischenzeitlicher Änderungen.
+- MA-09 ergänzt einen getrennten Reiter „Mitarbeitende“. Die Übersicht zeigt Namen, Aktivstatus, Typ, Wochen-Soll und Einsatzmöglichkeiten.
+- Lade-, Leer- und Fehlerzustand, erneutes Laden und die Auswahl einer Person sind automatisch geprüft. Der Auftraggeber hat den Reiter „Mitarbeitende“, den leeren deutschen Zustand und den Button „Aktualisieren“ am 2026-09-14 sichtbar bestätigt.
+- MA-10 ergänzt getrennte WPF-Aktionen zum Anlegen, Namen bearbeiten, Typ wechseln und Deaktivieren. Pflichtfeld- und Typ1-Konflikte bleiben verständlich und ohne Verlust der Eingaben sichtbar.
+- Die Typauswahl erklärt vor dem Speichern Code, Namen, Wochen-Soll und Einsatzmöglichkeiten. Eine Deaktivierung benötigt eine ausdrückliche Bestätigung und löscht keine Person.
+- MA-10A ergänzt Reaktivieren und endgültiges Löschen für deaktivierte Mitarbeitende. Reaktivieren erhält Kennung, Namen und Typ und verwendet dieselbe atomare Typ1-Grenze wie Anlegen und Typwechsel.
+- Nur inaktive und noch nie fachlich referenzierte Personen dürfen endgültig gelöscht werden. Ein SQLite-Fremdschlüsseltest weist nach, dass verwendete Personen deaktiviert erhalten bleiben und verständlich als nicht löschbar gemeldet werden.
+- Die rote Löschbestätigung zeigt den vollständigen Namen und den Hinweis, dass die Aktion nicht rückgängig gemacht werden kann. Abbruch und Fehler lassen die Person unverändert; erst erfolgreiche Speicherung entfernt sie aus der Übersicht.
+- MA-10A benötigt keine Datenbankmigration. Künftige Plan-, Verfügbarkeits-, Abwesenheits- und Zeitkontobezüge müssen das Löschen mit restriktiven Fremdschlüsseln verhindern.
 - System 04 – Einsatzorte, Diensttypen und Doppeldienste – ist als erstes Fachsystem ausgewählt, damit System 03 später vorhandene stabile Kennungen zuordnen kann.
 - Die beantwortete Fragen-Datei bestätigt Einsatzorte, Diensttypen, Standardzeiten, tatsächliche Bedarfszeiten, Doppeldienst, Springer und den minimalen Bedienumfang.
 - Die frühere Annahme einer stets festen Diensttypzeit ist ersetzt: Jeder Bedarf verlangt genau einen Diensttyp, besitzt aber seine tatsächliche, ausdrücklich bearbeitbare Zeit.
@@ -83,8 +107,8 @@ Status dieses Dokuments: Aktuell – MA-02 abgenommen; Hygiene-Schritt MA-02A um
 - ED-10 hat Domain, Application, Infrastructure und Desktop gegen den bestätigten Umfang von System 04 abgeglichen. Die stabilen Kennungen und unveränderlichen Katalogmomentaufnahmen bilden eine eindeutige Übergabe an das spätere System 03.
 - Der damalige System-03-Entwurf plante nur `WorkLocationId`- und `ShiftTypeId`-Freigaben. Die am 2026-09-14 bestätigte Mitarbeitertyp-Entscheidung ergänzt strukturierte kontextabhängige Musterfreigaben, ohne Katalogdaten oder Musterdefinitionen aus System 04 zu kopieren.
 - ED-10 und damit System 04 sind am 2026-09-13 ausdrücklich abgenommen. Die Roadmap und ihre beantwortete Fragen-Datei sind unter `docs/roadmaps/completed` archiviert.
-- Der weiterhin nicht abgenommene System-03-Entwurf wurde nach dieser Archivierung unter `docs/roadmaps/active` wieder aufgenommen. Noch existiert kein Mitarbeiter-Fachcode.
-- 14 Application-Tests, 46 Domain-Tests, 6 Infrastructure-Tests, 13 Desktop-Tests und 13 Architekturtests bestehen. Die vollständige Solution kompiliert mit 0 Warnungen und 0 Fehlern.
+- Der damalige System-03-Entwurf wurde nach dieser Archivierung unter `docs/roadmaps/active` wieder aufgenommen, fachlich überarbeitet und abgenommen. Inzwischen sind MA-01 bis MA-09 einschließlich MA-02A bestätigt; MA-10 ist umgesetzt und automatisch geprüft und wartet auf die sichtbare Abnahme.
+- Zum Abschluss von System 04 bestanden 14 Application-Tests, 46 Domain-Tests, 6 Infrastructure-Tests, 13 Desktop-Tests und 13 Architekturtests. Die aktuellen Gesamtzahlen stehen unter „Offene Prüf- und Abnahmegates“.
 - TG-07 mit den sieben getrennten Testprojekten für die sechs Produktionsmodule und die Architektur ist abgenommen.
 - TG-08 mit zwölf Architekturtests und den drei nachgewiesenen Fehlermutationen ist abgenommen.
 - TG-09 und damit System 02 sind nach dem manuellen sichtbaren Starttest vollständig abgenommen und archiviert.
@@ -106,11 +130,10 @@ Status dieses Dokuments: Aktuell – MA-02 abgenommen; Hygiene-Schritt MA-02A um
 - Die gesperrte Wiederherstellung, der vollständige Build mit 0 Warnungen und 0 Fehlern sowie aktuell 13 von 13 Architekturtests bestehen erneut.
 - Die Desktop-App startete technisch mit reagierendem Hauptfenster und dem Titel „Salztal Dienstplanung“ und wurde regulär mit Exitcode 0 beendet.
 - Der Auftraggeber hat den sichtbaren lokalen Start, den Fenstertitel und die beiden deutschen Hinweistexte bestätigt.
-- Es wurden noch keine fachlichen Planungs- oder Excel-Abläufe und keine Mitarbeiter- oder Dienstplanbedienung angelegt.
+- Es wurden noch keine fachlichen Planungs- oder Excel-Abläufe angelegt. Der vollständige sichtbare Mitarbeiterablauf einschließlich Reaktivieren und Löschen wartet noch auf die gemeinsame Abnahme.
 
 ## Noch nicht begonnen
 
-- Die Implementierung von System 03
 - Systeme 05 bis 14
 - System 15 – Portable Windows-Auslieferung und Endabnahme der Kernversion
 - System 16 – Zeitkonten als spätere Ausbaustufe
@@ -148,11 +171,13 @@ Die Antworten sind in der Fragen-Datei und im Entscheidungsdokument festgehalten
 - kontextabhängige Doppeldienstfreigabe für TypAH2 sowie standardmäßig ausgeschaltete Planungslaufoption für dessen Springer-Verwendung,
 - zwingender Wochenkorridor von plus/minus drei Stunden für Typ25, Typ30, Typ30a, Typ35 und Typ35a; Typ1 wird nur bewertet und gemeldet; besonderer AH-Korridor von sieben bis zwölf Stunden,
 - unveränderlicher Wochenstundenbericht als Bestandteil jedes späteren Planungsergebnisses,
-- Mitarbeitende werden deaktiviert; verwendete Typen können erst nach bewusster Neuzuordnung aller betroffenen Personen entfernt werden,
+- Mitarbeitende können deaktiviert und reaktiviert werden; eine zweite aktive Typ1-Person bleibt ausgeschlossen,
+- nur deaktivierte, noch nie fachlich verwendete Mitarbeitende können nach einer eigenen Unwiderruflichkeitswarnung endgültig gelöscht werden,
+- verwendete Typen können erst nach bewusster Neuzuordnung aller betroffenen Personen entfernt werden,
 - kein zusätzlicher Qualifikationskatalog in der ersten Fassung,
 - erste Mitarbeiteroberfläche mit Übersicht, Anlegen, Bearbeiten, Typwechsel und Deaktivieren; noch ohne Suche, Filter und Typenkatalogpflege.
 
-Die vollständige Entscheidung steht in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`. MA-01 ist abgenommen; MA-02 setzt zunächst nur die gemeinsamen Domain-Grundwerte um.
+Die vollständige Fachentscheidung steht in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`; die gemeinsame technische Migrationsgrenze in `docs/decisions/SHARED_SQLITE_MIGRATION_BOUNDARY.md`. MA-01 bis MA-09 einschließlich MA-02A sind abgenommen; MA-10 und MA-10A sind umgesetzt und automatisch geprüft und warten auf die gemeinsame sichtbare Abnahme.
 
 ## Offene Entscheidungen für spätere Systeme
 
@@ -168,7 +193,9 @@ Diese Entscheidungen sind für den Abschluss der Dokumentationsgrundlage noch ni
 
 ## Echte Blockaden
 
-Für MA-02A besteht keine technische Blockade. Der umgesetzte und automatisch geprüfte Hygiene-Schritt wartet auf die Abnahme.
+Für MA-10 besteht keine technische Blockade. Offen ist die sichtbare Prüfung des vollständigen Mitarbeiterablaufs einschließlich Neustart und erneutem Laden.
+
+Für MA-10A besteht keine technische Blockade. Die Implementierung ist abgeschlossen; offen ist nur der gemeinsame sichtbare MA-10-/MA-10A-Ablauf einschließlich Neustart.
 
 Das zuvor unversionierte Beispielbild mit echten Namen und konkreten Plandaten ist nicht mehr im Arbeitsordner vorhanden. Die daraus benötigten Fachinformationen sind nur abstrahiert und ohne personenbezogene Daten dokumentiert.
 
@@ -176,10 +203,11 @@ Die fehlende Excel-Vorlage blockiert später den Excel-Vorlagentest und System 1
 
 ## Offene Prüf- und Abnahmegates
 
-- Alle 13 Produktions- und Testprojekte kompilieren erfolgreich; 14 von 14 Application-Tests, 63 von 63 Domain-Tests, 6 von 6 Infrastructure-Tests, 13 von 13 Desktop-Tests und 13 von 13 Architekturtests bestehen.
+- Alle 13 Produktions- und Testprojekte kompilieren erfolgreich; 55 von 55 Application-Tests, 95 von 95 Domain-Tests, 23 von 23 Infrastructure-Tests, 32 von 32 Desktop-Tests und 16 von 16 Architekturtests bestehen. Insgesamt bestehen alle 221 vorhandenen Tests.
 - Der vollständige sichtbare Einsatzort-, Diensttyp-, Doppeldienst- und Springer-Ablauf wurde schrittweise manuell geprüft und durch den Auftraggeber bestätigt.
 - Die Paketwiederherstellung und der Build bestätigen noch keinen OR-Tools-Lauf auf einem sauberen Zielsystem. Die Visual-C++-x64-Laufzeitvoraussetzung wird erst bei der portablen Auslieferung praktisch geprüft.
-- Die SQLite-Katalogspeicherung ist mit temporären Testdateien geprüft und die lokale App-Datenbank wurde beim sichtbaren Start angelegt. Planungsengine und Excel-Export wurden noch nicht implementiert.
+- Die gemeinsame SQLite-Speicherung für Servicekatalog, Mitarbeitertypen, Einsatzfreigaben und Mitarbeitende ist mit leeren sowie vom System-04-Stand aktualisierten temporären Testdateien geprüft. Übersicht, Bearbeitung, Reaktivierung und referenzgeschütztes Löschen sind implementiert; der gemeinsame sichtbare MA-10-/MA-10A-Ablauf, Planungsengine und Excel-Export stehen noch aus.
+- Die aktuelle WPF-App wurde lokal mit dem Titel „Salztal Dienstplanung“ gestartet und reagiert. Die Windows-Prüfhilfe konnte das Fenster nicht erfassen; die sichtbare Bedienprüfung bleibt deshalb beim Auftraggeber.
 - Portable Windows-Ausgabe und Start auf einem geeigneten Windows-11-System stehen noch aus.
 - Die fachliche Endabnahme durch die Service-Leitung steht noch aus.
 
@@ -187,4 +215,4 @@ Keines dieser späteren Gates wird vorzeitig als bestanden geführt.
 
 ## Nächster minimaler Schritt
 
-MA-02A mit der repositoryweiten Zeilenendenregel ausdrücklich abnehmen oder Änderungswünsche nennen. Erst danach beginnt MA-03 mit Einsatzfreigaben und dem initialen Typenkatalog.
+Den vollständigen MA-10- und MA-10A-Ablauf mit synthetischen Daten sichtbar prüfen und ausdrücklich abnehmen oder Änderungswünsche nennen. Dazu gehören Anlegen, Umbenennen, Typwechsel, Deaktivieren, Reaktivieren, Typ1-Konflikt, Löschabbruch, endgültiges Löschen und erneutes Laden nach einem Neustart. Erst danach beginnt MA-11.

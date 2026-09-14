@@ -64,6 +64,39 @@ public sealed class DesktopCompositionBoundaryTests
         Assert.Empty(violations);
     }
 
+    [Fact]
+    public void DesktopFeatureSourcesWhenScannedDoNotReferenceOtherFeatureViewModels()
+    {
+        string featureDirectory = Path.Combine(
+            RepositoryLayout.Root.FullName,
+            "src",
+            "Salztal.Dienstplanung.Desktop",
+            "Features");
+        string employeeDirectory = Path.Combine(featureDirectory, "Employees");
+        string serviceCatalogDirectory = Path.Combine(featureDirectory, "ServiceCatalog");
+
+        AssertFeatureDoesNotReference(
+            employeeDirectory,
+            "Salztal.Dienstplanung.Desktop.Features.ServiceCatalog");
+        AssertFeatureDoesNotReference(
+            serviceCatalogDirectory,
+            "Salztal.Dienstplanung.Desktop.Features.Employees");
+    }
+
+    private static void AssertFeatureDoesNotReference(
+        string featureDirectory,
+        string forbiddenNamespace)
+    {
+        string[] violations = EnumerateSourceFiles(featureDirectory, "*.cs")
+            .Where(sourceFile => File.ReadAllText(sourceFile).Contains(
+                forbiddenNamespace,
+                StringComparison.Ordinal))
+            .Select(RepositoryLayout.GetRepositoryRelativePath)
+            .ToArray();
+
+        Assert.Empty(violations);
+    }
+
     private static IEnumerable<string> EnumerateSourceFiles(string directory, string searchPattern)
     {
         return Directory

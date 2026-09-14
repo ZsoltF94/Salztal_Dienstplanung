@@ -39,6 +39,10 @@ Ein Mitarbeitertyp wird gemeinsam verwendet. Ändert die Service-Leitung später
 
 Für die erste Fassung werden keine zusätzlichen Qualifikationen benötigt. Neue Mitarbeitertypen können später ergänzt werden; die erste Mitarbeiterbedienung zeigt und verwendet zunächst nur die bestätigten Starttypen.
 
+Deaktivierte Mitarbeitende können später mit derselben Kennung, demselben Namen und demselben Typ wieder aktiviert werden. Dabei darf weiterhin höchstens eine aktive Person vom Typ1 vorhanden sein.
+
+Endgültig gelöscht werden dürfen nur deaktivierte Mitarbeitende, die noch in keinem Plan und keinen anderen Fachdaten verwendet wurden. Vorher zeigt die App den vollständigen Namen und warnt, dass das Löschen nicht rückgängig gemacht werden kann. Bereits verwendete Personen bleiben zum Schutz der Historie deaktiviert erhalten.
+
 ## Einsatzorte und Dienste
 
 Die zunächst bekannten Einsatzorte sind:

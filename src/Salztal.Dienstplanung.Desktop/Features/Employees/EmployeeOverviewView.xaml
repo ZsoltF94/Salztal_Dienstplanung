@@ -1,0 +1,529 @@
+<UserControl x:Class="Salztal.Dienstplanung.Desktop.Features.Employees.EmployeeOverviewView"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d:DesignHeight="700"
+             d:DesignWidth="1200"
+             mc:Ignorable="d">
+  <UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+    <Style x:Key="EmployeeCardStyle"
+           TargetType="Border">
+      <Setter Property="Background"
+              Value="White" />
+      <Setter Property="BorderBrush"
+              Value="#D8DEE7" />
+      <Setter Property="BorderThickness"
+              Value="1" />
+      <Setter Property="CornerRadius"
+              Value="10" />
+      <Setter Property="Padding"
+              Value="22" />
+    </Style>
+
+    <Style x:Key="FieldErrorStyle"
+           TargetType="TextBlock">
+      <Setter Property="Margin"
+              Value="0,5,0,0" />
+      <Setter Property="Foreground"
+              Value="#8B1E1E" />
+      <Setter Property="TextWrapping"
+              Value="Wrap" />
+    </Style>
+  </UserControl.Resources>
+
+  <Grid Background="#F3F6FA">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <Border Padding="32,22"
+            Background="#17324D">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="12" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <StackPanel>
+          <TextBlock Foreground="White"
+                     FontSize="26"
+                     FontWeight="SemiBold"
+                     Text="Mitarbeitende" />
+          <TextBlock Margin="0,6,0,0"
+                     Foreground="#D7E4F0"
+                     FontSize="14"
+                     Text="Mitarbeiterbestand, Mitarbeitertypen und Einsatzmöglichkeiten" />
+        </StackPanel>
+        <Button Grid.Column="1"
+                MinWidth="130"
+                VerticalAlignment="Center"
+                AutomationProperties.Name="Neuen Mitarbeiter anlegen"
+                Command="{Binding BeginCreateCommand}"
+                Content="Neu anlegen" />
+        <Button Grid.Column="3"
+                MinWidth="130"
+                VerticalAlignment="Center"
+                AutomationProperties.Name="Mitarbeiterübersicht aktualisieren"
+                Command="{Binding LoadCommand}"
+                Content="Aktualisieren" />
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1"
+          Margin="28">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <Border Margin="0,0,0,16"
+              Padding="12"
+              Background="#E7F5EC"
+              BorderBrush="#7CB68E"
+              BorderThickness="1"
+              CornerRadius="6"
+              Visibility="{Binding HasSuccessMessage, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <TextBlock Foreground="#215E33"
+                   Text="{Binding SuccessMessage}"
+                   TextWrapping="Wrap" />
+      </Border>
+
+      <StackPanel Grid.Row="1"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <ProgressBar Width="220"
+                     Height="8"
+                     IsIndeterminate="True" />
+        <TextBlock Margin="0,14,0,0"
+                   Foreground="#526174"
+                   Text="Mitarbeitende werden geladen …" />
+      </StackPanel>
+
+      <StackPanel Grid.Row="1"
+                  MaxWidth="520"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Visibility="{Binding HasLoadError, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <TextBlock HorizontalAlignment="Center"
+                   FontSize="19"
+                   FontWeight="SemiBold"
+                   Text="Laden nicht möglich" />
+        <TextBlock Margin="0,10,0,18"
+                   Foreground="#8B1E1E"
+                   Text="{Binding LoadErrorMessage}"
+                   TextAlignment="Center"
+                   TextWrapping="Wrap" />
+        <Button Command="{Binding LoadCommand}"
+                Content="Erneut versuchen" />
+      </StackPanel>
+
+      <StackPanel Grid.Row="1"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Visibility="{Binding IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <TextBlock HorizontalAlignment="Center"
+                   FontSize="19"
+                   FontWeight="SemiBold"
+                   Text="Noch keine Mitarbeitenden vorhanden" />
+        <TextBlock Margin="0,8,0,16"
+                   Foreground="#526174"
+                   Text="Legen Sie den ersten Mitarbeiter mit Vorname, Nachname und Mitarbeitertyp an."
+                   TextAlignment="Center"
+                   TextWrapping="Wrap" />
+        <Button AutomationProperties.Name="Ersten Mitarbeiter anlegen"
+                Command="{Binding BeginCreateCommand}"
+                Content="Ersten Mitarbeiter anlegen" />
+      </StackPanel>
+
+      <Grid Grid.Row="1"
+            Visibility="{Binding HasEmployeeWorkspace, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="3*" />
+          <ColumnDefinition Width="24" />
+          <ColumnDefinition Width="2*" />
+        </Grid.ColumnDefinitions>
+
+        <Border Style="{StaticResource EmployeeCardStyle}">
+          <Grid>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Margin="0,0,0,16"
+                       FontSize="19"
+                       FontWeight="SemiBold"
+                       Text="Mitarbeiterübersicht" />
+            <DataGrid Grid.Row="1"
+                      AutomationProperties.Name="Vorhandene Mitarbeitende"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      CanUserReorderColumns="False"
+                      CanUserResizeRows="False"
+                      CanUserSortColumns="False"
+                      HeadersVisibility="Column"
+                      IsReadOnly="True"
+                      ItemsSource="{Binding Employees}"
+                      SelectedItem="{Binding SelectedEmployee}"
+                      SelectionMode="Single">
+              <DataGrid.Style>
+                <Style TargetType="DataGrid">
+                  <Setter Property="IsEnabled"
+                          Value="True" />
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsEditorOpen}"
+                                 Value="True">
+                      <Setter Property="IsEnabled"
+                              Value="False" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsDeactivationConfirmationOpen}"
+                                 Value="True">
+                      <Setter Property="IsEnabled"
+                               Value="False" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsDeletionConfirmationOpen}"
+                                 Value="True">
+                      <Setter Property="IsEnabled"
+                              Value="False" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsSaving}"
+                                 Value="True">
+                      <Setter Property="IsEnabled"
+                              Value="False" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </DataGrid.Style>
+              <DataGrid.Columns>
+                <DataGridTextColumn Width="*"
+                                    Binding="{Binding FirstName}"
+                                    Header="Vorname" />
+                <DataGridTextColumn Width="*"
+                                    Binding="{Binding LastName}"
+                                    Header="Nachname" />
+                <DataGridTextColumn Width="Auto"
+                                    Binding="{Binding StatusDisplay}"
+                                    Header="Status" />
+                <DataGridTextColumn Width="Auto"
+                                    Binding="{Binding EmployeeTypeCode}"
+                                    Header="Typ" />
+                <DataGridTextColumn Width="Auto"
+                                    Binding="{Binding WeeklyWorkTargetDisplay}"
+                                    Header="Wochen-Soll" />
+              </DataGrid.Columns>
+            </DataGrid>
+          </Grid>
+        </Border>
+
+        <Border Grid.Column="2"
+                DataContext="{Binding SelectedEmployee}"
+                Style="{StaticResource EmployeeCardStyle}"
+                Visibility="{Binding DataContext.ShowSelectedEmployeeDetails, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
+          <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+              <TextBlock FontSize="22"
+                         FontWeight="SemiBold"
+                         Text="{Binding DisplayName}" />
+              <TextBlock Margin="0,5,0,20"
+                         Foreground="#526174"
+                         Text="{Binding StatusDisplay, StringFormat=Status: {0}}" />
+
+              <TextBlock FontWeight="SemiBold"
+                         Text="Mitarbeitertyp" />
+              <TextBlock Margin="0,5,0,0"
+                         Text="{Binding EmployeeTypeCode}" />
+              <TextBlock Margin="0,3,0,0"
+                         Foreground="#526174"
+                         Text="{Binding EmployeeTypeName}"
+                         TextWrapping="Wrap" />
+
+              <TextBlock Margin="0,18,0,0"
+                         FontWeight="SemiBold"
+                         Text="Wochen-Soll" />
+              <TextBlock Margin="0,5,0,0"
+                         Text="{Binding WeeklyWorkTargetDisplay}" />
+
+              <TextBlock Margin="0,22,0,8"
+                         FontSize="17"
+                         FontWeight="SemiBold"
+                         Text="Einsatzmöglichkeiten" />
+              <ItemsControl ItemsSource="{Binding ShiftEligibilities}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Border Margin="0,0,0,8"
+                            Padding="10"
+                            Background="#F7F9FC"
+                            BorderBrush="#D8DEE7"
+                            BorderThickness="1"
+                            CornerRadius="6">
+                      <StackPanel>
+                        <TextBlock FontWeight="SemiBold"
+                                   Text="{Binding TargetName}" />
+                        <TextBlock Margin="0,3,0,0"
+                                   Foreground="#526174"
+                                   Text="{Binding AvailabilityDisplay}"
+                                   TextWrapping="Wrap" />
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <WrapPanel Margin="0,18,0,0">
+                <Button Margin="0,0,8,8"
+                        Command="{Binding DataContext.BeginRenameCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        Content="Namen bearbeiten" />
+                <Button Margin="0,0,8,8"
+                        Command="{Binding DataContext.BeginTypeChangeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        Content="Typ wechseln" />
+                <Button Margin="0,0,0,8"
+                        Command="{Binding DataContext.RequestDeactivationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        Content="Deaktivieren"
+                        Visibility="{Binding IsActive, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <Button Margin="0,0,8,8"
+                        Command="{Binding DataContext.ReactivateEmployeeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        Content="Reaktivieren"
+                        Visibility="{Binding IsInactive, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <Button Margin="0,0,0,8"
+                        Background="#B3261E"
+                        Command="{Binding DataContext.RequestDeletionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        Content="Endgültig löschen"
+                        Foreground="White"
+                        Visibility="{Binding IsInactive, Converter={StaticResource BooleanToVisibilityConverter}}" />
+              </WrapPanel>
+            </StackPanel>
+          </ScrollViewer>
+        </Border>
+
+        <Border Grid.Column="2"
+                Style="{StaticResource EmployeeCardStyle}"
+                Visibility="{Binding IsEditorOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+          <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+              <TextBlock FontSize="22"
+                         FontWeight="SemiBold"
+                         Text="{Binding EditorTitle}" />
+
+              <StackPanel Margin="0,20,0,0"
+                          Visibility="{Binding IsCreateMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock FontWeight="SemiBold"
+                           Text="Vorname" />
+                <TextBox Margin="0,6,0,0"
+                         AutomationProperties.Name="Vorname"
+                         Text="{Binding EditorFirstName, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Style="{StaticResource FieldErrorStyle}"
+                           Text="{Binding FirstNameErrorMessage}"
+                           Visibility="{Binding HasFirstNameError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                <TextBlock Margin="0,16,0,0"
+                           FontWeight="SemiBold"
+                           Text="Nachname" />
+                <TextBox Margin="0,6,0,0"
+                         AutomationProperties.Name="Nachname"
+                         Text="{Binding EditorLastName, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Style="{StaticResource FieldErrorStyle}"
+                           Text="{Binding LastNameErrorMessage}"
+                           Visibility="{Binding HasLastNameError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+              </StackPanel>
+
+              <StackPanel Margin="0,20,0,0"
+                          Visibility="{Binding IsRenameMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock FontWeight="SemiBold"
+                           Text="Vorname" />
+                <TextBox Margin="0,6,0,0"
+                         AutomationProperties.Name="Vorname bearbeiten"
+                         Text="{Binding EditorFirstName, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Style="{StaticResource FieldErrorStyle}"
+                           Text="{Binding FirstNameErrorMessage}"
+                           Visibility="{Binding HasFirstNameError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                <TextBlock Margin="0,16,0,0"
+                           FontWeight="SemiBold"
+                           Text="Nachname" />
+                <TextBox Margin="0,6,0,0"
+                         AutomationProperties.Name="Nachname bearbeiten"
+                         Text="{Binding EditorLastName, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Style="{StaticResource FieldErrorStyle}"
+                           Text="{Binding LastNameErrorMessage}"
+                           Visibility="{Binding HasLastNameError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+              </StackPanel>
+
+              <StackPanel Margin="0,20,0,0"
+                          Visibility="{Binding IsCreateMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock FontWeight="SemiBold"
+                           Text="Mitarbeitertyp" />
+                <ComboBox Margin="0,6,0,0"
+                          AutomationProperties.Name="Mitarbeitertyp auswählen"
+                          ItemsSource="{Binding EmployeeTypes}"
+                          SelectedItem="{Binding SelectedEmployeeType}">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                      <TextBlock MaxWidth="420"
+                                 Text="{Binding SelectionDisplay}"
+                                 TextWrapping="Wrap" />
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+                <TextBlock Style="{StaticResource FieldErrorStyle}"
+                           Text="{Binding EmployeeTypeErrorMessage}"
+                           Visibility="{Binding HasEmployeeTypeError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+              </StackPanel>
+
+              <StackPanel Margin="0,20,0,0"
+                          Visibility="{Binding IsTypeChangeMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock FontWeight="SemiBold"
+                           Text="Neuer Mitarbeitertyp" />
+                <ComboBox Margin="0,6,0,0"
+                          AutomationProperties.Name="Neuen Mitarbeitertyp auswählen"
+                          ItemsSource="{Binding EmployeeTypes}"
+                          SelectedItem="{Binding SelectedEmployeeType}">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                      <TextBlock MaxWidth="420"
+                                 Text="{Binding SelectionDisplay}"
+                                 TextWrapping="Wrap" />
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+                <TextBlock Style="{StaticResource FieldErrorStyle}"
+                           Text="{Binding EmployeeTypeErrorMessage}"
+                           Visibility="{Binding HasEmployeeTypeError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+              </StackPanel>
+
+              <Border Margin="0,18,0,0"
+                      Padding="12"
+                      Background="#F7F9FC"
+                      BorderBrush="#D8DEE7"
+                      BorderThickness="1"
+                      CornerRadius="6"
+                      DataContext="{Binding SelectedEmployeeType}"
+                      Visibility="{Binding DataContext.HasSelectedEmployeeType, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel>
+                  <TextBlock FontWeight="SemiBold"
+                             Text="{Binding Code}" />
+                  <TextBlock Margin="0,3,0,0"
+                             Text="{Binding Name}"
+                             TextWrapping="Wrap" />
+                  <TextBlock Margin="0,3,0,8"
+                             Foreground="#526174"
+                             Text="{Binding WeeklyWorkTargetDisplay, StringFormat=Wochen-Soll: {0}}" />
+                  <ItemsControl ItemsSource="{Binding ShiftEligibilities}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <TextBlock Margin="0,2,0,0"
+                                   Text="{Binding SummaryDisplay}"
+                                   TextWrapping="Wrap" />
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </Border>
+
+              <TextBlock Margin="0,16,0,0"
+                         Style="{StaticResource FieldErrorStyle}"
+                         Text="{Binding OperationErrorMessage}"
+                         Visibility="{Binding HasOperationError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+              <WrapPanel Margin="0,22,0,0">
+                <Button Margin="0,0,8,0"
+                        Command="{Binding SaveCreateCommand}"
+                        Content="Mitarbeiter anlegen"
+                        Visibility="{Binding IsCreateMode, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <Button Margin="0,0,8,0"
+                        Command="{Binding SaveNameCommand}"
+                        Content="Namen speichern"
+                        Visibility="{Binding IsRenameMode, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <Button Margin="0,0,8,0"
+                        Command="{Binding SaveTypeChangeCommand}"
+                        Content="Typwechsel speichern"
+                        Visibility="{Binding IsTypeChangeMode, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <Button Command="{Binding CancelEditCommand}"
+                        Content="Abbrechen" />
+              </WrapPanel>
+
+              <TextBlock Margin="0,14,0,0"
+                         Foreground="#526174"
+                         Text="Die Eingaben werden erst mit dem Speichern übernommen."
+                         TextWrapping="Wrap" />
+            </StackPanel>
+          </ScrollViewer>
+        </Border>
+
+        <Border Grid.Column="2"
+                Style="{StaticResource EmployeeCardStyle}"
+                Visibility="{Binding IsDeactivationConfirmationOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock FontSize="22"
+                       FontWeight="SemiBold"
+                       Text="Mitarbeiter deaktivieren" />
+            <TextBlock Margin="0,18,0,0"
+                       FontWeight="SemiBold"
+                       Text="{Binding SelectedEmployee.DisplayName}" />
+            <TextBlock Margin="0,6,0,0"
+                       Foreground="#526174"
+                       Text="Die Person bleibt gespeichert, wird aber als deaktiviert gekennzeichnet."
+                       TextWrapping="Wrap" />
+            <TextBlock Margin="0,14,0,0"
+                       Foreground="#8B1E1E"
+                       Text="{Binding OperationErrorMessage}"
+                       TextWrapping="Wrap"
+                       Visibility="{Binding HasOperationError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <WrapPanel Margin="0,22,0,0">
+              <Button Margin="0,0,8,0"
+                      Command="{Binding ConfirmDeactivationCommand}"
+                      Content="Jetzt deaktivieren" />
+              <Button Command="{Binding CancelDeactivationCommand}"
+                      Content="Abbrechen" />
+            </WrapPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="2"
+                Background="#FDECEC"
+                BorderBrush="#C94A4A"
+                Style="{StaticResource EmployeeCardStyle}"
+                Visibility="{Binding IsDeletionConfirmationOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Foreground="#8B1E1E"
+                       FontSize="22"
+                       FontWeight="SemiBold"
+                       Text="Mitarbeiter endgültig löschen" />
+            <TextBlock Margin="0,18,0,0"
+                       FontWeight="SemiBold"
+                       Text="{Binding SelectedEmployee.DisplayName}" />
+            <TextBlock Margin="0,8,0,0"
+                       Foreground="#8B1E1E"
+                       FontWeight="SemiBold"
+                       Text="Diese Aktion kann nicht rückgängig gemacht werden."
+                       TextWrapping="Wrap" />
+            <TextBlock Margin="0,8,0,0"
+                       Foreground="#526174"
+                       Text="Bereits in anderen Fachdaten verwendete Mitarbeitende können nicht gelöscht werden und bleiben deaktiviert erhalten."
+                       TextWrapping="Wrap" />
+            <TextBlock Margin="0,14,0,0"
+                       Foreground="#8B1E1E"
+                       Text="{Binding OperationErrorMessage}"
+                       TextWrapping="Wrap"
+                       Visibility="{Binding HasOperationError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <WrapPanel Margin="0,22,0,0">
+              <Button Margin="0,0,8,0"
+                      Command="{Binding CancelDeletionCommand}"
+                      Content="Abbrechen" />
+              <Button Background="#B3261E"
+                      Command="{Binding ConfirmDeletionCommand}"
+                      Content="Endgültig löschen"
+                      Foreground="White" />
+            </WrapPanel>
+          </StackPanel>
+        </Border>
+      </Grid>
+    </Grid>
+  </Grid>
+</UserControl>

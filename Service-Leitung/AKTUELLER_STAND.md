@@ -4,7 +4,7 @@ Stand: 14. September 2026
 
 ## Wo steht das Projekt?
 
-Das erste fachliche System mit Einsatzorten und Diensttypen ist abgeschlossen. Die Roadmap für Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben sowie der erste kleine Programmierschritt für die Grundwerte eines Mitarbeitertyps sind bestätigt. Ein zusätzlich eingefügter technischer Aufräumschritt für einheitliche Dateizeilen ist umgesetzt und geprüft; er wartet jetzt auf Bestätigung. Eine eigentliche Dienstplanung wurde noch nicht gebaut.
+Das erste fachliche System mit Einsatzorten und Diensttypen ist abgeschlossen. Die Roadmap, die Mitarbeitertypen, das Mitarbeiter-Grundmodell, die Lese- und Schreibabläufe sowie die sichere gemeinsame Datenbankfortführung und lokale Mitarbeiterspeicherung sind bestätigt. Auch die erste getrennte Mitarbeiterübersicht ist umgesetzt, geprüft und sichtbar bestätigt. Anlegen, Bearbeiten, Typwechsel, Deaktivieren, Reaktivieren und sicheres endgültiges Löschen sind jetzt programmiert und automatisch geprüft; ihr vollständiger sichtbarer Ablauf steht noch aus. Eine Dienstplanung wurde noch nicht gebaut.
 
 Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam besprochen, aufgeschrieben und abgenommen. Das Projekt ist außerdem mit einem GitHub-Repository verbunden, damit der Entwicklungsstand nachvollziehbar gespeichert werden kann.
 
@@ -76,7 +76,7 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 - Die internen Fachmodelle, die Anwendungsabläufe aus ED-06, die SQLite-Speicherung aus ED-07, die Einsatzortverwaltung aus ED-08 und die Diensttyp- und Einsatzmusteransicht aus ED-09 sind bestätigt.
 - Die gemeinsame Abschlussprüfung von ED-10 hat die technischen Bausteine, Dokumente und die spätere Übergabe an die Mitarbeiterverwaltung abgeglichen. System 04 ist ausdrücklich abgenommen und archiviert.
 - Die spätere Mitarbeiterverwaltung verwendet die vorhandenen Kennungen der Einsatzorte, normalen Diensttypen und Einsatzmuster. Sie kopiert keine Namen, Farben, Standardzeiten oder Musterbestandteile. Eine kontextabhängige Freigabe kann aber festhalten, dass TypAH2 den Frühdienst innerhalb von `D`, nicht jedoch automatisch als einzelnen Frühdienst übernehmen darf.
-- Die App besitzt noch keine Mitarbeiter- oder Dienstplanbedienung, automatische Planung oder Excel-Verarbeitung.
+- Die App besitzt jetzt eine Mitarbeiterbedienung, aber noch keine Dienstplanbedienung, automatische Planung oder Excel-Verarbeitung.
 - Das zuvor unversionierte Beispielbild mit echten Namen und konkreten Plandaten ist nicht mehr im Projektordner vorhanden. Die benötigten Fachinformationen wurden nur ohne personenbezogene Daten übernommen.
 
 ## Gerade in Arbeit
@@ -84,13 +84,32 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 - Die Fachfragen zu Mitarbeitenden und Mitarbeitertypen sind beantwortet. Die App startet später mit acht gemeinsam verwendeten Typen und ihren bestätigten Wochenstunden und Einsatzmöglichkeiten.
 - Die überarbeitete Roadmap für „Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben“ ist bestätigt.
 - Der erste Domain-Schritt ist bestätigt. Er bildet eine feste interne Typkennung, einen sichtbaren Code, einen verständlichen Namen und ein minutengenaues Wochen-Soll ab. Leere Angaben, eine leere Kennung und unmögliche Wochenwerte werden abgelehnt.
-- Die Textdateien des Projekts besitzen nun eine einheitlich durch Git abgesicherte Zeilenform. Diese technische Bereinigung hat keine Fachfunktion verändert; alle automatischen Prüfungen bestehen.
-- Mitarbeiterdaten, Einsatzfreigaben, Starttypenkatalog, Mitarbeiteroberfläche und Mitarbeiter-Datenbanktabellen sind noch nicht programmiert.
+- Die Textdateien des Projekts besitzen nun bestätigte, einheitlich durch Git abgesicherte Zeilenenden. Diese technische Bereinigung hat keine Fachfunktion verändert.
+- Die acht Starttypen besitzen ihre bestätigten Wochenstunden und Einsatzmöglichkeiten. TypAH1 und TypAH2 schlagen einen einzelnen Frühdienst nur als manuelle Notfalllösung vor; TypAH2 kann für den Springer nur nach bewusster Aktivierung berücksichtigt werden.
+- Typ1 bleibt außerhalb der späteren automatischen Einteilung. Seine vorhandenen manuellen Dienste werden geschützt, und er wird erst als letzte manuelle Lösung vorgeschlagen.
+- Jeder Mitarbeiter besitzt eine unsichtbare stabile Kennung, einen getrennten Vor- und Nachnamen, einen Aktivstatus und genau einen Verweis auf einen Mitarbeitertyp. Gleiche Namen sind zulässig.
+- Änderungen am Namen oder Typ sowie eine Deaktivierung bewahren die frühere Fassung unverändert. Wochenstunden und Einsatzmöglichkeiten werden nicht beim Mitarbeiter kopiert.
+- Die vorbereiteten Leseabläufe liefern Übersicht, Details und Typauswahl als unveränderliche Momentaufnahmen. Sie zeigen aktuelle Typnamen, Wochenstunden und Einsatzmöglichkeiten in verständlicher Form.
+- Ein leerer Mitarbeiterbestand und ein Abbruch vor dem Lesen sind berücksichtigt. Die Leseabläufe sind inzwischen mit der gemeinsamen lokalen Mitarbeiterdatenbank verbunden.
+- Die vorbereiteten Schreibabläufe prüfen Namen, Mitarbeiter- und Typkennungen sowie die Einsatzfreigaben eines Typs, bevor eine Speicherung verlangt wird. Fehler werden mit verständlichen deutschen Meldungen zurückgegeben.
+- Das Speichern führt Anlegen und Typwechsel gemeinsam mit der Prüfung aus, dass nie zwei aktive Typ1-Personen entstehen. Die letzte aktive Typ1-Person darf während der Ersteinrichtung deaktiviert werden; vor einer Planung muss später wieder genau eine aktive Typ1-Person vorhanden sein.
+- Die vorhandene lokale Datenbank erhält nur eine gemeinsame Folge nummerierter Änderungen. Die bereits veröffentlichte erste Änderung wurde nicht umgeschrieben; eine leere und eine bereits vorhandene synthetische Testdatenbank bleiben korrekt lesbar.
+- Die acht Mitarbeitertypen und ihre Einsatzmöglichkeiten werden beim Einrichten der lokalen Datenbank vollständig angelegt. Es werden keine Personen vorbefüllt.
+- Mitarbeitende können technisch gespeichert, umbenannt, einem anderen Typ zugeordnet und deaktiviert werden. Diese Änderungen bleiben nach dem erneuten Öffnen erhalten.
+- Die Datenbank verhindert eine zweite aktive Serviceleitung, unbekannte Zuordnungen und das Entfernen eines Typs, der noch von Mitarbeitenden verwendet wird.
+- Ein eigener Reiter „Mitarbeitende“ zeigt vorhandene Personen mit Aktivstatus, Typ, Wochenstunden und Einsatzmöglichkeiten. Laden, leerer Bestand, technische Fehler, erneutes Laden und Auswahl sind vorbereitet und automatisch geprüft.
+- Der Auftraggeber hat den Reiter „Mitarbeitende“, den verständlichen leeren Zustand und den Button „Aktualisieren“ sichtbar bestätigt.
+- Neue Mitarbeitende können mit Vorname, Nachname und einem der acht Typen angelegt werden. Name und Typ werden bewusst getrennt bearbeitet, damit eine abgelehnte Änderung keinen anderen Wert teilweise speichert.
+- Vor der Typauswahl sind Typcode, Name, Wochenstunden und Einsatzmöglichkeiten erkennbar. Leere Pflichtfelder und eine zweite aktive Typ1-Person werden verständlich abgelehnt, ohne die Eingaben zu verlieren.
+- Deaktivieren löscht keine Person und verlangt vorher eine ausdrückliche Bestätigung. Der vollständige sichtbare Ablauf einschließlich Neustart muss noch bestätigt werden.
+- Deaktivierte Mitarbeitende können wieder aktiviert werden. Kennung, Name und Typ bleiben erhalten; eine zweite aktive Serviceleitung wird weiterhin verhindert.
+- Nur deaktivierte Personen, die noch in keinem Plan und keinen anderen Fachdaten verwendet werden, können endgültig gelöscht werden. Verwendete Personen bleiben deaktiviert erhalten.
+- Vor dem endgültigen Löschen zeigt die App den vollständigen Namen und warnt deutlich, dass die Aktion nicht rückgängig gemacht werden kann. Erst ein erfolgreicher Speichervorgang entfernt die Person aus der Übersicht.
 
 ## Noch nicht gebaut
 
 - die fachlich nutzbare Windows-App,
-- die Mitarbeiterverwaltung,
+- die sichtbare Abnahme des vollständigen Mitarbeiter-Bearbeitungsablaufs,
 - das Anlegen, Löschen oder Deaktivieren von Einsatzorten und Diensttypen,
 - die Eingabe von Urlaub, Krankheit und Verfügbarkeit,
 - die automatische Erstellung eines Wochenplans,
@@ -103,4 +122,4 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 
 ## Nächster geplanter Schritt
 
-Als Nächstes wird der technische Aufräumschritt für einheitliche Dateizeilen bestätigt oder angepasst. Erst danach folgen die Einsatzfreigaben und der Starttypenkatalog; Mitarbeiter- und Dienstplanfunktionen existieren weiterhin nicht.
+Als Nächstes wird der vollständige Mitarbeiterablauf mit erfundenen Testnamen sichtbar geprüft: anlegen, Namen bearbeiten, Typ wechseln, Deaktivierung abbrechen und bestätigen, wieder aktivieren, einen Typ1-Konflikt anzeigen, endgültiges Löschen abbrechen und bestätigen sowie nach einem Neustart erneut laden. Dienstplanfunktionen bleiben weiterhin späteren Systemen vorbehalten.

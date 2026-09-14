@@ -7,4 +7,7 @@ public enum EmployeeTypeValidationCode
     NameRequired,
     WeeklyWorkTargetMustBePositive,
     WeeklyWorkTargetExceedsWeek,
+    ShiftEligibilityRequired,
+    DuplicateShiftEligibility,
+    PlanningPolicyRequired,
 }

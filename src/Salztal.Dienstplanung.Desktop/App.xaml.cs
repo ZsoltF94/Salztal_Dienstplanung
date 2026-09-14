@@ -17,7 +17,7 @@ internal sealed partial class App : System.Windows.Application
 
         try
         {
-            MainWindow window = await ServiceCatalogComposition.CreateMainWindowAsync(
+            MainWindow window = await MainWindowComposition.CreateMainWindowAsync(
                 CancellationToken.None);
             MainWindow = window;
             window.Show();

@@ -527,7 +527,7 @@ System 04 besitzt bereits die erste Migration und eine gemeinsame lokale Datenba
 
 ### Desktop Composition
 
-- `src/Salztal.Dienstplanung.Desktop/Composition/ServiceCatalogComposition.cs`
+- `src/Salztal.Dienstplanung.Desktop/Composition/MainWindowComposition.cs`
 - `src/Salztal.Dienstplanung.Desktop/App.xaml.cs`
 
 Nur `Desktop.Composition` darf neue konkrete SQLite-Adapter verdrahten. Mitarbeiter-ViewModels dürfen weiterhin nur Application-Verträge verwenden.
@@ -547,7 +547,9 @@ Diese Widersprüche sind im überarbeiteten MA-01-Entwurf und den betroffenen ak
 
 ## Nächster Schritt
 
-Die Antworten sind vollständig in die abgenommene Roadmap eingearbeitet. MA-02 mit den Mitarbeitertyp-Grundwerten ist inzwischen umgesetzt und automatisch geprüft:
+Die Antworten sind vollständig in die abgenommene Roadmap eingearbeitet. MA-02 bis MA-09 einschließlich des Hygiene-Schritts MA-02A sind abgenommen. MA-10 mit den Mitarbeiter-Bearbeitungsabläufen ist umgesetzt und automatisch geprüft:
 
-- MA-02 wartet auf ausdrückliche Abnahme oder Korrekturwünsche.
-- Mitarbeiterobjekt, Datenbank-, Planning- und WPF-Fachcode bleiben weiterhin unverändert.
+- MA-09 wurde am 2026-09-14 sichtbar abgenommen.
+- MA-10 wartet auf die sichtbare Abnahme des vollständigen Bedienablaufs.
+- Die neue Anforderung zum Reaktivieren und endgültigen Löschen deaktivierter Mitarbeitender ist als MA-10A ergänzt. Beide Empfehlungen aus `docs/roadmaps/active/EMPLOYEES_REACTIVATION_DELETION_QUESTIONS.md` sind bestätigt; MA-10A ist umgesetzt und automatisch geprüft und wartet gemeinsam mit MA-10 auf die sichtbare Abnahme.
+- Planning bleibt weiterhin unverändert.

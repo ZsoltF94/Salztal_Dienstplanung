@@ -1,4 +1,5 @@
 using Salztal.Dienstplanung.Domain.Employees;
+using Salztal.Dienstplanung.Domain.ShiftTypes;
 
 namespace Salztal.Dienstplanung.Domain.Tests.Employees;
 
@@ -177,6 +178,52 @@ public sealed class EmployeeTypeTests
 
         Assert.False(wasCreated);
         Assert.Null(employeeTypeId);
+    }
+
+    [Fact]
+    public void CreateWhenPlanningDefinitionIsMissingReturnsStructuredErrors()
+    {
+        EmployeeTypeValidationResult result = EmployeeType.Create(
+            Guid.NewGuid(),
+            "TypTest",
+            "Testtyp",
+            1_500,
+            null,
+            null);
+
+        Assert.Collection(
+            result.Errors,
+            error => Assert.Equal(
+                EmployeeTypeValidationCode.ShiftEligibilityRequired,
+                error.Code),
+            error => Assert.Equal(
+                EmployeeTypeValidationCode.PlanningPolicyRequired,
+                error.Code));
+    }
+
+    [Fact]
+    public void CreateWhenEligibilityIsDuplicatedReturnsStructuredError()
+    {
+        IReadOnlyCollection<ShiftTypeId> knownShiftTypeIds = InitialShiftTypeCatalog.All
+            .Select(shiftType => shiftType.Id)
+            .ToArray();
+        EmployeeTypeShiftEligibility eligibility =
+            Assert.IsType<EmployeeTypeShiftEligibility>(
+                EmployeeTypeShiftEligibility.CreateForShiftType(
+                    InitialShiftTypeCatalog.LateShift.Id.Value,
+                    ShiftEligibilityMode.Regular,
+                    knownShiftTypeIds).Value);
+
+        EmployeeTypeValidationResult result = EmployeeType.Create(
+            Guid.NewGuid(),
+            "TypTest",
+            "Testtyp",
+            1_500,
+            [eligibility, eligibility],
+            EmployeeTypePlanningPolicy.Standard);
+
+        EmployeeTypeValidationError error = Assert.Single(result.Errors);
+        Assert.Equal(EmployeeTypeValidationCode.DuplicateShiftEligibility, error.Code);
     }
 
     private static EmployeeType CreateEmployeeType(

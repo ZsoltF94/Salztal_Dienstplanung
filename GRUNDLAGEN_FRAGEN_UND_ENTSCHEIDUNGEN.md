@@ -43,6 +43,9 @@ Nach manueller Prüfung wird ein Plan abgenommen. Erst danach kann er in eine no
 - Eine spätere Änderung eines Typs gilt für alle ihm zugeordneten Mitarbeitenden und für nachfolgende Planungen. Bereits abgenommene Pläne bleiben unveränderliche Momentaufnahmen.
 - Die Starttypen sind `Typ1`, `Typ25`, `Typ30`, `Typ30a`, `Typ35`, `Typ35a`, `TypAH1` und `TypAH2`.
 - Für die erste Fassung werden keine zusätzlichen Qualifikationen benötigt. Die Einsatzmöglichkeiten werden über die Mitarbeitertypen abgebildet.
+- Deaktivierte Mitarbeitende können mit unveränderter Kennung, unveränderten Namen und unverändertem Mitarbeitertyp wieder aktiviert werden. Die Grenze von höchstens einer aktiven Typ1-Person bleibt dabei zwingend.
+- Nur deaktivierte Mitarbeitende dürfen endgültig gelöscht werden. Sobald eine Person in einem Plan, einer Verfügbarkeit, einer Abwesenheit, einem Zeitkonto oder anderen Fachdaten verwendet wird, bleibt sie zum Schutz der Historie deaktiviert erhalten und kann nicht endgültig gelöscht werden.
+- Endgültiges Löschen benötigt eine eigene Warnung mit vollständigem Namen und dem Hinweis, dass die Aktion nicht rückgängig gemacht werden kann.
 - Vor einer Generierung kann festgelegt werden, welche Mitarbeitenden im gewählten Zeitraum zur Verfügung stehen.
 - Urlaub, Krankheit, Fortbildung, Wunschfrei und eingeschränkte Verfügbarkeiten sollen berücksichtigt werden können.
 - Bei Abwesenheiten wird das wirksame Wochen-Soll später reduziert. Die genaue Formel wird erst mit dem Verfügbarkeits- und Abwesenheitssystem festgelegt.
