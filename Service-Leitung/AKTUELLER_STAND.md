@@ -4,7 +4,7 @@ Stand: 14. September 2026
 
 ## Wo steht das Projekt?
 
-Das erste fachliche System mit Einsatzorten und Diensttypen ist abgeschlossen. Die Roadmap, die Mitarbeitertypen, das Mitarbeiter-Grundmodell, die Lese- und Schreibabläufe sowie die sichere gemeinsame Datenbankfortführung und lokale Mitarbeiterspeicherung sind bestätigt. Auch die erste getrennte Mitarbeiterübersicht ist umgesetzt, geprüft und sichtbar bestätigt. Anlegen, Bearbeiten, Typwechsel, Deaktivieren, Reaktivieren und sicheres endgültiges Löschen sind jetzt programmiert und automatisch geprüft; ihr vollständiger sichtbarer Ablauf steht noch aus. Eine Dienstplanung wurde noch nicht gebaut.
+Die beiden ersten fachlichen Systeme sind abgeschlossen: Einsatzorte und Diensttypen sowie Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben. Die vollständige Mitarbeiterbedienung mit Anlegen, Bearbeiten, Typwechsel, Deaktivieren, Reaktivieren und sicherem endgültigem Löschen ist programmiert, automatisch geprüft und sichtbar bestätigt. Der gemeinsame Abschlussabgleich von System 03 ist abgenommen und seine Roadmap archiviert. Eine Dienstplanung wurde noch nicht gebaut.
 
 Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam besprochen, aufgeschrieben und abgenommen. Das Projekt ist außerdem mit einem GitHub-Repository verbunden, damit der Entwicklungsstand nachvollziehbar gespeichert werden kann.
 
@@ -79,7 +79,7 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 - Die App besitzt jetzt eine Mitarbeiterbedienung, aber noch keine Dienstplanbedienung, automatische Planung oder Excel-Verarbeitung.
 - Das zuvor unversionierte Beispielbild mit echten Namen und konkreten Plandaten ist nicht mehr im Projektordner vorhanden. Die benötigten Fachinformationen wurden nur ohne personenbezogene Daten übernommen.
 
-## Gerade in Arbeit
+## System 03 – umgesetzt und abgenommen
 
 - Die Fachfragen zu Mitarbeitenden und Mitarbeitertypen sind beantwortet. Die App startet später mit acht gemeinsam verwendeten Typen und ihren bestätigten Wochenstunden und Einsatzmöglichkeiten.
 - Die überarbeitete Roadmap für „Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben“ ist bestätigt.
@@ -101,7 +101,7 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 - Der Auftraggeber hat den Reiter „Mitarbeitende“, den verständlichen leeren Zustand und den Button „Aktualisieren“ sichtbar bestätigt.
 - Neue Mitarbeitende können mit Vorname, Nachname und einem der acht Typen angelegt werden. Name und Typ werden bewusst getrennt bearbeitet, damit eine abgelehnte Änderung keinen anderen Wert teilweise speichert.
 - Vor der Typauswahl sind Typcode, Name, Wochenstunden und Einsatzmöglichkeiten erkennbar. Leere Pflichtfelder und eine zweite aktive Typ1-Person werden verständlich abgelehnt, ohne die Eingaben zu verlieren.
-- Deaktivieren löscht keine Person und verlangt vorher eine ausdrückliche Bestätigung. Der vollständige sichtbare Ablauf einschließlich Neustart muss noch bestätigt werden.
+- Deaktivieren löscht keine Person und verlangt vorher eine ausdrückliche Bestätigung. Der vollständige sichtbare Ablauf einschließlich erneutem Laden ist bestätigt.
 - Deaktivierte Mitarbeitende können wieder aktiviert werden. Kennung, Name und Typ bleiben erhalten; eine zweite aktive Serviceleitung wird weiterhin verhindert.
 - Nur deaktivierte Personen, die noch in keinem Plan und keinen anderen Fachdaten verwendet werden, können endgültig gelöscht werden. Verwendete Personen bleiben deaktiviert erhalten.
 - Vor dem endgültigen Löschen zeigt die App den vollständigen Namen und warnt deutlich, dass die Aktion nicht rückgängig gemacht werden kann. Erst ein erfolgreicher Speichervorgang entfernt die Person aus der Übersicht.
@@ -109,7 +109,6 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 ## Noch nicht gebaut
 
 - die fachlich nutzbare Windows-App,
-- die sichtbare Abnahme des vollständigen Mitarbeiter-Bearbeitungsablaufs,
 - das Anlegen, Löschen oder Deaktivieren von Einsatzorten und Diensttypen,
 - die Eingabe von Urlaub, Krankheit und Verfügbarkeit,
 - die automatische Erstellung eines Wochenplans,
@@ -122,4 +121,4 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 
 ## Nächster geplanter Schritt
 
-Als Nächstes wird der vollständige Mitarbeiterablauf mit erfundenen Testnamen sichtbar geprüft: anlegen, Namen bearbeiten, Typ wechseln, Deaktivierung abbrechen und bestätigen, wieder aktivieren, einen Typ1-Konflikt anzeigen, endgültiges Löschen abbrechen und bestätigen sowie nach einem Neustart erneut laden. Dienstplanfunktionen bleiben weiterhin späteren Systemen vorbehalten.
+Als Nächstes wird gemeinsam entschieden, ob Personal- und Stundenbedarf, Verfügbarkeiten und Abwesenheiten oder der Regelkatalog vorbereitet wird. Für das ausgewählte System wird zuerst eine eigene Roadmap entworfen und abgenommen. Dienstplanfunktionen bleiben weiterhin späteren Systemen vorbehalten.

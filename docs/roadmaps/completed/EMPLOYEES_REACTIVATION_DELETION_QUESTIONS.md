@@ -2,7 +2,7 @@
 
 Stand: 2026-09-14
 
-Status: Beide Empfehlungen am 2026-09-14 bestätigt; MA-10A zur Implementierung freigegeben
+Status: Beide Empfehlungen bestätigt; MA-10A abgenommen und am 2026-09-14 mit System 03 archiviert
 
 ## Bereits eindeutig verstanden
 
@@ -35,4 +35,4 @@ Antwort: Empfehlung bestätigt. Es genügt die klare Warnung mit vollständigem 
 
 ## Nach den Antworten
 
-Die Entscheidungen sind in den MA-10A-Schritt und die betroffenen Leitdokumente übernommen. MA-10A wurde am 2026-09-14 ausdrücklich zur Implementierung gestartet.
+Die Entscheidungen sind in den MA-10A-Schritt und die betroffenen Leitdokumente übernommen. MA-10A wurde am 2026-09-14 umgesetzt, automatisch geprüft und gemeinsam mit MA-10 sichtbar abgenommen.

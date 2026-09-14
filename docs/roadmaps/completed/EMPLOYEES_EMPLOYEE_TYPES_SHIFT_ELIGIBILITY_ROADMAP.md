@@ -1,6 +1,6 @@
 # Teil-Roadmap: Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben
 
-Status: Aktive, abgenommene Teil-Roadmap – MA-09 abgenommen; MA-10 und MA-10A umgesetzt und automatisch geprüft, gemeinsamer sichtbarer Ablauf offen
+Status: Abgeschlossen und am 2026-09-14 archiviert – MA-01 bis MA-11 abgenommen
 
 Stand: 2026-09-14
 
@@ -567,7 +567,7 @@ Sichtbare Abnahme vom 2026-09-14:
 
 ### MA-10 – Anlegen, Bearbeiten, Typwechsel und Deaktivieren in WPF umsetzen
 
-Status: `[~]` – umgesetzt und automatisch geprüft; sichtbare Abnahme offen
+Status: `[x]` – umgesetzt, automatisch geprüft und am 2026-09-14 gemeinsam mit MA-10A sichtbar abgenommen
 
 Geplantes Ergebnis:
 
@@ -601,14 +601,18 @@ Abnahmebedingung:
 
 - Der Auftraggeber bestätigt die sichtbaren Eingabe- und Bearbeitungsabläufe.
 
+Sichtbare Abnahme vom 2026-09-14:
+
+- Der Auftraggeber hat den bereitgestellten vollständigen synthetischen Mitarbeiterablauf geprüft, das sichtbare Ergebnis bestätigt und den Start von MA-11 freigegeben.
+
 ### MA-10A – Deaktivierte Mitarbeitende reaktivieren und sicher löschen
 
-Status: `[~]` – umgesetzt und automatisch geprüft; gemeinsamer sichtbarer MA-10-/MA-10A-Ablauf offen
+Status: `[x]` – umgesetzt, automatisch geprüft und am 2026-09-14 gemeinsam mit MA-10 sichtbar abgenommen
 
 Voraussetzungen:
 
 - Die MA-10-Implementierung und ihre automatischen Prüfungen sind abgeschlossen. Ihr noch offener sichtbarer Ablauf wird mit dem manuellen MA-10A-Gesamtablauf gemeinsam geprüft.
-- Die Antworten in `docs/roadmaps/active/EMPLOYEES_REACTIVATION_DELETION_QUESTIONS.md` sind bestätigt und in die Roadmap eingearbeitet.
+- Die Antworten in `docs/roadmaps/completed/EMPLOYEES_REACTIVATION_DELETION_QUESTIONS.md` sind bestätigt und in die Roadmap eingearbeitet.
 
 Vorgesehenes Ergebnis:
 
@@ -669,9 +673,13 @@ Abnahmebedingung:
 
 - Der Auftraggeber bestätigt die sichtbaren Reaktivierungs- und Löschabläufe sowie den Neustart-Nachweis.
 
+Sichtbare Abnahme vom 2026-09-14:
+
+- Der Auftraggeber hat den bereitgestellten vollständigen synthetischen Mitarbeiterablauf einschließlich Reaktivieren, Löschbestätigung und erneutem Laden geprüft, das sichtbare Ergebnis bestätigt und den Start von MA-11 freigegeben.
+
 ### MA-11 – System 03 gemeinsam abschließen
 
-Status: `[ ]`
+Status: `[x]` – Abschlussabgleich bestanden und System 03 am 2026-09-14 ausdrücklich abgenommen
 
 Geplantes Ergebnis:
 
@@ -688,9 +696,23 @@ Prüfung:
 - `git diff --check` meldet keine Whitespace-Fehler.
 - Die Dateiliste enthält keine echten oder sensiblen Daten und keine Datenbank-, Sicherungs-, Export- oder Buildartefakte.
 
+Abschlussnachweis vom 2026-09-14:
+
+- Domain, Application, Infrastructure und Desktop wurden gegen die bestätigte System-03-Entscheidung und die vorhandenen Tests abgeglichen. Mitarbeitertyp, Wochen-Soll, strukturierte Einsatzfreigaben, Typ1-Planungsrichtlinie und Mitarbeiterlebenszyklus besitzen jeweils eine fachliche Quelle in Domain; Application, Infrastructure und Desktop ergänzen ausschließlich ihre vorgesehenen Verantwortungen.
+- Die Übergaben an Systeme 06 bis 12 sind unter „Übergaben an spätere Systeme“ und im Entscheidungsdokument ausdrücklich den späteren Eigentümern zugeordnet. Insbesondere bleiben Abwesenheitsreduktion, Regelkorridore, Planungseingang, Generierung, Konfliktbericht und Planversionen außerhalb von System 03.
+- Die gesperrte Paketwiederherstellung mit `dotnet restore Salztal.Dienstplanung.sln --locked-mode` ist erfolgreich.
+- Der vollständige Build umfasst 13 von 13 Projekten und endet mit 0 Warnungen und 0 Fehlern.
+- Alle 221 vorhandenen automatischen Tests bestehen: 95 Domain-, 55 Application-, 23 Infrastructure-, 32 Desktop- und 16 Architekturtests. Die weiterhin leeren Gerüstprojekte Planning.Tests und Excel.Tests werden vom gemeinsamen Testlauf erfolgreich geladen, enthalten aber planmäßig noch keine Tests.
+- Der vollständige sichtbare Mitarbeiterablauf aus MA-10 und MA-10A wurde vom Auftraggeber bestätigt.
+- Die abschließende Status-, Pfad-, Datenschutz-, Artefakt- und Whitespace-Prüfung ist Bestandteil dieses MA-11-Gates; ihr Ergebnis wird vor dem Abnahmebericht nochmals gegen den finalen Dokumentationsstand geprüft.
+
 Abnahmebedingung:
 
 - Der Auftraggeber bestätigt System 03 und erlaubt die Archivierung dieser Roadmap sowie den Übergang zum nächsten System.
+
+Abschlussabnahme vom 2026-09-14:
+
+- Der Auftraggeber hat MA-11 und System 03 ausdrücklich bestätigt und die Archivierung der Roadmap erlaubt.
 
 ## Übergaben an spätere Systeme
 
@@ -760,4 +782,4 @@ Nach jedem Schritt werden kurz genannt:
 
 ## Nächster minimaler Schritt
 
-Den vollständigen MA-10- und MA-10A-Ablauf gemeinsam mit klar synthetischen Namen sichtbar prüfen: Anlegen, Umbenennen, Typwechsel, Deaktivieren, Reaktivieren, Typ1-Konflikt, Löschabbruch, endgültiges Löschen und erneutes Laden nach einem Neustart. Erst nach ausdrücklicher Abnahme beginnt MA-11.
+System 03 ist vollständig abgenommen und unter `docs/roadmaps/completed` archiviert. Die Auswahl und Roadmap-Erstellung für ein nachfolgendes System erfolgen als eigener, ausdrücklich freizugebender Schritt.

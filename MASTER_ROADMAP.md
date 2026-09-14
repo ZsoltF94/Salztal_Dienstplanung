@@ -1,6 +1,6 @@
 # Master-Roadmap der Salztal-Dienstplanung
 
-Status: Grundfassung abgenommen am 2026-09-13; System 03 am 2026-09-14 fachlich neu eingeordnet
+Status: Grundfassung abgenommen am 2026-09-13; Systeme 03 und 04 abgeschlossen
 
 Stand: 2026-09-14
 
@@ -80,11 +80,11 @@ Abhängigkeiten: 01
 
 ### 03 – Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben
 
-Status: `[~]` – MA-09 sichtbar abgenommen; MA-10 und MA-10A umgesetzt und automatisch geprüft, gemeinsamer sichtbarer Ablauf offen
+Status: `[x]` – abgeschlossen und zur Archivierung freigegeben am 2026-09-14
 
 Ziel: Mitarbeitende mit getrennten Namen, Aktivstatus und genau einem gemeinsam referenzierten Mitarbeitertyp erfassen und lokal speichern. Jeder Typ stellt sein Wochen-Soll sowie reguläre, kontextabhängige und nur vorschlagsfähige Einsatzfreigaben als strukturierte Fachwerte bereit.
 
-Teil-Roadmap: abgenommene aktive Roadmap unter `docs/roadmaps/active/EMPLOYEES_EMPLOYEE_TYPES_SHIFT_ELIGIBILITY_ROADMAP.md`
+Teil-Roadmap: `docs/roadmaps/completed/EMPLOYEES_EMPLOYEE_TYPES_SHIFT_ELIGIBILITY_ROADMAP.md`
 
 Abhängigkeiten: 02 und 04
 
@@ -262,4 +262,4 @@ System 16 ergänzt Zeitkonten nach gesonderter Priorisierung, ohne den Abschluss
 
 ## Nächster übergeordneter Schritt
 
-System 04 – Einsatzorte, Diensttypen und Doppeldienste – ist mit ED-01 bis ED-10 abgenommen und archiviert. MA-01 bis MA-09 einschließlich des Hygiene-Schritts MA-02A von System 03 sind abgenommen. MA-10 ergänzt Anlegen, Bearbeiten, Typwechsel und Deaktivieren; MA-10A ergänzt Reaktivieren und referenzgeschütztes endgültiges Löschen deaktivierter Mitarbeitender. Beide Schritte sind umgesetzt und automatisch geprüft. Als Nächstes wird ihr vollständiger sichtbarer Ablauf gemeinsam abgenommen; MA-11 beginnt erst danach.
+System 03 – Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben – ist mit MA-01 bis MA-11 einschließlich MA-02A abgenommen und archiviert. System 04 ist ebenfalls abgeschlossen. Als Nächstes wird bewusst entschieden, ob System 05, 06 oder 07 vorbereitet wird; vor jeder Umsetzung entsteht zuerst eine eigene Teil-Roadmap und wird ausdrücklich abgenommen.

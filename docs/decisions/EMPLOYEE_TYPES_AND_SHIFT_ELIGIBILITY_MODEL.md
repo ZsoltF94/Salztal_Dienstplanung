@@ -103,6 +103,21 @@ Für die erste Fassung wird kein eigener Qualifikationskatalog benötigt. Die er
 - System 10 erzeugt Lösungsvorschläge und den Wochenstundenbericht.
 - Systeme 11 und 12 behandeln manuelle Sonderzuweisungen und unveränderliche Planversionen.
 
+## Verbindliche Übergaben an spätere Systeme
+
+| Übergabe aus System 03 | Verbindlicher Inhalt | Späterer Eigentümer |
+|---|---|---|
+| Ungekürztes Wochen-Soll | `WeeklyWorkTarget` bleibt ein positiver, minutengenauer Wert des gemeinsam referenzierten Mitarbeitertyps. | System 06 berechnet die Abwesenheitsreduktion; System 07 definiert den wirksamen Korridor. |
+| Typ1-Richtlinie | Keine automatische Einteilung, mindestens eine manuelle Wochenzuweisung, Schutz manueller Zuweisungen und letzte Vorschlagspriorität sind strukturierte Eigenschaften der Typdefinition. | Systeme 07 bis 10 setzen Prüfung, Planung und Vorschlagsreihenfolge um. |
+| AH-Freigaben | Reguläre, nur vorschlagsfähige und kontextabhängige Freigaben bleiben getrennte strukturierte Werte. Ein einzelner Frühdienst wird für AH nie automatisch freigegeben. | Systeme 07, 09 und 10 setzen Korridor, Generierung und Lösungsvorschläge um. |
+| AH2-Springeroption | Die Freigabe für `Spr` trägt `ExplicitPlanningRunOption`; die konkrete Option ist pro Planungslauf standardmäßig ausgeschaltet. | System 09 definiert den Planungslaufeingang und wertet die Option aus. |
+| Planungseingang | Mitarbeitende, Typdefinitionen, Wochen-Soll, Planungsrichtlinie und Einsatzfreigaben werden später als unveränderliche Momentaufnahme übergeben; sichtbare Typcodes sind keine Solver-Schalter. | System 08 definiert den vollständigen Planungseingang. |
+| Wochenstundenbericht | Je Person und Montag-bis-Sonntag-Woche werden Typ, wirksames Soll, geplante Minuten, vorzeichenbehaftete Abweichung sowie AH- und Typ1-Hinweise unveränderlich bewahrt. | System 10 definiert Bericht und verständliche Darstellung; System 12 bewahrt ihn in Planversionen. |
+
+Diese Übergaben sind Verträge für spätere Roadmaps und noch keine Freigabe, die zugehörige Planungs-, Abwesenheits-, Konflikt- oder Versionslogik in System 03 zu implementieren.
+
+Wichtiger technischer Anker: `Application.Employees.EmployeeTypeSnapshot` und `EmployeeTypeEligibilitySnapshot.AvailabilityDisplay` dienen der aktuellen Mitarbeiteroberfläche. Sie sind kein vollständiger Planungseingang und dürfen später weder über sichtbare Typcodes noch über deutsche Anzeigetexte ausgewertet werden. System 08 definiert dafür einen eigenen unveränderlichen Planungsvertrag, der die strukturierte `EmployeeTypePlanningPolicy`, die Kennungen, das minutengenaue Wochen-Soll sowie Modus und Aktivierung jeder Einsatzfreigabe ausdrücklich übernimmt.
+
 ## Architekturfolgen
 
 - `Domain.Employees` besitzt die neuen Fachtypen und referenziert die stabilen Domain-Kennungen aus System 04.

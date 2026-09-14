@@ -2,18 +2,18 @@
 
 Stand: 2026-09-14
 
-Status dieses Dokuments: Aktuell – MA-09 sichtbar abgenommen; MA-10 und MA-10A umgesetzt und automatisch geprüft, gemeinsamer sichtbarer Ablauf offen
+Status dieses Dokuments: Aktuell – System 03 vollständig abgenommen und archiviert
 
 ## Aktueller Überblick
 
 | Bereich | Aktueller Stand |
 |---|---|
-| Projektphase | Umsetzung von System 03 |
-| Aktives System | System 03 – Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben |
-| Aktive Teil-Roadmap | abgenommene Roadmap unter `docs/roadmaps/active/EMPLOYEES_EMPLOYEE_TYPES_SHIFT_ELIGIBILITY_ROADMAP.md` |
-| Aktueller Stand | MA-10 und MA-10A – vollständige Mitarbeiter-Stammdatenbedienung einschließlich Reaktivieren und sicherem Löschen umgesetzt und automatisch geprüft; gemeinsamer sichtbarer Ablauf offen |
-| Zuletzt abgenommener Schritt | MA-09 – getrennte Mitarbeiterübersicht in WPF |
-| Funktionsfähige App | Einsatzorte und Diensttyp-Standardzeiten können angezeigt und bearbeitet werden; Mitarbeitende können in einem getrennten Reiter gelesen werden; noch keine Dienstplanfunktion |
+| Projektphase | Auswahl und Vorbereitung des nächsten Fachsystems |
+| Aktives System | Keines; Systeme 03 und 04 sind abgeschlossen |
+| Aktive Teil-Roadmap | Keine |
+| Aktueller Stand | System 03 – vollständig geprüft, ausdrücklich abgenommen und unter `docs/roadmaps/completed` archiviert |
+| Zuletzt abgenommener Schritt | MA-11 – gemeinsamer Abschluss von System 03 |
+| Funktionsfähige App | Einsatzorte und Diensttyp-Standardzeiten können angezeigt und bearbeitet werden; Mitarbeitende können vollständig im bestätigten System-03-Umfang verwaltet werden; noch keine Dienstplanfunktion |
 | Echte Mitarbeiter- oder Plandaten im Repository | Keine festgestellt; das zuvor vorhandene sensible Beispielbild ist nicht mehr im Arbeitsordner |
 
 ## Nachweislich fertig und abgenommen
@@ -28,6 +28,7 @@ Status dieses Dokuments: Aktuell – MA-09 sichtbar abgenommen; MA-10 und MA-10A
 - Die zentrale `STATUS.md` führt aktiven Schritt, offene Entscheidungen, Blockaden und ausstehende Gates zusammen.
 - System 01 – Projektgrundlage ist vollständig geprüft, abgenommen und archiviert.
 - Die Teil-Roadmap für System 02 ist abgenommen.
+- System 03 – Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben – ist vollständig geprüft, abgenommen und archiviert.
 
 ## Aktuell
 
@@ -36,7 +37,7 @@ Status dieses Dokuments: Aktuell – MA-09 sichtbar abgenommen; MA-10 und MA-10A
 - Die acht Starttypen, ihre Wochen-Sollwerte, regulären Einsatzmöglichkeiten sowie die Typ1- und AH-Sonderfälle sind festgehalten.
 - Für die erste Fassung wird kein zusätzlicher Qualifikationskatalog benötigt. System 03 heißt deshalb künftig „Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben“.
 - Die überarbeitete Teil-Roadmap enthält die bestätigten Code-Anker, eine eigene Absicherung der bestehenden SQLite-Migrationsfolge und eindeutige Übergaben an die späteren Planungs- und Konfliktsysteme.
-- MA-01 bis MA-09 einschließlich MA-02A sind ausdrücklich abgenommen. MA-02 führt ausschließlich die stark typisierten, unveränderlichen Domain-Grundwerte für Mitarbeitertypkennung, Code, Name und Wochen-Soll ein.
+- MA-01 bis MA-10A einschließlich MA-02A sind ausdrücklich abgenommen. MA-02 führt ausschließlich die stark typisierten, unveränderlichen Domain-Grundwerte für Mitarbeitertypkennung, Code, Name und Wochen-Soll ein.
 - Ein Wochen-Soll wird minutengenau als ganze Zahl gespeichert, muss positiv sein und kann die vollständige Wochenlänge von 10.080 Minuten nicht überschreiten. Es werden weder `double` noch `float` verwendet.
 - MA-02A ergänzt `.gitattributes` und gleicht die Repository-Textdateien einmalig an die bereits bestätigte CRLF-Regel aus `.editorconfig` an. Shell-Skripte bleiben ausdrücklich auf LF.
 - Der zeilenendenunabhängige Inhaltsfingerabdruck von 169 geprüften Textdateien war vor und nach der Normalisierung identisch. Die vollständige Formatprüfung, der Build und alle 109 automatischen Tests bestehen.
@@ -107,7 +108,7 @@ Status dieses Dokuments: Aktuell – MA-09 sichtbar abgenommen; MA-10 und MA-10A
 - ED-10 hat Domain, Application, Infrastructure und Desktop gegen den bestätigten Umfang von System 04 abgeglichen. Die stabilen Kennungen und unveränderlichen Katalogmomentaufnahmen bilden eine eindeutige Übergabe an das spätere System 03.
 - Der damalige System-03-Entwurf plante nur `WorkLocationId`- und `ShiftTypeId`-Freigaben. Die am 2026-09-14 bestätigte Mitarbeitertyp-Entscheidung ergänzt strukturierte kontextabhängige Musterfreigaben, ohne Katalogdaten oder Musterdefinitionen aus System 04 zu kopieren.
 - ED-10 und damit System 04 sind am 2026-09-13 ausdrücklich abgenommen. Die Roadmap und ihre beantwortete Fragen-Datei sind unter `docs/roadmaps/completed` archiviert.
-- Der damalige System-03-Entwurf wurde nach dieser Archivierung unter `docs/roadmaps/active` wieder aufgenommen, fachlich überarbeitet und abgenommen. Inzwischen sind MA-01 bis MA-09 einschließlich MA-02A bestätigt; MA-10 ist umgesetzt und automatisch geprüft und wartet auf die sichtbare Abnahme.
+- Der damalige System-03-Entwurf wurde nach dieser Archivierung unter `docs/roadmaps/active` wieder aufgenommen, fachlich überarbeitet und umgesetzt. MA-01 bis MA-11 einschließlich MA-02A sind bestätigt; die Roadmap und ihre beantworteten Fragen sind unter `docs/roadmaps/completed` archiviert.
 - Zum Abschluss von System 04 bestanden 14 Application-Tests, 46 Domain-Tests, 6 Infrastructure-Tests, 13 Desktop-Tests und 13 Architekturtests. Die aktuellen Gesamtzahlen stehen unter „Offene Prüf- und Abnahmegates“.
 - TG-07 mit den sieben getrennten Testprojekten für die sechs Produktionsmodule und die Architektur ist abgenommen.
 - TG-08 mit zwölf Architekturtests und den drei nachgewiesenen Fehlermutationen ist abgenommen.
@@ -130,7 +131,7 @@ Status dieses Dokuments: Aktuell – MA-09 sichtbar abgenommen; MA-10 und MA-10A
 - Die gesperrte Wiederherstellung, der vollständige Build mit 0 Warnungen und 0 Fehlern sowie aktuell 13 von 13 Architekturtests bestehen erneut.
 - Die Desktop-App startete technisch mit reagierendem Hauptfenster und dem Titel „Salztal Dienstplanung“ und wurde regulär mit Exitcode 0 beendet.
 - Der Auftraggeber hat den sichtbaren lokalen Start, den Fenstertitel und die beiden deutschen Hinweistexte bestätigt.
-- Es wurden noch keine fachlichen Planungs- oder Excel-Abläufe angelegt. Der vollständige sichtbare Mitarbeiterablauf einschließlich Reaktivieren und Löschen wartet noch auf die gemeinsame Abnahme.
+- Es wurden noch keine fachlichen Planungs- oder Excel-Abläufe angelegt. Der vollständige sichtbare Mitarbeiterablauf einschließlich Reaktivieren, Löschbestätigung und erneutem Laden wurde vom Auftraggeber bestätigt.
 
 ## Noch nicht begonnen
 
@@ -177,7 +178,7 @@ Die Antworten sind in der Fragen-Datei und im Entscheidungsdokument festgehalten
 - kein zusätzlicher Qualifikationskatalog in der ersten Fassung,
 - erste Mitarbeiteroberfläche mit Übersicht, Anlegen, Bearbeiten, Typwechsel und Deaktivieren; noch ohne Suche, Filter und Typenkatalogpflege.
 
-Die vollständige Fachentscheidung steht in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`; die gemeinsame technische Migrationsgrenze in `docs/decisions/SHARED_SQLITE_MIGRATION_BOUNDARY.md`. MA-01 bis MA-09 einschließlich MA-02A sind abgenommen; MA-10 und MA-10A sind umgesetzt und automatisch geprüft und warten auf die gemeinsame sichtbare Abnahme.
+Die vollständige Fachentscheidung steht in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`; die gemeinsame technische Migrationsgrenze in `docs/decisions/SHARED_SQLITE_MIGRATION_BOUNDARY.md`. MA-01 bis MA-11 einschließlich MA-02A sind abgenommen; System 03 ist abgeschlossen und archiviert.
 
 ## Offene Entscheidungen für spätere Systeme
 
@@ -193,9 +194,7 @@ Diese Entscheidungen sind für den Abschluss der Dokumentationsgrundlage noch ni
 
 ## Echte Blockaden
 
-Für MA-10 besteht keine technische Blockade. Offen ist die sichtbare Prüfung des vollständigen Mitarbeiterablaufs einschließlich Neustart und erneutem Laden.
-
-Für MA-10A besteht keine technische Blockade. Die Implementierung ist abgeschlossen; offen ist nur der gemeinsame sichtbare MA-10-/MA-10A-Ablauf einschließlich Neustart.
+Für das abgeschlossene System 03 besteht keine technische Blockade. Für ein nachfolgendes System ist noch keine Teil-Roadmap ausgewählt oder freigegeben.
 
 Das zuvor unversionierte Beispielbild mit echten Namen und konkreten Plandaten ist nicht mehr im Arbeitsordner vorhanden. Die daraus benötigten Fachinformationen sind nur abstrahiert und ohne personenbezogene Daten dokumentiert.
 
@@ -206,8 +205,8 @@ Die fehlende Excel-Vorlage blockiert später den Excel-Vorlagentest und System 1
 - Alle 13 Produktions- und Testprojekte kompilieren erfolgreich; 55 von 55 Application-Tests, 95 von 95 Domain-Tests, 23 von 23 Infrastructure-Tests, 32 von 32 Desktop-Tests und 16 von 16 Architekturtests bestehen. Insgesamt bestehen alle 221 vorhandenen Tests.
 - Der vollständige sichtbare Einsatzort-, Diensttyp-, Doppeldienst- und Springer-Ablauf wurde schrittweise manuell geprüft und durch den Auftraggeber bestätigt.
 - Die Paketwiederherstellung und der Build bestätigen noch keinen OR-Tools-Lauf auf einem sauberen Zielsystem. Die Visual-C++-x64-Laufzeitvoraussetzung wird erst bei der portablen Auslieferung praktisch geprüft.
-- Die gemeinsame SQLite-Speicherung für Servicekatalog, Mitarbeitertypen, Einsatzfreigaben und Mitarbeitende ist mit leeren sowie vom System-04-Stand aktualisierten temporären Testdateien geprüft. Übersicht, Bearbeitung, Reaktivierung und referenzgeschütztes Löschen sind implementiert; der gemeinsame sichtbare MA-10-/MA-10A-Ablauf, Planungsengine und Excel-Export stehen noch aus.
-- Die aktuelle WPF-App wurde lokal mit dem Titel „Salztal Dienstplanung“ gestartet und reagiert. Die Windows-Prüfhilfe konnte das Fenster nicht erfassen; die sichtbare Bedienprüfung bleibt deshalb beim Auftraggeber.
+- Die gemeinsame SQLite-Speicherung für Servicekatalog, Mitarbeitertypen, Einsatzfreigaben und Mitarbeitende ist mit leeren sowie vom System-04-Stand aktualisierten temporären Testdateien geprüft. Übersicht, Bearbeitung, Reaktivierung und referenzgeschütztes Löschen sind implementiert und sichtbar bestätigt; Planungsengine und Excel-Export stehen noch aus.
+- Die WPF-Mitarbeiterbedienung wurde vom Auftraggeber einschließlich des vollständigen MA-10-/MA-10A-Ablaufs bestätigt. Dieses System-03-Gate ist bestanden.
 - Portable Windows-Ausgabe und Start auf einem geeigneten Windows-11-System stehen noch aus.
 - Die fachliche Endabnahme durch die Service-Leitung steht noch aus.
 
@@ -215,4 +214,4 @@ Keines dieser späteren Gates wird vorzeitig als bestanden geführt.
 
 ## Nächster minimaler Schritt
 
-Den vollständigen MA-10- und MA-10A-Ablauf mit synthetischen Daten sichtbar prüfen und ausdrücklich abnehmen oder Änderungswünsche nennen. Dazu gehören Anlegen, Umbenennen, Typwechsel, Deaktivieren, Reaktivieren, Typ1-Konflikt, Löschabbruch, endgültiges Löschen und erneutes Laden nach einem Neustart. Erst danach beginnt MA-11.
+Gemeinsam auswählen, ob als Nächstes System 05 – Personal-, Schicht- und Stundenbedarf, System 06 – Verfügbarkeiten und Abwesenheiten oder System 07 – Regelkatalog und Prioritäten vorbereitet wird. Danach wird zunächst ausschließlich die passende Teil-Roadmap entworfen und abgenommen.
