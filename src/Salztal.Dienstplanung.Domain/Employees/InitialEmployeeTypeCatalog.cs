@@ -21,6 +21,8 @@ public static class InitialEmployeeTypeCatalog
                     "Typ1",
                     "Serviceleitung",
                     40 * 60,
+                    true,
+                    8 * 60,
                     EmployeeTypePlanningPolicy.ServiceManagement,
                     Shift(InitialShiftTypeCatalog.EarlyShift),
                     Shift(InitialShiftTypeCatalog.LateShift),
@@ -41,19 +43,62 @@ public static class InitialEmployeeTypeCatalog
                         InitialShiftTypeCatalog.CafeteriaShiftB,
                         ShiftEligibilityMode.ManualSuggestion)),
                 CreateInitial(
-                    new Guid("b75fed95-1c2f-439f-9696-217bed8c4d8f"),
-                    "Typ25",
-                    "Restaurant - 25 Stunden",
-                    25 * 60,
+                    new Guid("71cc48ce-172a-4580-a6b2-e1acc77b94f6"),
+                    "Typ20",
+                    "Restaurant - 20 Stunden",
+                    20 * 60,
+                    true,
+                    4 * 60,
                     EmployeeTypePlanningPolicy.Standard,
                     Shift(InitialShiftTypeCatalog.EarlyShift),
                     Shift(InitialShiftTypeCatalog.LateShift),
                     Pattern(InitialShiftPatternCatalog.SplitShift.Id)),
                 CreateInitial(
+                    new Guid("a06b4fcc-dbf1-4b3a-b975-07dc2d488157"),
+                    "Typ20a",
+                    "Alle Dienste - 20 Stunden",
+                    20 * 60,
+                    true,
+                    4 * 60,
+                    EmployeeTypePlanningPolicy.Standard,
+                    Shift(InitialShiftTypeCatalog.EarlyShift),
+                    Shift(InitialShiftTypeCatalog.LateShift),
+                    Shift(InitialShiftTypeCatalog.CafeteriaShiftA),
+                    Shift(InitialShiftTypeCatalog.CafeteriaShiftB),
+                    Pattern(InitialShiftPatternCatalog.SplitShift.Id),
+                    Pattern(InitialShiftPatternCatalog.ReliefShift.Id)),
+                CreateInitial(
+                    new Guid("b75fed95-1c2f-439f-9696-217bed8c4d8f"),
+                    "Typ25",
+                    "Restaurant - 25 Stunden",
+                    25 * 60,
+                    true,
+                    5 * 60,
+                    EmployeeTypePlanningPolicy.Standard,
+                    Shift(InitialShiftTypeCatalog.EarlyShift),
+                    Shift(InitialShiftTypeCatalog.LateShift),
+                    Pattern(InitialShiftPatternCatalog.SplitShift.Id)),
+                CreateInitial(
+                    new Guid("3c553205-5413-4f0c-ad1c-b4037066470c"),
+                    "Typ25a",
+                    "Alle Dienste - 25 Stunden",
+                    25 * 60,
+                    true,
+                    5 * 60,
+                    EmployeeTypePlanningPolicy.Standard,
+                    Shift(InitialShiftTypeCatalog.EarlyShift),
+                    Shift(InitialShiftTypeCatalog.LateShift),
+                    Shift(InitialShiftTypeCatalog.CafeteriaShiftA),
+                    Shift(InitialShiftTypeCatalog.CafeteriaShiftB),
+                    Pattern(InitialShiftPatternCatalog.SplitShift.Id),
+                    Pattern(InitialShiftPatternCatalog.ReliefShift.Id)),
+                CreateInitial(
                     new Guid("6f0feaed-65eb-4568-9c1f-a130cca65e44"),
                     "Typ30",
                     "Restaurant - 30 Stunden",
                     30 * 60,
+                    true,
+                    6 * 60,
                     EmployeeTypePlanningPolicy.Standard,
                     Shift(InitialShiftTypeCatalog.EarlyShift),
                     Shift(InitialShiftTypeCatalog.LateShift),
@@ -63,6 +108,8 @@ public static class InitialEmployeeTypeCatalog
                     "Typ30a",
                     "Alle Dienste - 30 Stunden",
                     30 * 60,
+                    true,
+                    6 * 60,
                     EmployeeTypePlanningPolicy.Standard,
                     Shift(InitialShiftTypeCatalog.EarlyShift),
                     Shift(InitialShiftTypeCatalog.LateShift),
@@ -75,6 +122,8 @@ public static class InitialEmployeeTypeCatalog
                     "Typ35",
                     "Restaurant - 35 Stunden",
                     35 * 60,
+                    true,
+                    7 * 60,
                     EmployeeTypePlanningPolicy.Standard,
                     Shift(InitialShiftTypeCatalog.EarlyShift),
                     Shift(InitialShiftTypeCatalog.LateShift),
@@ -84,6 +133,8 @@ public static class InitialEmployeeTypeCatalog
                     "Typ35a",
                     "Alle Dienste - 35 Stunden",
                     35 * 60,
+                    true,
+                    7 * 60,
                     EmployeeTypePlanningPolicy.Standard,
                     Shift(InitialShiftTypeCatalog.EarlyShift),
                     Shift(InitialShiftTypeCatalog.LateShift),
@@ -96,7 +147,9 @@ public static class InitialEmployeeTypeCatalog
                     "TypAH1",
                     "Restaurant-Spätdienst - 10 Stunden",
                     10 * 60,
-                    EmployeeTypePlanningPolicy.Standard,
+                    false,
+                    null,
+                    EmployeeTypePlanningPolicy.Auxiliary,
                     Shift(InitialShiftTypeCatalog.LateShift),
                     Shift(
                         InitialShiftTypeCatalog.EarlyShift,
@@ -106,7 +159,9 @@ public static class InitialEmployeeTypeCatalog
                     "TypAH2",
                     "Restaurant, Cafeteria B und Doppeldienst - 10 Stunden",
                     10 * 60,
-                    EmployeeTypePlanningPolicy.Standard,
+                    false,
+                    null,
+                    EmployeeTypePlanningPolicy.Auxiliary,
                     Shift(InitialShiftTypeCatalog.LateShift),
                     Shift(InitialShiftTypeCatalog.CafeteriaShiftB),
                     Pattern(InitialShiftPatternCatalog.SplitShift.Id),
@@ -120,19 +175,25 @@ public static class InitialEmployeeTypeCatalog
 
     public static EmployeeType Type1 => InitialEmployeeTypes[0];
 
-    public static EmployeeType Type25 => InitialEmployeeTypes[1];
+    public static EmployeeType Type20 => InitialEmployeeTypes[1];
 
-    public static EmployeeType Type30 => InitialEmployeeTypes[2];
+    public static EmployeeType Type20a => InitialEmployeeTypes[2];
 
-    public static EmployeeType Type30a => InitialEmployeeTypes[3];
+    public static EmployeeType Type25 => InitialEmployeeTypes[3];
 
-    public static EmployeeType Type35 => InitialEmployeeTypes[4];
+    public static EmployeeType Type25a => InitialEmployeeTypes[4];
 
-    public static EmployeeType Type35a => InitialEmployeeTypes[5];
+    public static EmployeeType Type30 => InitialEmployeeTypes[5];
 
-    public static EmployeeType TypeAh1 => InitialEmployeeTypes[6];
+    public static EmployeeType Type30a => InitialEmployeeTypes[6];
 
-    public static EmployeeType TypeAh2 => InitialEmployeeTypes[7];
+    public static EmployeeType Type35 => InitialEmployeeTypes[7];
+
+    public static EmployeeType Type35a => InitialEmployeeTypes[8];
+
+    public static EmployeeType TypeAh1 => InitialEmployeeTypes[9];
+
+    public static EmployeeType TypeAh2 => InitialEmployeeTypes[10];
 
     public static IReadOnlyList<EmployeeType> All => InitialEmployeeTypes;
 
@@ -170,6 +231,8 @@ public static class InitialEmployeeTypeCatalog
         string code,
         string name,
         int weeklyWorkTargetMinutes,
+        bool allowsVacationAndSickness,
+        int? absenceDayValueMinutes,
         EmployeeTypePlanningPolicy planningPolicy,
         params EmployeeTypeShiftEligibility[] shiftEligibilities)
     {
@@ -178,6 +241,8 @@ public static class InitialEmployeeTypeCatalog
             code,
             name,
             weeklyWorkTargetMinutes,
+            allowsVacationAndSickness,
+            absenceDayValueMinutes,
             shiftEligibilities,
             planningPolicy);
 

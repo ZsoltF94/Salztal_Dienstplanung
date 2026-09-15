@@ -1,11 +1,15 @@
 using System.IO;
+using Salztal.Dienstplanung.Application.Availabilities;
 using Salztal.Dienstplanung.Application.Employees;
 using Salztal.Dienstplanung.Application.ServiceCatalog;
 using Salztal.Dienstplanung.Application.StaffingDemands;
+using Salztal.Dienstplanung.Desktop.Features.Availabilities;
 using Salztal.Dienstplanung.Desktop.Features.Employees;
+using Salztal.Dienstplanung.Desktop.Features.EmployeeTypes;
 using Salztal.Dienstplanung.Desktop.Features.ServiceCatalog;
 using Salztal.Dienstplanung.Desktop.Features.StaffingDemands;
 using Salztal.Dienstplanung.Desktop.Shared;
+using Salztal.Dienstplanung.Infrastructure.Persistence.Availabilities;
 using Salztal.Dienstplanung.Infrastructure.Persistence.Employees;
 using Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog;
 using Salztal.Dienstplanung.Infrastructure.Persistence.StaffingDemands;
@@ -58,6 +62,18 @@ internal static class MainWindowComposition
                 dependencies.EmployeeReader,
                 dependencies.DeleteEmployeeStore),
             errorReporter);
+        EmployeeTypeOverviewViewModel employeeTypes = new(
+            new GetEmployeeTypeCatalogQuery(dependencies.EmployeeReader),
+            new CreateEmployeeTypeCommand(
+                dependencies.EmployeeReader,
+                dependencies.CreateEmployeeTypeStore),
+            new UpdateEmployeeTypeCommand(
+                dependencies.EmployeeReader,
+                dependencies.UpdateEmployeeTypeStore),
+            new DeleteEmployeeTypeCommand(
+                dependencies.EmployeeReader,
+                dependencies.DeleteEmployeeTypeStore),
+            errorReporter);
         DateOnly today = DateOnly.FromDateTime(DateTime.Today);
         DateOnly currentWeekMonday = GetWeekMonday(today);
         StaffingDemandOverviewViewModel staffingDemands = new(
@@ -78,14 +94,26 @@ internal static class MainWindowComposition
             currentWeekMonday,
             staffingDemands.LoadAsync,
             errorReporter);
+        AvailabilityOverviewViewModel availabilities = new(
+            new GetAvailabilityPeriodQuery(dependencies.AvailabilityReader),
+            new SaveAvailabilityEntryCommand(
+                dependencies.AvailabilityReader,
+                dependencies.SetAvailabilityEntryStore),
+            new RemoveAvailabilityEntryCommand(
+                dependencies.AvailabilityReader,
+                dependencies.RemoveAvailabilityEntryStore),
+            currentWeekMonday,
+            errorReporter);
         serviceCatalog.SelectedWorkLocationChanged +=
             standardStaffingDemands.SelectWorkLocation;
 
         return new MainWindow(
             serviceCatalog,
             employees,
+            employeeTypes,
             staffingDemands,
-            standardStaffingDemands);
+            standardStaffingDemands,
+            availabilities);
     }
 
     public static async Task<MainWindowDependencies> CreateInitializedAsync(
@@ -96,6 +124,7 @@ internal static class MainWindowComposition
         await serviceCatalogStore.InitializeAsync(cancellationToken);
         SqliteEmployeeStore employeeStore = new(databasePath);
         SqliteStaffingDemandStore staffingDemandStore = new(databasePath);
+        SqliteAvailabilityStore availabilityStore = new(databasePath);
         await staffingDemandStore.InitializeAsync(cancellationToken);
 
         return new MainWindowDependencies(
@@ -109,10 +138,16 @@ internal static class MainWindowComposition
             employeeStore,
             employeeStore,
             employeeStore,
+            employeeStore,
+            employeeStore,
+            employeeStore,
             staffingDemandStore,
             staffingDemandStore,
             staffingDemandStore,
-            staffingDemandStore);
+            staffingDemandStore,
+            availabilityStore,
+            availabilityStore,
+            availabilityStore);
     }
 
     private static DateOnly GetWeekMonday(DateOnly date)

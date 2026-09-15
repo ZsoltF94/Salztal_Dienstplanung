@@ -20,14 +20,14 @@ public sealed class SqliteEmployeeStoreTests
             TestContext.Current.CancellationToken);
 
         Assert.Empty(data.Employees);
-        Assert.Equal(8, data.EmployeeTypes.Count);
-        Assert.Equal(8L, await ExecuteScalarAsync(database.Path, "SELECT COUNT(*) FROM EmployeeTypes;"));
+        Assert.Equal(11, data.EmployeeTypes.Count);
+        Assert.Equal(11L, await ExecuteScalarAsync(database.Path, "SELECT COUNT(*) FROM EmployeeTypes;"));
         Assert.Equal(
-            38L,
+            53L,
             await ExecuteScalarAsync(
                 database.Path,
                 "SELECT COUNT(*) FROM EmployeeTypeShiftEligibilities;"));
-        Assert.Equal(4L, await ExecuteScalarAsync(
+        Assert.Equal(6L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM __EFMigrationsHistory;"));
 
@@ -39,6 +39,7 @@ public sealed class SqliteEmployeeStoreTests
             Assert.Equal(expected.Code, actual.Code);
             Assert.Equal(expected.Name, actual.Name);
             Assert.Equal(expected.WeeklyWorkTarget, actual.WeeklyWorkTarget);
+            Assert.Equal(expected.AbsencePolicy, actual.AbsencePolicy);
             Assert.Equal(expected.PlanningPolicy, actual.PlanningPolicy);
             Assert.Equal(expected.ShiftEligibilities, actual.ShiftEligibilities);
         }

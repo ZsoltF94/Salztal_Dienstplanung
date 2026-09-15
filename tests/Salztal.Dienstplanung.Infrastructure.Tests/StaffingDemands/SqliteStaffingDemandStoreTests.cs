@@ -32,7 +32,7 @@ public sealed class SqliteStaffingDemandStoreTests
 
         Assert.Equal(23, data.StandardRevisions.Count);
         Assert.Empty(data.DateExceptions);
-        Assert.Equal(4L, await ExecuteScalarAsync(
+        Assert.Equal(6L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM __EFMigrationsHistory;"));
         Assert.Equal(23L, await ExecuteScalarAsync(
@@ -117,8 +117,8 @@ public sealed class SqliteStaffingDemandStoreTests
                 && revision.Key.ShiftTypeId == InitialShiftTypeCatalog.EarlyShift.Id);
         Assert.Equal(new TimeOnly(7, 0), earlyMonday.ActualTime?.Start);
         Assert.Equal(new TimeOnly(14, 0), earlyMonday.ActualTime?.End);
-        Assert.Equal(8L, await ExecuteScalarAsync(database.Path, "SELECT COUNT(*) FROM EmployeeTypes;"));
-        Assert.Equal(4L, await ExecuteScalarAsync(
+        Assert.Equal(11L, await ExecuteScalarAsync(database.Path, "SELECT COUNT(*) FROM EmployeeTypes;"));
+        Assert.Equal(6L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM __EFMigrationsHistory;"));
     }
@@ -145,7 +145,7 @@ public sealed class SqliteStaffingDemandStoreTests
 
         Assert.Equal(1, revision.CorrectionSequence);
         Assert.Equal(new TimeOnly(14, 0), revision.ActualTime?.Start);
-        Assert.Equal(4L, await ExecuteScalarAsync(
+        Assert.Equal(6L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM __EFMigrationsHistory;"));
     }

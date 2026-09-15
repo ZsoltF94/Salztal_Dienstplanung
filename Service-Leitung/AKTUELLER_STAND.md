@@ -1,10 +1,10 @@
 # Aktueller Stand
 
-Stand: 14. September 2026
+Stand: 15. September 2026
 
 ## Wo steht das Projekt?
 
-Die beiden ersten fachlichen Systeme sind abgeschlossen: Einsatzorte und Diensttypen sowie Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben. Die vollständige Mitarbeiterbedienung mit Anlegen, Bearbeiten, Typwechsel, Deaktivieren, Reaktivieren und sicherem endgültigem Löschen ist programmiert, automatisch geprüft und sichtbar bestätigt. Beim nächsten System für Personal-, Schicht- und Stundenbedarf sind Bedarfsgrundwerte, Wochenvorlage, einzelne Datumsausnahmen, Lese- und Schreibabläufe sowie die lokale Datenbankspeicherung intern programmiert und bestätigt. Die sichtbare Wochenübersicht ist ebenfalls bestätigt. Die nach der ersten Sichtprüfung gewünschte klarere Trennung ist nun programmiert und automatisch geprüft; ihre sichtbare Abnahme steht noch aus.
+Vier fachliche Systeme sind abgeschlossen: Einsatzorte und Diensttypen, Mitarbeitende und Mitarbeitertypen, Personal-, Schicht- und Stundenbedarf sowie Verfügbarkeiten und Abwesenheiten. System 06 ist fachlich, technisch und sichtbar vollständig geprüft, ausdrücklich abgenommen und archiviert.
 
 Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam besprochen, aufgeschrieben und abgenommen. Das Projekt ist außerdem mit einem GitHub-Repository verbunden, damit der Entwicklungsstand nachvollziehbar gespeichert werden kann.
 
@@ -38,6 +38,109 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 - Die sichtbare Einsatzortverwaltung mit Auswahl, Name und Farbkennzeichnung ist geprüft und bestätigt.
 - Die sichtbare Verwaltung der Diensttyp-Standardzeiten sowie die Erklärungen für Doppeldienst und Springer sind geprüft und bestätigt.
 - System 04 mit Einsatzorten, normalen Diensttypen, Doppeldienst und Springer ist vollständig geprüft, bestätigt und archiviert.
+- System 05 mit regelmäßigen Bedarfen, einzelnen Tagesänderungen, berechneten Stunden und lokaler Speicherung ist vollständig geprüft, bestätigt und archiviert.
+
+## Bestätigt: erster Mitarbeitertypen-Schritt
+
+- Die fachliche Grundlage kennt nun alle elf bestätigten Starttypen, darunter neu `Typ20`, `Typ20a` und `Typ25a`.
+- Für Urlaub `U` und Krankheit `K` besitzt jeder dafür zugelassene Typ einen minutengenauen Tageswert. Die bestätigten Startwerte von vier bis acht Stunden sind hinterlegt; für AH bleiben `U` und `K` unzulässig.
+- Normale Typen, Typ1 und AH sind durch geschützte Rollen eindeutig unterschieden. Namen oder sichtbare Typcodes entscheiden nicht über diese Sonderrollen.
+- Bei einer späteren Bearbeitung bleiben die feste Kennung, der Typcode und die Sonderrolle erhalten. Name, Wochen-Soll, Abwesenheitsregel und Einsatzberechtigungen können über den vorbereiteten Fachvertrag geändert werden.
+- Die lokale Datenbank und die sichtbare App sind in MT-01 bewusst noch nicht erweitert worden. Die Speicherung wurde anschließend in MT-03 umgesetzt; die sichtbare App folgt erst in MT-04.
+- Der vollständige technische Testlauf umfasst 371 erfolgreiche Prüfungen; der Build enthält keine Warnungen oder Fehler.
+- Der erste Mitarbeitertypen-Schritt ist am 15. September 2026 ausdrücklich bestätigt worden.
+
+## Bestätigt: Abläufe der Mitarbeitertypenpflege
+
+- Die App-Grundlage kann künftig alle Angaben eines Mitarbeitertyps vollständig und eindeutig an die Bedienoberfläche übergeben: Code, Name, Wochen-Soll, Urlaubs- und Krankheitsregel, Tageswert, geschützte Rolle und jede Einsatzberechtigung.
+- Beim Anlegen wird immer ein normal automatisch planbarer Typ vorbereitet. Ein bereits verwendeter Typcode wird verständlich abgelehnt.
+- Beim Bearbeiten bleiben die feste Kennung, der Typcode und eine besondere Typ1- oder AH-Rolle unverändert. Die freigegebenen Stammdaten und Einsatzberechtigungen können geändert werden.
+- Endgültiges Löschen verlangt eine ausdrückliche Bestätigung. Typ1- und AH-Typen sowie Typen, die einer aktiven oder deaktivierten Person oder anderen Fachdaten zugeordnet sind, bleiben geschützt erhalten.
+- Wird ein Typ zwischen Lesen und Speichern verändert, überschreibt die App-Grundlage diesen neueren Stand nicht, sondern fordert zum erneuten Laden auf.
+- Die Abläufe und verständlichen Fehlermeldungen sind automatisch geprüft. Insgesamt bestehen nun 393 Prüfungen; der vollständige Build enthält keine Warnungen oder Fehler.
+- Dauerhafte Datenbankspeicherung und sichtbare Bedienoberfläche sind bewusst noch nicht in MT-02 enthalten. Die Speicherung wurde anschließend in MT-03 umgesetzt; die Bedienoberfläche folgt erst in MT-04.
+- Die vorbereiteten Abläufe und Fehlermeldungen sind am 15. September 2026 ausdrücklich bestätigt worden.
+
+## Bestätigt: dauerhafte Speicherung der Mitarbeitertypen
+
+- Die gemeinsame lokale Datenbank enthält nun alle elf Starttypen samt Wochen-Soll, Urlaubs- und Krankheitsregel, minutengenauem Tageswert, geschützter Planungsrolle und jeder Einsatzberechtigung.
+- Eine vorhandene Datenbank aus System 05 wird in derselben nachvollziehbaren Folge erweitert. Synthetische Tests belegen, dass bereits vorhandene Mitarbeiter-, Katalog- und Bedarfsdaten dabei erhalten bleiben.
+- Neue normale Typen können dauerhaft angelegt und erlaubte Angaben vollständig geändert werden. Die Werte bleiben nach dem Schließen und erneuten Öffnen korrekt erhalten.
+- Typcodes sind auch bei unterschiedlicher Groß- und Kleinschreibung eindeutig. Ungültige Abwesenheits- oder Rollenwerte werden zusätzlich direkt von der Datenbank abgelehnt.
+- Ein noch nicht verwendeter normaler Typ kann samt Einsatzberechtigungen vollständig gelöscht werden. Ein einer Person zugeordneter Typ bleibt durch den Referenzschutz erhalten.
+- Ein technischer Fehler oder ein zwischenzeitlich geänderter Stand führt nicht zu einer Teiländerung. Der vorherige Datenstand bleibt vollständig erhalten.
+- Insgesamt bestehen nun 404 automatische Prüfungen; der vollständige Build enthält keine Warnungen oder Fehler. Der sichtbare WPF-Tab ist weiterhin nicht Bestandteil dieses Schritts.
+- Die dauerhafte Speicherung ist am 15. September 2026 ausdrücklich bestätigt worden.
+
+## Bestätigt: Mitarbeitertypen-Tab
+
+- Ein eigener Reiter „Mitarbeitertypen“ zeigt Typcode, Namen, Wochen-Soll, U-/K-Regel, Tageswert, geschützte Planungsrolle und alle Einsatzberechtigungen.
+- Reguläre Planbarkeit, ein rein manueller Vorschlag und eine nur nach bewusster Laufoption aktive Berechtigung bleiben getrennt erkennbar und bearbeitbar.
+- Beim Anlegen entsteht immer ein normaler Mitarbeitertyp. Beim Bearbeiten bleiben Kennung, Typcode und besondere Typ1- oder AH-Rolle geschützt.
+- Vor einer Änderung weist die App darauf hin, dass sie für alle zugeordneten Mitarbeitenden und künftigen Planungen gilt, während abgenommene Planversionen unverändert bleiben.
+- Endgültiges Löschen ist nur für normale Typen erreichbar und verlangt eine deutliche Bestätigung. Verwendete Typen bleiben erhalten und werden verständlich gemeldet.
+- Ungültige Eingaben und technische Fehler lassen die eingegebenen Werte zur Korrektur stehen. Auch ein laufender Speichervorgang kann ohne Verlust der Eingaben abgebrochen werden.
+- In der Detailansicht wird jede Einsatzberechtigung mit dem zugehörigen Dienst- oder Musternamen und ihrem Status angezeigt. Eine automatische Ansichtsprüfung schützt diese sichtbare Zuordnung vor einem Rückfall.
+- Grüne Erfolgsfelder sowie rote Eingabe- und technische Fehlerfelder zeigen ihren vollständigen Rückmeldungstext an, sobald sie eingeblendet werden. Die automatische Prüfung deckt diese gemeinsame Anzeigelogik ab.
+- Zwölf automatische Ablaufprüfungen und zwei zusätzliche Prüfungen des fehlerfreien Ansichtsstarts einschließlich geladener Typdaten bestehen. Insgesamt sind 418 Prüfungen grün; der vollständige Build enthält keine Warnungen oder Fehler.
+- Ein unerwarteter technischer Oberflächenfehler beendet die App künftig nicht mehr kommentarlos, sondern wird verständlich gemeldet.
+- Die sichtbare Bedienprüfung mit ausschließlich synthetischen Angaben wurde am 15. September 2026 bestätigt.
+
+## Abgenommen: Mitarbeitertypen-Vorbereitung
+
+- Fachmodell, Abläufe, lokale Speicherung und sichtbare Bedienoberfläche wurden gemeinsam geprüft.
+- Alle 418 automatischen Prüfungen bestehen. Der vollständige Build enthält keine Warnungen oder Fehler.
+- Die lokale Datenbank besitzt alle erwarteten Migrationen; das aktuelle Datenmodell stimmt mit dem Migrationsstand überein.
+- Die technischen und verständlichen Leitdokumente beschreiben denselben Stand.
+- Das unversionierte Referenzbild wurde als reines Beispiel ohne personenbezogene oder reale Planungsdaten bestätigt. Es bleibt unversioniert und wird nicht als Fachdatenquelle verwendet.
+- Der Gesamtstand wurde am 15. September 2026 ausdrücklich abgenommen. VA-01 darf damit beginnen.
+
+## Fachlich umgesetzt und geprüft: Tageseinträge und Wochen-Soll
+
+- `U`, `K` und ein von der Service-Leitung gesetztes rotes `X` sind drei eindeutig getrennte Tageseinträge für eine Person und ein konkretes Datum.
+- Pro Person und Tag kann nur ein aktueller Wert gelten. Eine neue Auswahl ersetzt den bisherigen Wert; der unveränderte Ausgangsstand bleibt bei der fachlichen Berechnung erhalten.
+- Das wirksame Soll wird für jede Woche von Montag bis Sonntag in Minuten berechnet. `U` und `K` ziehen den Tageswert des Mitarbeitertyps ab, auch an Wochenenden und Feiertagen. Ein rotes `X` zieht nichts ab; weniger als null Minuten sind ausgeschlossen.
+- Bei AH werden `U` und `K` abgelehnt, ein rotes `X` bleibt zulässig. Für Typ1 wird eindeutig erkannt, ob wirklich alle sieben Tage einer Woche gesperrt sind oder noch mindestens ein Tag verfügbar ist.
+- 22 neue Prüfungen decken diese Fälle ab. Zusammen mit allen bisherigen Bereichen bestehen nun 440 automatische Prüfungen; der vollständige Build enthält keine Warnungen oder Fehler.
+- Oberfläche und lokale Speicherung waren bewusst noch nicht Teil dieses Schritts. VA-01 wurde am 15. September 2026 zusammen mit dem vollständig funktionierenden Stand bis VA-05 ausdrücklich abgenommen.
+
+## Fachlich umgesetzt und geprüft: Drei-Wochen-Lesestand
+
+- Ein beliebig ausgewähltes Datum wird eindeutig auf den zugehörigen Montag bezogen. Der Lesestand enthält von dort genau 21 Tage bis zum dritten Sonntag.
+- Angezeigt werden später nur aktive Personen. Jede Zeile enthält Name, aktuellen Mitarbeitertyp, vorhandene Tageseinträge sowie ungekürztes und wirksames Soll für jede der drei Wochen.
+- Die Übergabe ist unveränderlich und enthält keine Datenbank- oder Oberflächenobjekte. Abbruch wird sauber weitergegeben.
+- Fehlende oder doppelte Personen- und Typzuordnungen, doppelte aktuelle Tageseinträge und ein unzulässiges `U` oder `K` bei AH führen zu verständlichen Fehlern statt zu einem unvollständigen Stand.
+- 14 neue Prüfungen decken diesen Lesevertrag ab. Insgesamt sind 454 automatische Prüfungen grün; der Build enthält keine Warnungen oder Fehler.
+- Die tatsächliche Datenbankspeicherung und die sichtbare Tabelle sind weiterhin bewusst spätere Schritte.
+
+## Fachlich umgesetzt und geprüft: Tageseinträge ändern
+
+- Ein leeres Tagesfeld kann mit `U`, `K` oder rotem `X` belegt werden. Ein anderer bestehender Wert wird erst nach einer ausdrücklichen Ersetzungsbestätigung geändert.
+- Das Entfernen eines Eintrags verlangt ebenfalls eine ausdrückliche Sicherheitsbestätigung.
+- Jeder gelesene Eintrag besitzt einen positiven Änderungsstand. Wurde das Feld zwischen Lesen und Speichern verändert, bleibt der neuere Stand erhalten und die App kann zum erneuten Laden auffordern.
+- Für deaktivierte Personen werden keine neuen Änderungen gespeichert. Fehlende Personen oder Typen sowie bei AH unzulässige `U`- und `K`-Einträge werden verständlich abgelehnt.
+- Validierungs-, Bestätigungs- und Konfliktfehler rufen die Speicherung nicht auf. Die spätere Historie abgenommener Pläne gehört nicht zum aktuellen Eintrag und wird durch diese Verträge nicht verändert.
+- 19 neue Prüfungen decken diese Schreibabläufe ab. Insgesamt sind 473 automatische Prüfungen grün; der Build enthält keine Warnungen oder Fehler.
+
+## Technisch umgesetzt und geprüft: Tageseinträge lokal speichern
+
+- Pro Person und Datum speichert die gemeinsame lokale Datenbank genau einen aktuellen Wert: Urlaub, Krankheit oder ein fest gesetztes rotes `X`.
+- Jede Änderung besitzt einen positiven Änderungsstand. Ein inzwischen veränderter Wert wird nicht unbemerkt überschrieben; die App kann stattdessen zum erneuten Laden auffordern.
+- Solange ein Tageseintrag besteht, schützt die Datenbank die zugehörige Person vor dem Löschen. Ungültige Eintragsarten und Änderungsstände werden zusätzlich direkt abgelehnt.
+- Die neue sechste Migration erweitert vorhandene Datenbanken ohne Änderung früherer Migrationen. Tests mit ausschließlich erfundenen Daten bestätigen Neuaufbau, Aktualisierung, Neustart, Eindeutigkeit, Fremdschlüssel sowie den unveränderten vorherigen Stand bei einem künstlich ausgelösten Schreibfehler.
+- Zwölf neue Prüfungen decken die lokale Speicherung ab. Insgesamt sind 485 automatische Prüfungen grün; der vollständige Build enthält keine Warnungen oder Fehler.
+- Die lokale Speicherung bildet die technische Grundlage für die anschließend umgesetzte Drei-Wochen-Tabelle aus VA-05.
+
+## Sichtbar umgesetzt und automatisch geprüft: „Dienstplan SER“
+
+- Der neue Tab zeigt alle aktiven Mitarbeitenden als Zeilen. Links stehen Name und bindender Mitarbeitertyp, danach folgen genau 21 Tage von Montag bis zum dritten Sonntag.
+- Rechts werden für jede Person und jede der drei Wochen das normale und das durch `U` oder `K` verringerte Wochen-Soll angezeigt.
+- Ein Tagesfeld wird einzeln ausgewählt. Urlaub, Krankheit, festes Frei und Leeren stehen als klare Schaltflächen bereit; zusätzlich funktionieren die Kürzel `U`, `K`, `X` und `Entf`.
+- Ein rotes `X` erscheint als roter Buchstabe auf normalem Hintergrund und wird zusätzlich verständlich als fest freier Tag erklärt. Bei AH sind Urlaub und Krankheit nicht auswählbar.
+- Ein vorhandener anderer Wert und das Leeren werden erst nach einer sichtbaren Bestätigung geändert. Gleichzeitiges Bearbeiten mehrerer Felder ist bewusst nicht enthalten.
+- Zehn neue Desktop-Prüfungen decken Laden, Zeitraumwechsel, Aktionen, Tastatur, Bestätigen und Abbrechen, AH, Konflikte, Fehlerzustände sowie die gerenderte Darstellung ab. Insgesamt sind 495 automatische Prüfungen grün; der Build enthält keine Warnungen oder Fehler.
+- Vor dem sichtbaren Start wurde die vorhandene lokale Datenbank im lokalen Sicherungsordner kopiert. Die App bleibt nach der Aktualisierung stabil geöffnet.
+- Die Service-Leitung hat am 15. September 2026 bestätigt, dass die vollständige Ansicht und alle vereinbarten sichtbaren Abläufe funktionieren.
 
 ## System 04 – umgesetzt und abgenommen
 
@@ -110,7 +213,6 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 
 - die fachlich nutzbare Windows-App,
 - das Anlegen, Löschen oder Deaktivieren von Einsatzorten und Diensttypen,
-- die sichtbare Bearbeitung einzelner Datumsausnahmen,
 - die Eingabe von Urlaub, Krankheit und Verfügbarkeit,
 - die automatische Erstellung eines Wochenplans,
 - die Erklärung nicht besetzbarer Dienste,
@@ -120,7 +222,7 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 - die Datensicherung,
 - die spätere Verwaltung von Über- und Minusstunden.
 
-## System 05 – derzeit in Arbeit
+## System 05 – umgesetzt und abgenommen
 
 - Ein einzelner Bedarf kann intern mit Datum, Einsatzort, normalem Diensttyp, tatsächlicher Zeit und positiver Personenzahl gültig beschrieben werden.
 - Die App-Grundlage berechnet daraus minutengenau die Dauer und die insgesamt benötigten Mitarbeiterstunden. Ein zusätzlicher, möglicherweise widersprüchlicher Stundenwert wird nicht eingegeben.
@@ -165,12 +267,20 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 - Im Reiter „Bedarf“ wird ausschließlich ein konkreter Kalendertag über „Nur diesen Tag ändern“ angepasst. Diese „Einmalige Änderung“ darf erneut bearbeitet, auf „kein Bedarf“ gesetzt oder wieder auf den regelmäßigen Standard zurückgesetzt werden.
 - Die allgemeine Standardzeit eines Diensttyps und der regelmäßige Personalbedarf bleiben getrennt. Ein regelmäßiger Bedarf erhält weiterhin einen bewusst gewählten Wirksamkeitsmontag, damit frühere Wochen unverändert bleiben.
 - Nach jedem Speichern oder Zurücksetzen wird die Woche aus der lokalen Datenbank neu geladen und alle sichtbaren Summen werden neu berechnet. Auch ein zuvor fehlender Tagesbedarf kann ergänzt werden.
-- Die Korrektur ist programmiert und automatisch geprüft. Als offener Nachweis bleibt die gemeinsame sichtbare Bedienprüfung.
+- Die Korrektur ist programmiert, automatisch geprüft und sichtbar abgenommen.
 - Der weitere Änderungsbedarf aus der Sichtprüfung ist programmiert: Ein bereits geänderter regelmäßiger Bedarf kann nun erneut für denselben Wirksamkeitsmontag gespeichert, auf „kein regelmäßiger Bedarf“ gesetzt oder wieder ergänzt werden.
 - Jede weitere Speicherung erzeugt intern eine neue unveränderliche Korrekturfassung. Ältere Fassungen bleiben erhalten; sichtbar und fachlich gilt für diesen Montag immer die zuletzt gespeicherte Fassung.
 - Der Einsatzort wird auch beim regelmäßigen Bedarf über die linke Einsatzortliste gewählt. Die Bedarfsansicht zeigt anschließend alle sieben Tage von Montag bis Sonntag sowie vorhandene und fehlende Bedarfe der normalen Diensttypen.
-- BE-09B ist programmiert und automatisch geprüft. Offen ist die sichtbare Prüfung beider Einsatzorte und zweier aufeinanderfolgender Korrekturen desselben Bedarfs am selben Montag.
+- BE-09B ist programmiert, automatisch geprüft und sichtbar abgenommen. Damit ist System 05 vollständig abgeschlossen.
+
+## Abschließender System-06-Nachweis
+
+- Alle 13 Projekte lassen sich ohne Warnung und ohne Fehler erstellen.
+- Alle 495 vorhandenen automatischen Prüfungen sind grün. Die später benötigten Planning- und Excel-Prüfprojekte sind noch leer und melden dies erwartungsgemäß.
+- Datenbankmigrationen, Architekturgrenzen, Formatierung und Dokumentpfade sind geprüft.
+- Im Projektordner liegen keine Datenbanken, Sicherungen oder Exporte mit Anwendungsdaten. Das bestätigte Beispielbild bleibt unversioniert.
+- Die späteren Übergaben für Regelkatalog, Planmomentaufnahme, Generierung, Berichte, Bearbeitung, Planversionen und Excel sind klar getrennt dokumentiert.
 
 ## Nächster geplanter Schritt
 
-Als Nächstes werden die einheitliche linke Einsatzortauswahl, die vollständige Wochenansicht und zwei aufeinanderfolgende Korrekturen desselben regelmäßigen Bedarfs sichtbar geprüft. Danach können BE-09A und BE-09B gemeinsam abgenommen werden.
+System 06 ist abgeschlossen. Als Nächstes kann der Verständnisabgleich für den zentralen Regelkatalog fortgesetzt werden. Erst nach beantworteten Fachfragen und einer eigenen bestätigten Teil-Roadmap darf System 07 implementiert werden.

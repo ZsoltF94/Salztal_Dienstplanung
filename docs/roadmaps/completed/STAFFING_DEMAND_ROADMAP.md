@@ -1,8 +1,8 @@
 # Teil-Roadmap: Personal-, Schicht- und Stundenbedarf
 
-Status: Aktiv – BE-01 bis BE-08 abgenommen; BE-09A und BE-09B automatisch geprüft; gemeinsame Sichtprüfung offen
+Status: Abgeschlossen und archiviert am 2026-09-15
 
-Stand: 2026-09-14
+Stand: 2026-09-15
 
 ## Ziel und Nutzen
 
@@ -517,7 +517,7 @@ Abnahme vom 2026-09-14:
 
 ### BE-09 – Standardbedarfe in WPF bearbeiten
 
-Status: `[~]` – umgesetzt und automatisch geprüft; nach der Sichtprüfung nicht abgenommen und durch BE-09A zu korrigieren
+Status: `[x]` – ursprünglicher sichtbarer Entwurf geprüft und verworfen; korrigierter Zielablauf durch BE-09A und BE-09B am 2026-09-15 abgenommen
 
 Umfang:
 
@@ -559,7 +559,7 @@ Sichtprüfungsbefund vom 2026-09-14:
 
 ### BE-09A – Standard- und Einmaländerungsbedienung nach Sichtprüfung neu ordnen
 
-Status: `[~]` – umgesetzt und automatisch geprüft; sichtbare Bedienprüfung und ausdrückliche Abnahme offen
+Status: `[x]` – umgesetzt, automatisch geprüft und als Bestandteil des korrigierten Gesamtbereichs am 2026-09-15 sichtbar abgenommen
 
 Ziel und Nutzen:
 
@@ -636,7 +636,7 @@ Sichtprüfungsnachtrag vom 2026-09-14:
 
 ### BE-09B – Regelmäßigen Wochenbedarf konsistent anzeigen und am selben Montag wiederholt korrigieren
 
-Status: `[~]` – implementiert und automatisch geprüft; sichtbare Abnahme offen
+Status: `[x]` – implementiert, automatisch geprüft und am 2026-09-15 sichtbar abgenommen
 
 Ziel und Nutzen:
 
@@ -710,7 +710,7 @@ Prüfung:
 Abnahmebedingung:
 
 - Der Auftraggeber hat diesen BE-09B-Plan einschließlich der neuen Korrekturfolge und Migration vor der Implementierung ausdrücklich bestätigt.
-- Nach der Implementierung bestätigt der Auftraggeber die konsistente linke Einsatzortführung, die vollständige Montag-bis-Sonntag-Ansicht und die wiederholte Änderung desselben Wirksamkeitsmontags. Erst danach können BE-09A und BE-09B abgeschlossen werden.
+- Der Auftraggeber hat am 2026-09-15 bestätigt, dass die konsistente linke Einsatzortführung, die vollständige Montag-bis-Sonntag-Ansicht und die wiederholte Änderung desselben Wirksamkeitsmontags zunächst passend sind. Spätere Änderungswünsche der Service-Leitung werden als neuer abgestimmter Umfang behandelt.
 
 Umsetzungsnachweis vom 2026-09-14:
 
@@ -719,11 +719,11 @@ Umsetzungsnachweis vom 2026-09-14:
 - Die neue Migration `20260914185047_AddStandardDemandCorrectionSequence` übernimmt bestehende Revisionen mit Folge `1`, ergänzt die Datenbankbedingung für positive Folgen und erweitert den eindeutigen Index verlustfrei.
 - Der regelmäßige Bedarfsbereich zeigt für den links gewählten Einsatzort Montag bis Sonntag mit allen normalen Diensttypen, Zeiten, Personenzahlen und fehlenden Bedarfen. Die frühere zweite Einsatzortauswahl im rechten Editor ist entfernt; eine Tages-/Diensttypzeile kann direkt zur Bearbeitung gewählt werden.
 - Die automatische Prüfung umfasst 148 Domain-, 98 Application-, 34 Infrastructure-, 64 Desktop- und 17 Architekturtests. Insgesamt bestehen 361 Tests; Build, Format-, Migrations- und Diff-Prüfung werden im Abschlussbericht getrennt ausgewiesen.
-- Offen bleibt ausschließlich die sichtbare Bedienprüfung durch den Auftraggeber mit beiden Einsatzorten und zwei aufeinanderfolgenden Korrekturen desselben Bedarfs am selben Wirksamkeitsmontag.
+- Die sichtbare Bedienprüfung wurde am 2026-09-15 ausdrücklich abgenommen.
 
 ### BE-10 – System 05 gemeinsam abschließen
 
-Status: `[ ]`
+Status: `[x]` – Abschlussprüfung bestanden und Roadmap am 2026-09-15 archiviert
 
 Umfang:
 
@@ -745,6 +745,16 @@ Prüfung:
 Abnahmebedingung:
 
 - Der Auftraggeber bestätigt System 05 und erlaubt die Archivierung dieser Roadmap sowie die Auswahl des nächsten Systems.
+
+Abschlussnachweis vom 2026-09-15:
+
+- Der Auftraggeber hat die korrigierten sichtbaren Abläufe aus BE-09A und BE-09B ausdrücklich abgenommen und den Abschluss der Roadmap freigegeben.
+- `dotnet restore Salztal.Dienstplanung.sln --locked-mode` ist erfolgreich.
+- Der vollständige Solution-Build ist mit 0 Warnungen und 0 Fehlern erfolgreich.
+- Alle 361 vorhandenen Tests bestehen: 148 Domain-, 98 Application-, 34 Infrastructure-, 64 Desktop- und 17 Architekturtests. Die noch leeren Planning- und Excel-Testprojekte werden im Gesamtlauf wie vorgesehen behandelt.
+- `dotnet format --verify-no-changes`, der EF-Abgleich ohne ausstehende Modelländerung und `git diff --check` bestehen.
+- Die Suche fand keine Datenbanken, Sicherungen, Exporte oder auffälligen Bilddateien im Repository. Es wurden keine echten Mitarbeiter- oder Plandaten hinzugefügt.
+- Die Übergaben an Systeme 08 bis 12 bleiben unverändert dokumentiert; Planning, Regeln, Planmodell, Konflikterklärung, Planansichten und Planversionen wurden nicht vorgezogen.
 
 ## Übergaben an spätere Systeme
 
@@ -775,7 +785,7 @@ Abnahmebedingung:
 - BE-01 und jeder spätere Schritt benötigen ausdrückliche Abnahme; Schweigen ist keine Zustimmung.
 - Vor jeder Abnahme und vor einem beauftragten Commit wird die Dateiliste auf echte Mitarbeiter-, Plan- und andere sensible Klinikdaten geprüft.
 - Migration und Datenbanktests verwenden ausschließlich temporäre synthetische SQLite-Dateien.
-- Die sichtbare WPF-Wochenübersicht aus BE-08 sowie die korrigierten Standard- und Einmaländerungsabläufe aus BE-09A und BE-09B benötigen jeweils einen manuellen Bediennachweis durch den Auftraggeber.
+- Die sichtbare WPF-Wochenübersicht aus BE-08 sowie die korrigierten Standard- und Einmaländerungsabläufe aus BE-09A und BE-09B wurden manuell geprüft und ausdrücklich abgenommen.
 - Ein erfolgreicher Build oder ViewModel-Test ersetzt keinen sichtbaren WPF-Test.
 - Ein lokaler Start ersetzt nicht die spätere portable Windows-11-Prüfung.
 - OR-Tools, Excel-Vorlage, portable Ausgabe und fachliche Endabnahme sind für System 05 nicht betroffen und bleiben spätere offene Gates.
@@ -796,4 +806,4 @@ Der Abschlussbericht nennt:
 
 ## Nächster minimaler Schritt
 
-BE-09B sichtbar prüfen: beide Einsatzorte über die linke Liste wechseln, die vollständige Montag-bis-Sonntag-Ansicht kontrollieren und denselben regelmäßigen Bedarf zweimal für denselben Wirksamkeitsmontag speichern. Danach BE-09A und BE-09B ausdrücklich abnehmen oder verbleibende Abweichungen melden.
+System 05 ist abgeschlossen. Als nächstes System wird gemäß Master-Roadmap System 06 „Verfügbarkeiten und Abwesenheiten“ empfohlen. Vor jeder Implementierung wird dafür zuerst eine eigene Teil-Roadmap mit den noch offenen Fachentscheidungen erstellt und ausdrücklich abgenommen.

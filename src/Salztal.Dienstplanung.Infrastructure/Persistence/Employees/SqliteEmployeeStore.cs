@@ -16,7 +16,10 @@ public sealed class SqliteEmployeeStore :
     IChangeEmployeeTypeStore,
     IDeactivateEmployeeStore,
     IReactivateEmployeeStore,
-    IDeleteEmployeeStore
+    IDeleteEmployeeStore,
+    ICreateEmployeeTypeStore,
+    IUpdateEmployeeTypeStore,
+    IDeleteEmployeeTypeStore
 {
     private readonly ServiceCatalogDbContextFactory _contextFactory;
 
@@ -245,7 +248,111 @@ public sealed class SqliteEmployeeStore :
         }
     }
 
-    private static EmployeeType[] MapEmployeeTypes(
+    async Task<EmployeeTypeWriteStoreResult> ICreateEmployeeTypeStore.CreateAsync(
+        EmployeeType employeeType,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(employeeType);
+
+        await using ServiceCatalogDbContext context = _contextFactory.Create();
+        await using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction =
+            await context.Database.BeginTransactionAsync(cancellationToken);
+        context.EmployeeTypes.Add(CreateEntity(employeeType));
+
+        try
+        {
+            await context.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            return EmployeeTypeWriteStoreResult.Succeeded;
+        }
+        catch (DbUpdateException exception) when (IsConstraintViolation(exception))
+        {
+            return IsEmployeeTypeCodeConstraintViolation(exception)
+                ? EmployeeTypeWriteStoreResult.DuplicateCode
+                : EmployeeTypeWriteStoreResult.Conflict;
+        }
+    }
+
+    async Task<EmployeeTypeWriteStoreResult> IUpdateEmployeeTypeStore.UpdateAsync(
+        EmployeeType expected,
+        EmployeeType replacement,
+        CancellationToken cancellationToken)
+    {
+        ValidateEmployeeTypeReplacement(expected, replacement);
+
+        await using ServiceCatalogDbContext context = _contextFactory.Create();
+        await using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction =
+            await context.Database.BeginTransactionAsync(cancellationToken);
+        EmployeeTypeEntity? stored = await context.EmployeeTypes
+            .Include(employeeType => employeeType.ShiftEligibilities)
+            .SingleOrDefaultAsync(
+                employeeType => employeeType.Id == expected.Id.Value,
+                cancellationToken);
+        if (stored is null || !MatchesEmployeeType(stored, expected))
+        {
+            return EmployeeTypeWriteStoreResult.Conflict;
+        }
+
+        ApplyDetails(stored, replacement);
+        context.EmployeeTypeShiftEligibilities.RemoveRange(stored.ShiftEligibilities);
+        stored.ShiftEligibilities.Clear();
+        foreach (EmployeeTypeShiftEligibility eligibility in replacement.ShiftEligibilities)
+        {
+            stored.ShiftEligibilities.Add(CreateEntity(replacement.Id, eligibility));
+        }
+
+        try
+        {
+            await context.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            return EmployeeTypeWriteStoreResult.Succeeded;
+        }
+        catch (DbUpdateException exception) when (IsConstraintViolation(exception))
+        {
+            return EmployeeTypeWriteStoreResult.Conflict;
+        }
+    }
+
+    async Task<EmployeeTypeDeleteStoreResult> IDeleteEmployeeTypeStore.DeleteAsync(
+        EmployeeType expected,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(expected);
+        if (expected.PlanningPolicy.Role != EmployeeTypePlanningRole.Normal)
+        {
+            throw new ArgumentException(
+                "Only an employee type with a normal planning role can be deleted.",
+                nameof(expected));
+        }
+
+        await using ServiceCatalogDbContext context = _contextFactory.Create();
+        await using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction =
+            await context.Database.BeginTransactionAsync(cancellationToken);
+        EmployeeTypeEntity? stored = await context.EmployeeTypes
+            .Include(employeeType => employeeType.ShiftEligibilities)
+            .SingleOrDefaultAsync(
+                employeeType => employeeType.Id == expected.Id.Value,
+                cancellationToken);
+        if (stored is null || !MatchesEmployeeType(stored, expected))
+        {
+            return EmployeeTypeDeleteStoreResult.Conflict;
+        }
+
+        context.EmployeeTypes.Remove(stored);
+
+        try
+        {
+            await context.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            return EmployeeTypeDeleteStoreResult.Succeeded;
+        }
+        catch (DbUpdateException exception) when (IsForeignKeyConstraintViolation(exception))
+        {
+            return EmployeeTypeDeleteStoreResult.Referenced;
+        }
+    }
+
+    internal static EmployeeType[] MapEmployeeTypes(
         IEnumerable<EmployeeTypeEntity> employeeTypeEntities,
         IEnumerable<EmployeeTypeShiftEligibilityEntity> eligibilityEntities,
         ServiceCatalogData serviceCatalog)
@@ -284,6 +391,8 @@ public sealed class SqliteEmployeeStore :
             entity.Code,
             entity.Name,
             entity.WeeklyWorkTargetMinutes,
+            entity.AllowsVacationAndSickness,
+            entity.AbsenceDayValueMinutes,
             eligibilities,
             MapPlanningPolicy(entity));
 
@@ -316,23 +425,29 @@ public sealed class SqliteEmployeeStore :
 
     private static EmployeeTypePlanningPolicy MapPlanningPolicy(EmployeeTypeEntity entity)
     {
-        EmployeeTypePlanningPolicy[] knownPolicies =
-        [
-            EmployeeTypePlanningPolicy.Standard,
-            EmployeeTypePlanningPolicy.ServiceManagement,
-        ];
+        EmployeeTypePlanningPolicy policy = entity.PlanningRole switch
+        {
+            EmployeeTypePlanningRole.Normal => EmployeeTypePlanningPolicy.Standard,
+            EmployeeTypePlanningRole.ServiceManagement =>
+                EmployeeTypePlanningPolicy.ServiceManagement,
+            EmployeeTypePlanningRole.Auxiliary => EmployeeTypePlanningPolicy.Auxiliary,
+            _ => throw InvalidStoredData("employee-type planning role", entity.Id),
+        };
 
-        return knownPolicies.SingleOrDefault(policy =>
-                policy.AllowsAutomaticAssignment == entity.AllowsAutomaticAssignment
-                && policy.RequiresWeeklyManualAssignment ==
-                    entity.RequiresWeeklyManualAssignment
-                && policy.PreservesManualAssignmentsOnGeneration ==
-                    entity.PreservesManualAssignmentsOnGeneration
-                && policy.ManualSuggestionPriority == entity.ManualSuggestionPriority)
-            ?? throw InvalidStoredData("employee-type planning policy", entity.Id);
+        if (policy.AllowsAutomaticAssignment != entity.AllowsAutomaticAssignment
+            || policy.RequiresWeeklyManualAssignment !=
+                entity.RequiresWeeklyManualAssignment
+            || policy.PreservesManualAssignmentsOnGeneration !=
+                entity.PreservesManualAssignmentsOnGeneration
+            || policy.ManualSuggestionPriority != entity.ManualSuggestionPriority)
+        {
+            throw InvalidStoredData("employee-type planning policy", entity.Id);
+        }
+
+        return policy;
     }
 
-    private static Employee MapEmployee(EmployeeEntity entity)
+    internal static Employee MapEmployee(EmployeeEntity entity)
     {
         Employee employee = Employee.Create(
                 entity.Id,
@@ -354,6 +469,90 @@ public sealed class SqliteEmployeeStore :
             EmployeeTypeId = employee.EmployeeTypeId.Value,
             IsActive = employee.IsActive,
         };
+    }
+
+    private static EmployeeTypeEntity CreateEntity(EmployeeType employeeType)
+    {
+        EmployeeTypeEntity entity = new();
+        ApplyDetails(entity, employeeType);
+        entity.Id = employeeType.Id.Value;
+        entity.Code = employeeType.Code.Value;
+
+        foreach (EmployeeTypeShiftEligibility eligibility in employeeType.ShiftEligibilities)
+        {
+            entity.ShiftEligibilities.Add(CreateEntity(employeeType.Id, eligibility));
+        }
+
+        return entity;
+    }
+
+    private static EmployeeTypeShiftEligibilityEntity CreateEntity(
+        EmployeeTypeId employeeTypeId,
+        EmployeeTypeShiftEligibility eligibility)
+    {
+        return new EmployeeTypeShiftEligibilityEntity
+        {
+            EmployeeTypeId = employeeTypeId.Value,
+            TargetKind = eligibility.TargetKind,
+            ShiftTypeId = eligibility.ShiftTypeId?.Value,
+            ShiftPatternId = eligibility.ShiftPatternId?.Value,
+            Mode = eligibility.Mode,
+            Activation = eligibility.Activation,
+        };
+    }
+
+    private static void ApplyDetails(EmployeeTypeEntity entity, EmployeeType employeeType)
+    {
+        entity.Name = employeeType.Name.Value;
+        entity.WeeklyWorkTargetMinutes = employeeType.WeeklyWorkTarget.Minutes;
+        entity.AllowsVacationAndSickness =
+            employeeType.AbsencePolicy.AllowsVacationAndSickness;
+        entity.AbsenceDayValueMinutes = employeeType.AbsencePolicy.DayValue?.Minutes;
+        entity.PlanningRole = employeeType.PlanningPolicy.Role;
+        entity.AllowsAutomaticAssignment =
+            employeeType.PlanningPolicy.AllowsAutomaticAssignment;
+        entity.RequiresWeeklyManualAssignment =
+            employeeType.PlanningPolicy.RequiresWeeklyManualAssignment;
+        entity.PreservesManualAssignmentsOnGeneration =
+            employeeType.PlanningPolicy.PreservesManualAssignmentsOnGeneration;
+        entity.ManualSuggestionPriority =
+            employeeType.PlanningPolicy.ManualSuggestionPriority;
+    }
+
+    private static bool MatchesEmployeeType(
+        EmployeeTypeEntity entity,
+        EmployeeType expected)
+    {
+        return entity.Id == expected.Id.Value
+            && entity.Code == expected.Code.Value
+            && entity.Name == expected.Name.Value
+            && entity.WeeklyWorkTargetMinutes == expected.WeeklyWorkTarget.Minutes
+            && entity.AllowsVacationAndSickness ==
+                expected.AbsencePolicy.AllowsVacationAndSickness
+            && entity.AbsenceDayValueMinutes == expected.AbsencePolicy.DayValue?.Minutes
+            && entity.PlanningRole == expected.PlanningPolicy.Role
+            && entity.AllowsAutomaticAssignment ==
+                expected.PlanningPolicy.AllowsAutomaticAssignment
+            && entity.RequiresWeeklyManualAssignment ==
+                expected.PlanningPolicy.RequiresWeeklyManualAssignment
+            && entity.PreservesManualAssignmentsOnGeneration ==
+                expected.PlanningPolicy.PreservesManualAssignmentsOnGeneration
+            && entity.ManualSuggestionPriority ==
+                expected.PlanningPolicy.ManualSuggestionPriority
+            && MatchesEligibilities(entity.ShiftEligibilities, expected.ShiftEligibilities);
+    }
+
+    private static bool MatchesEligibilities(
+        List<EmployeeTypeShiftEligibilityEntity> stored,
+        IReadOnlyCollection<EmployeeTypeShiftEligibility> expected)
+    {
+        return stored.Count == expected.Count
+            && stored.All(entity => expected.Any(eligibility =>
+                entity.TargetKind == eligibility.TargetKind
+                && entity.ShiftTypeId == eligibility.ShiftTypeId?.Value
+                && entity.ShiftPatternId == eligibility.ShiftPatternId?.Value
+                && entity.Mode == eligibility.Mode
+                && entity.Activation == eligibility.Activation));
     }
 
     private static IQueryable<EmployeeEntity> MatchingEmployee(
@@ -428,6 +627,23 @@ public sealed class SqliteEmployeeStore :
         ArgumentNullException.ThrowIfNull(replacement);
     }
 
+    private static void ValidateEmployeeTypeReplacement(
+        EmployeeType expected,
+        EmployeeType replacement)
+    {
+        ArgumentNullException.ThrowIfNull(expected);
+        ArgumentNullException.ThrowIfNull(replacement);
+
+        if (expected.Id != replacement.Id
+            || expected.Code != replacement.Code
+            || expected.PlanningPolicy != replacement.PlanningPolicy)
+        {
+            throw new ArgumentException(
+                "Replacement may only change editable employee-type details.",
+                nameof(replacement));
+        }
+    }
+
     private static bool IsActiveType1(Employee employee, EmployeeTypeId type1Id)
     {
         return employee.IsActive && employee.EmployeeTypeId == type1Id;
@@ -462,6 +678,37 @@ public sealed class SqliteEmployeeStore :
                 && exception.Message.Contains(
                     "FOREIGN KEY constraint failed",
                     StringComparison.Ordinal));
+    }
+
+    private static bool IsForeignKeyConstraintViolation(Exception exception)
+    {
+        for (Exception? current = exception; current is not null; current = current.InnerException)
+        {
+            if (current is SqliteException sqliteException
+                && IsForeignKeyConstraintViolation(sqliteException))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsEmployeeTypeCodeConstraintViolation(Exception exception)
+    {
+        for (Exception? current = exception; current is not null; current = current.InnerException)
+        {
+            if (current is SqliteException sqliteException
+                && sqliteException.SqliteErrorCode == 19
+                && sqliteException.Message.Contains(
+                    "EmployeeTypes.Code",
+                    StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static InvalidDataException InvalidStoredData(string kind, object id)

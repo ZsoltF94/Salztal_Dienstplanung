@@ -4,7 +4,7 @@
 
 Dieses Dokument hält das gemeinsam bestätigte Grundverständnis, bereits getroffene Entscheidungen und noch offene Grundsatzfragen fest. Es ist noch keine technische Spezifikation und enthält bewusst noch nicht die später zu erfassenden Detailregeln für Mitarbeitertypen, Dienste und Einsatzorte.
 
-Status: Grundfassung abgenommen am 2026-09-13; Mitarbeiter- und Bedarfs-Ergänzungen fachlich bestätigt am 2026-09-14
+Status: Grundfassung abgenommen am 2026-09-13; Ergänzungen bis System 06 fachlich bestätigt am 2026-09-15
 
 ## Ziel der App
 
@@ -41,14 +41,19 @@ Nach manueller Prüfung wird ein Plan abgenommen. Erst danach kann er in eine no
 - Jeder Mitarbeiter verweist auf genau einen gemeinsam definierten, bindenden Mitarbeitertyp.
 - Der Mitarbeitertyp besitzt das Wochen-Soll und strukturierte Einsatzfreigaben. Diese Werte werden nicht als unabhängige Kopien beim Mitarbeiter gespeichert.
 - Eine spätere Änderung eines Typs gilt für alle ihm zugeordneten Mitarbeitenden und für nachfolgende Planungen. Bereits abgenommene Pläne bleiben unveränderliche Momentaufnahmen.
-- Die Starttypen sind `Typ1`, `Typ25`, `Typ30`, `Typ30a`, `Typ35`, `Typ35a`, `TypAH1` und `TypAH2`.
+- Die Starttypen werden vor System 06 um `Typ20`, `Typ20a` und `Typ25a` ergänzt. Typen ohne `a` besitzen nur Restaurant-Freigaben einschließlich `D`; Typen mit `a` dürfen zusätzlich in der Cafeteria und als `Spr` eingesetzt werden.
+- Mitarbeitertypen können in einem eigenen Tab angelegt und bearbeitet werden. Bearbeitbar sind Name, Wochen-Soll, Zulässigkeit und Tageswert für `U` und `K`, normale Dienstfreigaben sowie Berechtigungen für `D` und `Spr`. Der beim Anlegen vergebene eindeutige Typcode bleibt stabil.
+- Neu angelegte Typen sind normale automatisch planbare Typen mit einem zwingenden Wochenkorridor von minus drei bis plus drei Stunden. Die besonderen Planungsrollen von Typ1 und AH bleiben geschützt, während ihre bestätigten Stammdaten und Einsatzberechtigungen bearbeitbar sind.
+- Ein noch nie referenzierter normaler Typ darf nach Sicherheitsabfrage endgültig gelöscht werden. Verwendete Typen sowie die für die geschützten Typ1- und AH-Rollen benötigten Starttypen bleiben erhalten.
 - Für die erste Fassung werden keine zusätzlichen Qualifikationen benötigt. Die Einsatzmöglichkeiten werden über die Mitarbeitertypen abgebildet.
 - Deaktivierte Mitarbeitende können mit unveränderter Kennung, unveränderten Namen und unverändertem Mitarbeitertyp wieder aktiviert werden. Die Grenze von höchstens einer aktiven Typ1-Person bleibt dabei zwingend.
 - Nur deaktivierte Mitarbeitende dürfen endgültig gelöscht werden. Sobald eine Person in einem Plan, einer Verfügbarkeit, einer Abwesenheit, einem Zeitkonto oder anderen Fachdaten verwendet wird, bleibt sie zum Schutz der Historie deaktiviert erhalten und kann nicht endgültig gelöscht werden.
 - Endgültiges Löschen benötigt eine eigene Warnung mit vollständigem Namen und dem Hinweis, dass die Aktion nicht rückgängig gemacht werden kann.
 - Vor einer Generierung kann festgelegt werden, welche Mitarbeitenden im gewählten Zeitraum zur Verfügung stehen.
-- Urlaub, Krankheit, Fortbildung, Wunschfrei und eingeschränkte Verfügbarkeiten sollen berücksichtigt werden können.
-- Bei Abwesenheiten wird das wirksame Wochen-Soll später reduziert. Die genaue Formel wird erst mit dem Verfügbarkeits- und Abwesenheitssystem festgelegt.
+- Für die erste Fassung werden Urlaub `U`, Krankheit `K` und ein von der Service-Leitung vorgegebenes rotes `X` berücksichtigt. Fortbildung, Wunschfrei und eingeschränkte Zeitfenster sind nicht vorgesehen; ein gewünschter verbindlicher freier Tag wird als rotes `X` eingetragen.
+- `U` und `K` reduzieren das wirksame Wochen-Soll je Montag-bis-Sonntag-Woche um den am Mitarbeitertyp eingestellten Tageswert, mindestens auf null. Der Wert gilt auch an Wochenenden und Feiertagen. Ein rotes oder schwarzes `X` reduziert das Soll nicht.
+- Für AH sind `U` und `K` zunächst nicht auswählbar; eine krankheitsbedingte Sperre trägt die Service-Leitung als rotes `X` ein.
+- Rote `X` werden für konkrete Kalendertage einzeln eingetragen, von der Generierung nie verändert und nicht in spätere Zeiträume übernommen. Die Service-Leitung darf eigene Eingaben nach einer Sicherheitsabfrage korrigieren.
 
 ### Dienste und Einsatzorte
 
@@ -77,6 +82,9 @@ Nach manueller Prüfung wird ein Plan abgenommen. Erst danach kann er in eine no
 - Nicht erfüllte Anforderungen müssen in einer präzisen Konfliktliste erklärt werden.
 - Die Service-Leitung kann den erzeugten Vorschlag manuell bearbeiten.
 - Einzelne Dienste oder Zuweisungen können gesperrt werden, damit eine erneute Generierung sie unverändert lässt.
+- Bei der automatischen Generierung werden zuerst alle Nicht-AH-Typen geplant. AH wird danach ausschließlich für verbleibende zulässige Lücken verwendet; bereits gedeckte Plätze werden nicht zugunsten von AH freigeräumt.
+- Für AH bleiben zehn Wochenstunden das Ziel und zwölf Stunden die zwingende Obergrenze. Weniger als sechs sowie mehr als zehn geplante Stunden werden im Generierungsbericht gemeldet; weniger als sechs Stunden blockieren den Plan nicht.
+- Ein manuell vorgetragener Typ1-Früh- oder Spätdienst kann als Bürozeit `B` gekennzeichnet werden. Seine tatsächliche Dauer zählt zu den Typ1-Wochenstunden, deckt aber keinen Personalbedarf. Nach der Abnahme bleibt der zugrunde liegende Dienst sichtbar; nur `B` wird im Plan und späteren Excel-Export ausgeblendet. Die Büroinformation bleibt intern in der unveränderlichen Planversion erhalten.
 
 ### Historie, Änderungen und Zeitkonten
 
@@ -242,4 +250,4 @@ Diese Versionsverwaltung ist bestätigt.
 - endgültige technische Architektur,
 - Aufbau der Excel-Vorlage.
 
-Die Planungs- beziehungsweise Optimierungsmethode und die technische Architektur wurden anschließend in `ARCHITECTURE.md` festgelegt und abgenommen. Konkrete Einsatzorte, Diensttypen, Doppeldienst und Springer-Einsatz wurden am 2026-09-13 für System 04 bestätigt. Bindende Mitarbeitertypen, ihre Wochen-Sollwerte und Einsatzfreigaben wurden am 2026-09-14 für System 03 bestätigt und stehen in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`. Die vollständigen Startbedarfe, ihre Änderungswirkung und die Datumsausnahmen wurden am 2026-09-14 für System 05 bestätigt und stehen in der abgenommenen Teil-Roadmap `docs/roadmaps/active/STAFFING_DEMAND_ROADMAP.md`. Die übrigen fachlichen Detailpunkte werden weiterhin erst vor den jeweils betroffenen Systemen gemeinsam geklärt.
+Die Planungs- beziehungsweise Optimierungsmethode und die technische Architektur wurden anschließend in `ARCHITECTURE.md` festgelegt und abgenommen. Konkrete Einsatzorte, Diensttypen, Doppeldienst und Springer-Einsatz wurden am 2026-09-13 für System 04 bestätigt. Bindende Mitarbeitertypen, ihre Wochen-Sollwerte und Einsatzfreigaben wurden am 2026-09-14 für System 03 bestätigt und stehen in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`. Die vollständigen Startbedarfe, ihre Änderungswirkung und die Datumsausnahmen wurden für das am 2026-09-15 abgeschlossene System 05 bestätigt und stehen in `docs/roadmaps/completed/STAFFING_DEMAND_ROADMAP.md`. Die übrigen fachlichen Detailpunkte werden weiterhin erst vor den jeweils betroffenen Systemen gemeinsam geklärt.

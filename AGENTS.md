@@ -100,12 +100,14 @@ Eine Roadmap wird nur nach ausdrücklicher Statusentscheidung verschoben. Verwei
 
 ## Abnahmeprozess
 
-- Pro Turn wird grundsätzlich nur der aktuell freigegebene minimale Roadmap-Schritt abgeschlossen.
-- Nach dem Bericht wird nicht selbstständig mit dem nächsten Schritt begonnen.
+- Bearbeitet wird immer nur der kleinste aktuell freigegebene Roadmap-Schritt.
+- Nach einem planmäßig und fehlerfrei abgeschlossenen Schritt darf unmittelbar mit dem nächsten Roadmap-Schritt fortgefahren werden, wenn kein Handlungsbedarf des Auftraggebers und kein externes oder manuelles Gate besteht.
+- Bei kritischen Fehlern, unerwarteten fachlichen oder technischen Entscheidungen, klärungsbedürftigen Fragen sowie visuellen oder anderen manuellen Abnahmen wird vor dem nächsten Schritt gestoppt und der konkrete Handlungsbedarf genannt.
+- Nach jedem abgeschlossenen Roadmap-Schritt wird ein Abschlusston abgespielt. Wenn Handlungsbedarf des Auftraggebers besteht, wird zusätzlich ein zweiter, unterscheidbarer Hinweiston abgespielt.
 - Eine ausdrückliche Abnahme oder eine klare Aufforderung wie „es kann weitergehen“ gilt als Freigabe des zuvor berichteten Schritts.
 - Neue Rückfragen oder Änderungswünsche werden dem laufenden Schritt zugeordnet, sofern sie ihn ergänzen.
 - Ändert eine Rückmeldung die Architektur oder den Umfang, wird zuerst die Dokumentation angepasst.
-- Mehrere Schritte dürfen nur zusammen umgesetzt werden, wenn der Auftraggeber dies ausdrücklich verlangt.
+- Die bedingte automatische Weiterführung ist eine ausdrückliche Freigabe für aufeinanderfolgende Schritte ohne Handlungsbedarf; sie erweitert niemals den fachlichen Umfang eines einzelnen Schritts.
 - Eine Abnahme darf niemals vorweggenommen oder aus Schweigen abgeleitet werden.
 
 ## Verhalten bei Prüf-, Ideen- und Verständnisfragen

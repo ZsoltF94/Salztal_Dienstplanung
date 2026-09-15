@@ -1,3 +1,4 @@
+using Salztal.Dienstplanung.Application.Availabilities;
 using Salztal.Dienstplanung.Application.Employees;
 using Salztal.Dienstplanung.Application.ServiceCatalog;
 using Salztal.Dienstplanung.Application.StaffingDemands;
@@ -15,7 +16,13 @@ internal sealed record MainWindowDependencies(
     IDeactivateEmployeeStore DeactivateEmployeeStore,
     IReactivateEmployeeStore ReactivateEmployeeStore,
     IDeleteEmployeeStore DeleteEmployeeStore,
+    ICreateEmployeeTypeStore CreateEmployeeTypeStore,
+    IUpdateEmployeeTypeStore UpdateEmployeeTypeStore,
+    IDeleteEmployeeTypeStore DeleteEmployeeTypeStore,
     IStaffingDemandReader StaffingDemandReader,
     IStandardStaffingDemandRevisionStore StandardStaffingDemandRevisionStore,
     IStaffingDemandDateExceptionStore StaffingDemandDateExceptionStore,
-    IRemoveStaffingDemandDateExceptionStore RemoveStaffingDemandDateExceptionStore);
+    IRemoveStaffingDemandDateExceptionStore RemoveStaffingDemandDateExceptionStore,
+    IAvailabilityReader AvailabilityReader,
+    ISetAvailabilityEntryStore SetAvailabilityEntryStore,
+    IRemoveAvailabilityEntryStore RemoveAvailabilityEntryStore);

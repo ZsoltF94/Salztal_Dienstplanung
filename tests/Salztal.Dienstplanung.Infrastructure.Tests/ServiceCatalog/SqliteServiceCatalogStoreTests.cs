@@ -18,6 +18,10 @@ public sealed class SqliteServiceCatalogStoreTests
         "20260914144923_AddStaffingDemands";
     private const string StaffingDemandCorrectionMigration =
         "20260914185047_AddStandardDemandCorrectionSequence";
+    private const string EmployeeTypeManagementMigration =
+        "20260915160041_AddEmployeeTypeManagement";
+    private const string AvailabilityEntriesMigration =
+        "20260915183307_AddAvailabilityEntries";
 
     [Fact]
     public async Task InitializeAsyncOnEmptyDatabaseCreatesMigrationAndCompleteInitialCatalog()
@@ -62,7 +66,7 @@ public sealed class SqliteServiceCatalogStoreTests
         await store.InitializeAsync(TestContext.Current.CancellationToken);
         await store.InitializeAsync(TestContext.Current.CancellationToken);
 
-        Assert.Equal(4L, await ExecuteScalarAsync(
+        Assert.Equal(6L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM __EFMigrationsHistory;"));
         Assert.Equal(2L, await ExecuteScalarAsync(
@@ -127,6 +131,8 @@ public sealed class SqliteServiceCatalogStoreTests
                 EmployeeMigration + "|10.0.12",
                 StaffingDemandMigration + "|10.0.12",
                 StaffingDemandCorrectionMigration + "|10.0.12",
+                EmployeeTypeManagementMigration + "|10.0.12",
+                AvailabilityEntriesMigration + "|10.0.12",
             ],
             await ReadMigrationHistoryAsync(database.Path));
         Assert.Equal(

@@ -26,19 +26,62 @@ public sealed class InitialEmployeeTypeCatalogTests
                 "Typ1",
                 "Serviceleitung",
                 40 * 60,
+                true,
+                8 * 60,
                 [EarlyShiftId, LateShiftId, CafeteriaShiftAId, CafeteriaShiftBId],
                 [SplitShiftId, ReliefShiftId],
                 [EarlyShiftId, LateShiftId, CafeteriaShiftAId, CafeteriaShiftBId],
                 [],
                 EmployeeTypePlanningPolicy.ServiceManagement),
+            type20 => AssertEmployeeType(
+                type20,
+                "71cc48ce-172a-4580-a6b2-e1acc77b94f6",
+                "Typ20",
+                "Restaurant - 20 Stunden",
+                20 * 60,
+                true,
+                4 * 60,
+                [EarlyShiftId, LateShiftId],
+                [SplitShiftId],
+                [],
+                [],
+                EmployeeTypePlanningPolicy.Standard),
+            type20a => AssertEmployeeType(
+                type20a,
+                "a06b4fcc-dbf1-4b3a-b975-07dc2d488157",
+                "Typ20a",
+                "Alle Dienste - 20 Stunden",
+                20 * 60,
+                true,
+                4 * 60,
+                [EarlyShiftId, LateShiftId, CafeteriaShiftAId, CafeteriaShiftBId],
+                [SplitShiftId, ReliefShiftId],
+                [],
+                [],
+                EmployeeTypePlanningPolicy.Standard),
             type25 => AssertEmployeeType(
                 type25,
                 "b75fed95-1c2f-439f-9696-217bed8c4d8f",
                 "Typ25",
                 "Restaurant - 25 Stunden",
                 25 * 60,
+                true,
+                5 * 60,
                 [EarlyShiftId, LateShiftId],
                 [SplitShiftId],
+                [],
+                [],
+                EmployeeTypePlanningPolicy.Standard),
+            type25a => AssertEmployeeType(
+                type25a,
+                "3c553205-5413-4f0c-ad1c-b4037066470c",
+                "Typ25a",
+                "Alle Dienste - 25 Stunden",
+                25 * 60,
+                true,
+                5 * 60,
+                [EarlyShiftId, LateShiftId, CafeteriaShiftAId, CafeteriaShiftBId],
+                [SplitShiftId, ReliefShiftId],
                 [],
                 [],
                 EmployeeTypePlanningPolicy.Standard),
@@ -48,6 +91,8 @@ public sealed class InitialEmployeeTypeCatalogTests
                 "Typ30",
                 "Restaurant - 30 Stunden",
                 30 * 60,
+                true,
+                6 * 60,
                 [EarlyShiftId, LateShiftId],
                 [SplitShiftId],
                 [],
@@ -59,6 +104,8 @@ public sealed class InitialEmployeeTypeCatalogTests
                 "Typ30a",
                 "Alle Dienste - 30 Stunden",
                 30 * 60,
+                true,
+                6 * 60,
                 [EarlyShiftId, LateShiftId, CafeteriaShiftAId, CafeteriaShiftBId],
                 [SplitShiftId, ReliefShiftId],
                 [],
@@ -70,6 +117,8 @@ public sealed class InitialEmployeeTypeCatalogTests
                 "Typ35",
                 "Restaurant - 35 Stunden",
                 35 * 60,
+                true,
+                7 * 60,
                 [EarlyShiftId, LateShiftId],
                 [SplitShiftId],
                 [],
@@ -81,6 +130,8 @@ public sealed class InitialEmployeeTypeCatalogTests
                 "Typ35a",
                 "Alle Dienste - 35 Stunden",
                 35 * 60,
+                true,
+                7 * 60,
                 [EarlyShiftId, LateShiftId, CafeteriaShiftAId, CafeteriaShiftBId],
                 [SplitShiftId, ReliefShiftId],
                 [],
@@ -92,22 +143,26 @@ public sealed class InitialEmployeeTypeCatalogTests
                 "TypAH1",
                 "Restaurant-Spätdienst - 10 Stunden",
                 10 * 60,
+                false,
+                null,
                 [LateShiftId],
                 [],
                 [EarlyShiftId],
                 [],
-                EmployeeTypePlanningPolicy.Standard),
+                EmployeeTypePlanningPolicy.Auxiliary),
             typeAh2 => AssertEmployeeType(
                 typeAh2,
                 "b4dd7b2a-2b7b-4a8d-b46b-ba1601a5a5a6",
                 "TypAH2",
                 "Restaurant, Cafeteria B und Doppeldienst - 10 Stunden",
                 10 * 60,
+                false,
+                null,
                 [LateShiftId, CafeteriaShiftBId],
                 [SplitShiftId],
                 [EarlyShiftId],
                 [ReliefShiftId],
-                EmployeeTypePlanningPolicy.Standard));
+                EmployeeTypePlanningPolicy.Auxiliary));
     }
 
     [Fact]
@@ -182,6 +237,18 @@ public sealed class InitialEmployeeTypeCatalogTests
         Assert.True(policy.RequiresWeeklyManualAssignment);
         Assert.True(policy.PreservesManualAssignmentsOnGeneration);
         Assert.Equal(ManualSuggestionPriority.LastResort, policy.ManualSuggestionPriority);
+        Assert.Equal(EmployeeTypePlanningRole.ServiceManagement, policy.Role);
+    }
+
+    [Fact]
+    public void AuxiliaryTypesWhenReadCarryProtectedAuxiliaryRole()
+    {
+        Assert.Equal(
+            EmployeeTypePlanningRole.Auxiliary,
+            InitialEmployeeTypeCatalog.TypeAh1.PlanningPolicy.Role);
+        Assert.Equal(
+            EmployeeTypePlanningRole.Auxiliary,
+            InitialEmployeeTypeCatalog.TypeAh2.PlanningPolicy.Role);
     }
 
     [Fact]
@@ -200,6 +267,9 @@ public sealed class InitialEmployeeTypeCatalogTests
         Assert.Equal(
             InitialEmployeeTypeCatalog.Type25.PlanningPolicy,
             changed.PlanningPolicy);
+        Assert.Equal(
+            InitialEmployeeTypeCatalog.Type25.AbsencePolicy,
+            changed.AbsencePolicy);
         Assert.Equal("Restaurant - 25 Stunden geändert", changed.Name.Value);
         Assert.Equal(1_560, changed.WeeklyWorkTarget.Minutes);
         Assert.Equal(
@@ -214,6 +284,8 @@ public sealed class InitialEmployeeTypeCatalogTests
         string expectedCode,
         string expectedName,
         int expectedWeeklyMinutes,
+        bool expectedAllowsVacationAndSickness,
+        int? expectedAbsenceDayValueMinutes,
         Guid[] expectedRegularShiftTypeIds,
         Guid[] expectedRegularShiftPatternIds,
         Guid[] expectedManualSuggestionShiftTypeIds,
@@ -224,6 +296,12 @@ public sealed class InitialEmployeeTypeCatalogTests
         Assert.Equal(expectedCode, employeeType.Code.Value);
         Assert.Equal(expectedName, employeeType.Name.Value);
         Assert.Equal(expectedWeeklyMinutes, employeeType.WeeklyWorkTarget.Minutes);
+        Assert.Equal(
+            expectedAllowsVacationAndSickness,
+            employeeType.AbsencePolicy.AllowsVacationAndSickness);
+        Assert.Equal(
+            expectedAbsenceDayValueMinutes,
+            employeeType.AbsencePolicy.DayValue?.Minutes);
         Assert.Equal(expectedPlanningPolicy, employeeType.PlanningPolicy);
 
         Assert.Equal(

@@ -32,7 +32,7 @@ internal sealed class EmployeeTypeShiftEligibilityEntityConfiguration
             });
 
         builder.HasKey(eligibility => eligibility.Id);
-        builder.Property(eligibility => eligibility.Id).ValueGeneratedNever();
+        builder.Property(eligibility => eligibility.Id).ValueGeneratedOnAdd();
         builder.Property(eligibility => eligibility.TargetKind).HasConversion<int>();
         builder.Property(eligibility => eligibility.Mode).HasConversion<int>();
         builder.Property(eligibility => eligibility.Activation).HasConversion<int>();
@@ -58,7 +58,7 @@ internal sealed class EmployeeTypeShiftEligibilityEntityConfiguration
 
         builder
             .HasOne(eligibility => eligibility.EmployeeType)
-            .WithMany()
+            .WithMany(employeeType => employeeType.ShiftEligibilities)
             .HasForeignKey(eligibility => eligibility.EmployeeTypeId)
             .OnDelete(DeleteBehavior.Cascade);
         builder
@@ -79,7 +79,7 @@ internal sealed class EmployeeTypeShiftEligibilityEntityConfiguration
     {
         int id = 0;
 
-        foreach (EmployeeType employeeType in InitialEmployeeTypeCatalog.All)
+        foreach (EmployeeType employeeType in EmployeeTypePersistenceSeedCatalog.All)
         {
             foreach (EmployeeTypeShiftEligibility eligibility in employeeType.ShiftEligibilities)
             {

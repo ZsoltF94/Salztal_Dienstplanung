@@ -1,20 +1,20 @@
 # Projektstatus
 
-Stand: 2026-09-14
+Stand: 2026-09-15
 
-Status dieses Dokuments: Aktuell – System 05 mit abgenommener Teil-Roadmap aktiv
+Status dieses Dokuments: Aktuell – System 06 vollständig abgeschlossen und archiviert
 
 ## Aktueller Überblick
 
 | Bereich | Aktueller Stand |
 |---|---|
-| Projektphase | Beginn der kleinschrittigen System-05-Umsetzung |
-| Aktives System | System 05 – Personal-, Schicht- und Stundenbedarf |
-| Aktive Teil-Roadmap | `docs/roadmaps/active/STAFFING_DEMAND_ROADMAP.md` |
-| Aktueller Stand | BE-09B – wiederholte Standardkorrekturen und konsistente Wochenansicht implementiert und automatisch geprüft; Sichtprüfung offen |
-| Zuletzt abgenommener Schritt | BE-08 – sichtbare WPF-Wochenübersicht |
-| Funktionsfähige App | Einsatzorte, Diensttyp-Standardzeiten, Mitarbeitende und regelmäßige Wochenbedarfe können im jeweils bestätigten Umfang verwaltet werden; noch keine Dienstplanfunktion |
-| Echte Mitarbeiter- oder Plandaten im Repository | Keine festgestellt; das zuvor vorhandene sensible Beispielbild ist nicht mehr im Arbeitsordner |
+| Projektphase | Systeme 05 und 06 abgeschlossen; System 07 im Verständnisabgleich |
+| Aktives System | Keine Implementierung freigegeben; für System 07 besteht nur eine Fragensammlung |
+| Aktive Teil-Roadmap | Keine; System 06 liegt unter `docs/roadmaps/completed/AVAILABILITY_ABSENCE_ROADMAP.md` |
+| Aktueller Stand | System 06 fachlich, technisch und sichtbar abgenommen; Roadmap und Fragen archiviert |
+| Zuletzt abgenommener Schritt | VA-06 – Gesamtnachweis und ausdrückliche Abnahme von System 06 |
+| Funktionsfähige App | Einsatzorte, Diensttyp-Standardzeiten, Mitarbeitende, regelmäßige Bedarfe und einzelne Tagesänderungen können im bestätigten Umfang verwaltet werden; noch keine Dienstplanfunktion |
+| Echte Mitarbeiter- oder Plandaten im Repository | Keine Daten übernommen; `dienstplan beispiel blank.jpeg` wurde als reines Beispiel ohne personenbezogene oder reale Planungsdaten bestätigt, bleibt unversioniert und wird nicht als Fachdatenquelle verwendet |
 
 ## Nachweislich fertig und abgenommen
 
@@ -24,16 +24,28 @@ Status dieses Dokuments: Aktuell – System 05 mit abgenommener Teil-Roadmap akt
 - Zielplattform, Technik und modulare Architektur sind verbindlich festgelegt.
 - Clean-Code-, Namespace-, Test- und Qualitätsregeln sind festgelegt.
 - Der kleinschrittige Arbeits-, Berichts- und Abnahmeprozess ist in `AGENTS.md` verbindlich geregelt.
+- Planmäßig und fehlerfrei abgeschlossene Roadmap-Schritte dürfen ab MT-04 automatisch in den nächsten Schritt übergehen, solange kein Handlungsbedarf und kein externes, manuelles oder visuelles Gate besteht. Bei solchen Gates wird weiterhin gestoppt.
 - Die abgenommene `MASTER_ROADMAP.md` ordnet 16 geplante Systeme und ihre Abhängigkeiten.
 - Die zentrale `STATUS.md` führt aktiven Schritt, offene Entscheidungen, Blockaden und ausstehende Gates zusammen.
 - System 01 – Projektgrundlage ist vollständig geprüft, abgenommen und archiviert.
 - Die Teil-Roadmap für System 02 ist abgenommen.
 - System 03 – Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben – ist vollständig geprüft, abgenommen und archiviert.
+- System 05 – Personal-, Schicht- und Stundenbedarf – ist vollständig geprüft, abgenommen und archiviert.
 
 ## Aktuell
 
-- System 05 – Personal-, Schicht- und Stundenbedarf – ist als nächstes Fachsystem ausgewählt.
-- Die aktive Teil-Roadmap `docs/roadmaps/active/STAFFING_DEMAND_ROADMAP.md` gliedert System 05 nach den Bedienkorrekturen in BE-01 bis BE-10 einschließlich BE-09A und BE-09B. BE-02 bis BE-08 sind umgesetzt und abgenommen. BE-09 wurde nach der Sichtprüfung nicht abgenommen; BE-09A und der daraus entstandene Korrekturschritt BE-09B sind umgesetzt und automatisch geprüft. Ihre gemeinsame Sichtprüfung ist offen.
+- Die Fachfragen für System 06 sind beantwortet und in `docs/roadmaps/completed/AVAILABILITY_ABSENCE_QUESTIONS.md` archiviert.
+- Die vollständig abgenommene Teil-Roadmap `docs/roadmaps/completed/AVAILABILITY_ABSENCE_ROADMAP.md` enthält den Mitarbeitertypen-Vorbereitungsteil und die Drei-Wochen-Erfassung.
+- MT-01 führt eine strukturierte Planungsrolle für normale Typen, Typ1 und AH sowie eine unveränderliche `U`-/`K`-Regel mit einem geprüften Tageswert von höchstens 24 Stunden ein. Kennung, Code und Sonderrolle bleiben bei der fachlichen Bearbeitung erhalten.
+- Der Domain-Startkatalog enthält jetzt elf Typen einschließlich `Typ20`, `Typ20a` und `Typ25a`. Normale Typen verwenden die normale automatische Planungsrolle; Typ1 und AH behalten ihre geschützten Rollen. Die neuen Domain-Werte und Einsatzfreigaben sind automatisch geprüft.
+- MT-03 führt die vorhandene gemeinsame SQLite-Migrationsfolge fort. Alle elf Starttypen, Abwesenheitswerte und geschützten Planungsrollen werden nun strukturiert gespeichert; die frühere kennungsbasierte Übergangsabbildung für AH ist nicht mehr erforderlich.
+- MT-01 wurde am 2026-09-15 nach dem vollständigen Nachweis ausdrücklich abgenommen.
+- MT-02 erweitert den Typkatalog um strukturierte Angaben zu Abwesenheitsregel, Tageswert, Planungsrolle sowie Modus und Aktivierung jeder Einsatzfreigabe. Sichtbare Codes und deutsche Anzeigetexte werden nicht als Planungslogik ausgewertet.
+- Ein neuer Typ erhält immer die normale Planungsrolle. Beim Bearbeiten bleiben Kennung, Typcode und besondere Typ1- oder AH-Rolle unverändert; doppelte Codes und unbekannte Katalogbezüge werden mit stabilen Codes und verständlichen Meldungen abgelehnt.
+- Endgültiges Löschen benötigt eine ausdrückliche Bestätigung. Typ1- und AH-Rollen sowie Typen mit zugeordneten aktiven oder deaktivierten Personen oder anderen Fachdaten werden geschützt; zwischenzeitliche Änderungen führen ohne Teiländerung zu einem Konfliktergebnis.
+- Die drei schmalen Speicherverträge für Anlegen, Bearbeiten und Löschen sind vorbereitet. Eine konkrete SQLite-Implementierung, Migration oder sichtbare Bedienoberfläche gehört noch nicht zu MT-02.
+- System 05 – Personal-, Schicht- und Stundenbedarf – wurde am 2026-09-15 nach dem vollständigen BE-10-Nachweis ausdrücklich abgenommen und nach `docs/roadmaps/completed/STAFFING_DEMAND_ROADMAP.md` archiviert.
+- BE-09A und BE-09B bilden gemeinsam den abgenommenen korrigierten Bedienstand: regelmäßige Bedarfe werden unter „Einsatzorte und Dienste“ verwaltet, einzelne Tagesänderungen im Reiter „Bedarf“, und derselbe Wirksamkeitsmontag bleibt wiederholt korrigierbar.
 - Die vollständigen Startbedarfe, ab Montag wirksame Standardrevisionen, vollständige Datumsausnahmen, manuelle Feiertagsbehandlung und höchstens ein zusammenhängender Bedarfsblock je Einsatzort, Datum und Diensttyp sind fachlich bestätigt.
 - Die geplanten Code-Anker halten Bedarfs-Domain, Application-Verträge, `Persistence/StaffingDemands` und `Features/StaffingDemands` getrennt. Die bestehende gemeinsame SQLite-Migrationsfolge bleibt verbindlich.
 - BE-02 führt `StaffingDemandId`, `RequiredEmployeeCount`, `StaffingDemandTime` und `StaffingDemand` als unveränderliche Domain-Werte ein.
@@ -82,7 +94,7 @@ Status dieses Dokuments: Aktuell – System 05 mit abgenommener Teil-Roadmap akt
 - Die Sichtprüfung von BE-09 hat einen Änderungsbedarf ergeben. BE-09A hat den regelmäßigen Standardeditor aus dem Reiter „Bedarf“ entfernt und in die Unterteilung „Einsatzorte“, „Diensttypen“ und „Regelmäßiger Bedarf“ im Reiter „Einsatzorte und Dienste“ verschoben.
 - Der Reiter „Bedarf“ bearbeitet nun nur konkrete Kalendertage über „Nur diesen Tag ändern“. Eine solche „Einmalige Änderung“ kann wiederholt bearbeitet, für „kein Bedarf“ verwendet oder auf den dann wirksamen regelmäßigen Standard zurückgesetzt werden.
 - Diensttyp-Standardzeit und regelmäßiger Personalbedarf bleiben getrennte Speichervorgänge. Regelmäßige Bedarfsänderungen gelten weiterhin ausschließlich ab einem gewählten Montag und verändern frühere Wochen nicht.
-- BE-09A ist umgesetzt und automatisch geprüft. 8 neue Desktop-Tests und 1 zusätzlicher Architekturtest erhöhen den Gesamtstand auf 350 erfolgreiche Tests; das sichtbare Abnahmegate bleibt offen.
+- BE-09A ist umgesetzt, automatisch geprüft und am 2026-09-15 als Bestandteil des korrigierten Gesamtbereichs sichtbar abgenommen. 8 neue Desktop-Tests und 1 zusätzlicher Architekturtest erhöhten den damaligen Gesamtstand auf 350 erfolgreiche Tests.
 - BE-09B erlaubt nun eine zweite und weitere Änderung desselben regelmäßigen Bedarfs am selben Wirksamkeitsmontag. Fortlaufende unveränderliche Korrekturfassungen bleiben erhalten; für den jeweiligen Montag gilt die zuletzt gespeicherte Fassung.
 - Der regelmäßige Bedarfsbereich zeigt den links gewählten Einsatzort vollständig von Montag bis Sonntag. Die zusätzliche Einsatzortauswahl im rechten Editor ist entfallen; vorhandene und fehlende Bedarfe können aus der Woche zur Bearbeitung gewählt werden.
 - Die neue verlustfreie Migration `20260914185047_AddStandardDemandCorrectionSequence` übernimmt bestehende Revisionen mit Folge `1` und sichert positive, je Bedarfsschlüssel und Montag eindeutige Korrekturfolgen.
@@ -187,9 +199,9 @@ Status dieses Dokuments: Aktuell – System 05 mit abgenommener Teil-Roadmap akt
 - Der Auftraggeber hat den sichtbaren lokalen Start, den Fenstertitel und die beiden deutschen Hinweistexte bestätigt.
 - Es wurden noch keine fachlichen Planungs- oder Excel-Abläufe angelegt. Der vollständige sichtbare Mitarbeiterablauf einschließlich Reaktivieren, Löschbestätigung und erneutem Laden wurde vom Auftraggeber bestätigt.
 
-## Noch nicht begonnen
+## Noch nicht implementiert
 
-- Systeme 06 bis 14
+- Systeme 07 bis 14; für System 07 läuft bisher nur der Verständnisabgleich, keine Implementierung
 - System 15 – Portable Windows-Auslieferung und Endabnahme der Kernversion
 - System 16 – Zeitkonten als spätere Ausbaustufe
 
@@ -229,7 +241,7 @@ Die Antworten sind in der Fragen-Datei und im Entscheidungsdokument festgehalten
 - Stunden werden aus tatsächlicher Dauer mal Personenzahl in ganzen Minuten berechnet und nicht unabhängig eingegeben.
 - Die erste Übersicht soll Bedarf, Tagessummen je Einsatzort, Wochensummen je Einsatzort und die Gesamtsumme der Woche darstellen; die atomaren Daten bleiben für spätere abgestimmte Summen verfügbar.
 
-Diese Entscheidungen und die umgesetzten Code-Anker stehen in `docs/roadmaps/active/STAFFING_DEMAND_ROADMAP.md`. BE-01 bis BE-08 sind ausdrücklich abgenommen. BE-09 wurde nach der Sichtprüfung nicht abgenommen; BE-09A und BE-09B sind umgesetzt und automatisch geprüft. Ihre gemeinsame sichtbare Abnahme ist offen.
+Diese Entscheidungen und die umgesetzten Code-Anker stehen in `docs/roadmaps/completed/STAFFING_DEMAND_ROADMAP.md`. BE-01 bis BE-08 sowie die korrigierten Zielabläufe aus BE-09A und BE-09B sind ausdrücklich abgenommen; BE-10 und System 05 sind abgeschlossen.
 
 ## Bestätigte Entscheidungen für System 03
 
@@ -240,7 +252,7 @@ Diese Entscheidungen und die umgesetzten Code-Anker stehen in `docs/roadmaps/act
 - höchstens eine aktive Typ1-Person; vor einer späteren Planung wird genau eine aktive Person verlangt,
 - Typ1 wird manuell vorgetragen, automatisch geschützt und nur als letzte manuelle Lösung vorgeschlagen,
 - kontextabhängige Doppeldienstfreigabe für TypAH2 sowie standardmäßig ausgeschaltete Planungslaufoption für dessen Springer-Verwendung,
-- zwingender Wochenkorridor von plus/minus drei Stunden für Typ25, Typ30, Typ30a, Typ35 und Typ35a; Typ1 wird nur bewertet und gemeldet; besonderer AH-Korridor von sieben bis zwölf Stunden,
+- zwingender Wochenkorridor von plus/minus drei Stunden für die normalen Typen; Typ1 wird nur bewertet und gemeldet; die frühere AH-Untergrenze von sieben Stunden ist durch die System-06-Entscheidung ersetzt,
 - unveränderlicher Wochenstundenbericht als Bestandteil jedes späteren Planungsergebnisses,
 - Mitarbeitende können deaktiviert und reaktiviert werden; eine zweite aktive Typ1-Person bleibt ausgeschlossen,
 - nur deaktivierte, noch nie fachlich verwendete Mitarbeitende können nach einer eigenen Unwiderruflichkeitswarnung endgültig gelöscht werden,
@@ -250,11 +262,23 @@ Diese Entscheidungen und die umgesetzten Code-Anker stehen in `docs/roadmaps/act
 
 Die vollständige Fachentscheidung steht in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`; die gemeinsame technische Migrationsgrenze in `docs/decisions/SHARED_SQLITE_MIGRATION_BOUNDARY.md`. MA-01 bis MA-11 einschließlich MA-02A sind abgenommen; System 03 ist abgeschlossen und archiviert.
 
+## Bestätigte Entscheidungen für System 06 und seinen Vorbereitungsteil
+
+- Vor der Abwesenheitserfassung werden `Typ20`, `Typ20a` und `Typ25a` mit 20, 20 beziehungsweise 25 Wochenstunden ergänzt. Ohne `a` gelten Restaurant-Frühdienst, Restaurant-Spätdienst und `D`; mit `a` zusätzlich beide Cafeteria-Dienste und `Spr`.
+- Ein Mitarbeitertypen-Tab erlaubt Codevergabe beim Anlegen sowie Bearbeiten von Name, Wochen-Soll, `U`-/`K`-Regel, normalen Dienstfreigaben und `D`-/`Spr`-Berechtigungen. Vorhandene Codes bleiben stabil.
+- Neue Typen besitzen die normale automatische Planungsrolle und den zwingenden Korridor von minus drei bis plus drei Stunden. Typ1- und AH-Stammdaten sind bearbeitbar, ihre besonderen Rollen bleiben geschützt.
+- Noch nie referenzierte normale Typen dürfen nach Sicherheitsabfrage gelöscht werden. Verwendete Typen und die benötigten Sondertypen bleiben erhalten.
+- `U` und `K` sind ganztägig, sperren die Generierung und reduzieren das Wochen-Soll um den Typ-Tageswert, mindestens auf null. Bestätigte Werte sind 4, 5, 6, 7 beziehungsweise 8 Stunden für die Typgruppen 20, 25, 30, 35 beziehungsweise Typ1.
+- Für AH sind `U` und `K` zunächst nicht auswählbar; eine krankheitsbedingte Sperre wird als rotes `X` eingetragen. Rote und schwarze `X` reduzieren das Soll nicht.
+- Die gemeinsame Ansicht „Dienstplan SER“ zeigt aktive Mitarbeitende als Zeilen und 21 Tage ab einem gewählten Montag. System 06 erfasst dort zunächst `U`, `K` und rote `X`; Typ1-Zuweisungen und generierte Dienste werden in späteren Systemen ergänzt.
+- Ein vollständig abwesendes Typ1 in einer Woche erlaubt die Generierung ohne Typ1-Dienst mit Hinweis. Bei teilweiser Abwesenheit bleibt mindestens ein vorgetragener Dienst erforderlich.
+- Typ1 darf einen vorgetragenen Früh- oder Spätdienst als Bürozeit `B` markieren. Die Stunden zählen, der Dienst deckt keinen Bedarf, und nach Abnahme bleibt nur der zugrunde liegende Dienst sichtbar; die interne Markierung bleibt in der Planversion erhalten.
+- AH wird erst nach allen automatisch planbaren Nicht-AH-Typen ausschließlich für verbleibende Lücken eingeplant. Zehn Stunden bleiben Ziel, zwölf Stunden zwingende Obergrenze; unter sechs und über zehn Stunden entstehen Berichtshinweise.
+- Die späteren Regeln zu freien Tagen, Urlaubswochenenden, höchstens sieben Arbeitstagen und Doppeldiensten sind priorisiert festgehalten, werden aber nicht in System 06 implementiert.
+
 ## Offene Entscheidungen für spätere Systeme
 
 - vollständige zwingende und priorisierte weiche Regeln,
-- genaue Reduktionsformel des Wochen-Solls bei Abwesenheiten,
-- Verhalten der Typ1-Generierungsvoraussetzung bei einer vollständig abwesenden Woche,
 - Inhalt und Aufbau der noch bereitzustellenden Excel-Vorlage,
 - endgültige Bestätigung der Excel-Bibliothek nach dem Vorlagentest,
 - praktische Voraussetzungen der portablen Ausgabe auf dem vorgesehenen Windows-11-Rechner.
@@ -263,16 +287,29 @@ Diese Entscheidungen sind für den Abschluss der Dokumentationsgrundlage noch ni
 
 ## Echte Blockaden
 
-Für das abgeschlossene System 03 und die bisherige Umsetzung von System 05 besteht keine technische Blockade. Für BE-09A und BE-09B steht die gemeinsame sichtbare Bedienprüfung noch aus.
+Für die abgeschlossenen Systeme 03, 04, 05 und 06 besteht keine technische oder fachliche Blockade.
 
-Das zuvor unversionierte Beispielbild mit echten Namen und konkreten Plandaten ist nicht mehr im Arbeitsordner vorhanden. Die daraus benötigten Fachinformationen sind nur abstrahiert und ohne personenbezogene Daten dokumentiert.
+Das unversionierte lokale Referenzbild `dienstplan beispiel blank.jpeg` liegt weiterhin im Arbeitsordner. Die Service-Leitung hat es am 2026-09-15 als reines Beispiel ohne personenbezogene oder reale Planungsdaten bestätigt; es wurde nicht als Fachdatenquelle oder Roadmap-Anlage übernommen.
 
 Die fehlende Excel-Vorlage blockiert später den Excel-Vorlagentest und System 13, aber nicht die gegenwärtige Projektgrundlage.
 
 ## Offene Prüf- und Abnahmegates
 
-- Alle 13 Produktions- und Testprojekte kompilieren erfolgreich; 98 von 98 Application-Tests, 148 von 148 Domain-Tests, 34 von 34 Infrastructure-Tests, 64 von 64 Desktop-Tests und 17 von 17 Architekturtests bestehen. Insgesamt bestehen alle 361 vorhandenen Tests. Planning- und Excel-Testprojekte enthalten im aktuellen Ausbauzustand noch keine Tests; ihr Exitcode 8 wird beim Gesamtlauf ausdrücklich als „keine Tests vorhanden“ behandelt.
-- Die korrigierten BE-09A- und BE-09B-Abläufe sind programmiert und automatisch geprüft. Offen ist die gemeinsame Sichtprüfung der wiederholten Bearbeitung desselben Wirksamkeitsmontags sowie der Wochen- und Einsatzortführung.
+- Alle 13 Produktions- und Testprojekte kompilieren erfolgreich; 153 von 153 Application-Tests, 180 von 180 Domain-Tests, 57 von 57 Infrastructure-Tests, 88 von 88 Desktop-Tests und 17 von 17 Architekturtests bestehen. Insgesamt bestehen alle 495 vorhandenen Tests. Planning- und Excel-Testprojekte enthalten im aktuellen Ausbauzustand noch keine Tests; ihr Exitcode 8 wird beim Gesamtlauf ausdrücklich als „keine Tests vorhanden“ behandelt.
+- MT-01 ist automatisch geprüft und ausdrücklich abgenommen: Die elf Starttypen, ihre Tageswerte, Rollen und Einsatzfreigaben sowie gültige und ungültige Tageswertgrenzen sind durch fokussierte Domain-Tests abgedeckt. Der vollständige Testlauf bestätigt zusätzlich, dass die bisherigen System-03-Abläufe grün bleiben und EF keine vorgezogene Migration verlangt.
+- MT-02 ist automatisch geprüft: 22 zusätzliche Application-Tests decken den vollständigen strukturierten Lesestand, Erfolg, Validierung, Abbruch, doppelte Codes, unbekannte Katalogbezüge, geschützte Rollen, parallele Änderungen und Referenzkonflikte ab. Build, vollständiger Testlauf und Formatprüfung sind grün.
+- MT-02 wurde am 2026-09-15 ausdrücklich abgenommen.
+- MT-03 ist umgesetzt und automatisch geprüft: Die fünfte Migration ergänzt drei Starttypen sowie strukturierte Tageswerte und Planungsrollen in derselben gemeinsamen Historie. Echte temporäre SQLite-Dateien belegen wiederholte Initialisierung, Upgrade vom System-05-Stand ohne Verlust synthetischer Mitarbeiter-, Katalog- oder Bedarfsdaten, vollständige Neustart-Roundtrips, Eindeutigkeit, Fremdschlüssel, optimistische Konflikte und atomaren Rollback. EF meldet keine ausstehende Modelländerung.
+- MT-03 wurde am 2026-09-15 ausdrücklich abgenommen.
+- MT-04 ist umgesetzt, automatisch geprüft und am 2026-09-15 sichtbar abgenommen: Der neue WPF-Tab zeigt alle Typwerte und getrennten Berechtigungszustände, erlaubt Anlegen und Bearbeiten unter Schutz von Code und Sonderrolle und verlangt vor dem zulässigen Löschen eine klare Bestätigung. Die Detailansicht bindet die sichtbaren Dienst- und Musternamen an die vorhandene strukturierte Bezeichnung; der erweiterte Render-Test prüft jedes erwartete Paar aus Name und Berechtigungsstatus. Erfolgs-, Validierungs- und technische Rückmeldungen melden sowohl ihren Text als auch dessen Sichtbarkeit an die Oberfläche; grüne und rote Felder zeigen ihren vollständigen Text. Lade-, Leer-, Arbeits-, Abbruch-, Erfolgs-, Validierungs-, Konflikt- und technische Fehlerzustände sind durch 12 ViewModel-Tests abgedeckt. Zwei zusätzliche WPF-Tests reproduzierten die zunächst fehlenden lokalen XAML-Ressourcen sowie den späteren Render-Absturz durch rückschreibende Anzeige-Bindungen und schützen diese Korrekturen vor einem Rückfall. Unerwartete Dispatcher-Fehler schließen die App nicht mehr kommentarlos, sondern führen zu einer verständlichen Meldung und kontrolliertem Beenden.
+- MT-05 wurde nach seinem grünen Gesamt-, Migrations- und Hygiene-Nachweis am 2026-09-15 ausdrücklich abgenommen.
+- VA-01 ist umgesetzt, automatisch geprüft und am 2026-09-15 ausdrücklich abgenommen: 22 neue Domain-Prüfungen decken alle drei Eintragsarten, eindeutige aktuelle Tageseinträge, Ersetzung, Wochenränder, Wochenende und Feiertag, Null-Untergrenze, AH-Ausschluss sowie vollständige und teilweise Typ1-Abwesenheitswochen ab.
+- VA-02 ist umgesetzt, automatisch geprüft und am 2026-09-15 ausdrücklich abgenommen: 14 neue Application-Prüfungen decken leeren Bestand, Montagsermittlung und Periodenwechsel, 21 unveränderliche Tageswerte, nur aktive Personen, drei getrennte Sollberechnungen, strukturierte Einträge, Abbruch sowie fehlende, doppelte oder fachlich unzulässige Lesedaten ab. Der Vertrag enthält keine UI-, Datenbank- oder technischen Adapterobjekte.
+- VA-03 ist umgesetzt, automatisch geprüft und am 2026-09-15 ausdrücklich abgenommen: 19 neue Application-Prüfungen decken alle drei Kennzeichen, bestätigtes Ersetzen und Entfernen, AH-Ausschluss, inaktive und fehlende Personen, fehlende Typen, veraltete Änderungsstände, Store-Konflikte und Abbruch ab. Vor Validierungs-, Bestätigungs- oder Konfliktfehlern erfolgt kein Speicheraufruf; spätere Planversionen werden von diesen aktuellen Schreibverträgen nicht verändert.
+- VA-04 ist umgesetzt, automatisch geprüft und am 2026-09-15 ausdrücklich abgenommen: Die sechste gemeinsame Migration ergänzt genau einen aktuellen Eintrag je Person und Datum, einen restriktiven Mitarbeiter-Fremdschlüssel sowie Datenbankprüfungen für Art und positiven Änderungsstand. Zwölf neue temporäre SQLite-Prüfungen decken Neuaufbau, Upgrade vom MT-03-Stand, Neustart, Eindeutigkeit, Fremdschlüssel, Bereichslesen, optimistische Konflikte, Entfernen und unveränderten Altstand bei einem künstlich ausgelösten Schreibfehler ab. Frühere Migrationen wurden nicht verändert; EF meldet keine ausstehende Modelländerung und keine produktive Datenbank wurde verwendet.
+- VA-05 ist umgesetzt, automatisch geprüft und am 2026-09-15 sichtbar abgenommen: Der Tab „Dienstplan SER“ zeigt aktive Mitarbeitende, 21 einzelne Tagesfelder und je drei ungekürzte sowie wirksame Wochen-Sollwerte. Datumsauswahl und 21-Tage-Navigation, Aktionsschaltflächen, Tastaturkürzel, bestätigtes Ersetzen und Leeren, AH-Einschränkung, Konflikt- und Ladefehler sowie der rote Buchstabe `X` sind durch zehn Desktop-Prüfungen einschließlich echtem WPF-Render-Test abgedeckt. Vor dem Start wurde die vorhandene lokale Datenbank unter `AppData/Local/Salztal Dienstplanung/Backups` gesichert; die Service-Leitung hat anschließend bestätigt, dass alle vereinbarten sichtbaren Abläufe funktionieren.
+- VA-06 und damit System 06 wurden am 2026-09-15 ausdrücklich abgenommen: Gesperrte Wiederherstellung, Build aller 13 Projekte, 495 vorhandene Tests, Format, Architektur, Migration, Pfade, Datenschutz und Diff sind grün. Planning und Excel enthalten weiterhin bewusst keine Tests und melden jeweils den erwarteten Exitcode 8. Es bestehen keine veralteten Roadmap-Pfade, keine geänderten Paket-Lockdateien und keine Datenbank-, Sicherungs- oder Exportartefakte im Repository. Die Übergaben an Systeme 07 bis 13 stimmen mit Roadmap, Grundlagen und Architektur überein.
+- Die korrigierten BE-09A- und BE-09B-Abläufe sind programmiert, automatisch geprüft und sichtbar abgenommen. Der BE-10-Gesamtnachweis bestätigt weiterhin alle 361 Tests, einen Build mit 0 Warnungen und 0 Fehlern, die Formatierung, den EF-Migrationsstand und die Repository-Hygiene.
 - Der vollständige sichtbare Einsatzort-, Diensttyp-, Doppeldienst- und Springer-Ablauf wurde schrittweise manuell geprüft und durch den Auftraggeber bestätigt.
 - Die Paketwiederherstellung und der Build bestätigen noch keinen OR-Tools-Lauf auf einem sauberen Zielsystem. Die Visual-C++-x64-Laufzeitvoraussetzung wird erst bei der portablen Auslieferung praktisch geprüft.
 - Die gemeinsame SQLite-Speicherung für Servicekatalog, Mitarbeitertypen, Einsatzfreigaben und Mitarbeitende ist mit leeren sowie vom System-04-Stand aktualisierten temporären Testdateien geprüft. Übersicht, Bearbeitung, Reaktivierung und referenzgeschütztes Löschen sind implementiert und sichtbar bestätigt; Planungsengine und Excel-Export stehen noch aus.
@@ -284,4 +321,4 @@ Keines dieser späteren Gates wird vorzeitig als bestanden geführt.
 
 ## Nächster minimaler Schritt
 
-BE-09B sichtbar prüfen: Cafeteria und Restaurant über die linke Einsatzortliste wechseln, die vollständige Woche kontrollieren und denselben regelmäßigen Bedarf zweimal für denselben Wirksamkeitsmontag speichern. Danach BE-09A und BE-09B ausdrücklich abnehmen oder Abweichungen melden.
+System 06 ist vollständig abgenommen und unter `docs/roadmaps/completed` archiviert. Als nächster möglicher Arbeitsbereich kann der bereits begonnene Verständnisabgleich für System 07 fortgesetzt werden. Vor jeglicher Implementierung muss daraus eine eigene Teil-Roadmap entstehen und ausdrücklich abgenommen werden.

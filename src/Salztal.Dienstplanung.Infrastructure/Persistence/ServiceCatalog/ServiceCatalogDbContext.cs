@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Salztal.Dienstplanung.Infrastructure.Persistence.Availabilities;
 using Salztal.Dienstplanung.Infrastructure.Persistence.Employees;
 using Salztal.Dienstplanung.Infrastructure.Persistence.StaffingDemands;
 
@@ -20,6 +21,9 @@ internal sealed class ServiceCatalogDbContext(DbContextOptions<ServiceCatalogDbC
 
     public DbSet<EmployeeEntity> Employees => Set<EmployeeEntity>();
 
+    public DbSet<AvailabilityEntryEntity> AvailabilityEntries =>
+        Set<AvailabilityEntryEntity>();
+
     public DbSet<StandardStaffingDemandRevisionEntity> StandardStaffingDemandRevisions =>
         Set<StandardStaffingDemandRevisionEntity>();
 
@@ -34,6 +38,7 @@ internal sealed class ServiceCatalogDbContext(DbContextOptions<ServiceCatalogDbC
         modelBuilder.ApplyConfiguration(new EmployeeTypeEntityConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeTypeShiftEligibilityEntityConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new AvailabilityEntryEntityConfiguration());
         modelBuilder.ApplyConfiguration(
             new StandardStaffingDemandRevisionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new StaffingDemandDateExceptionEntityConfiguration());

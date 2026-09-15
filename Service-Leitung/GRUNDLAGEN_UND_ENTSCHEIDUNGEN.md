@@ -27,19 +27,23 @@ Für jeden Mitarbeiter werden Vorname und Nachname getrennt eingetragen. Zusätz
 
 Urlaub und andere persönliche Planungsangaben bleiben davon getrennt. Dazu gehören später:
 
-- Urlaub,
-- Krankheit,
-- Fortbildungen,
-- Wunschfrei,
-- andere Einschränkungen der Verfügbarkeit.
+- Urlaub `U`,
+- Krankheit `K`,
+- ein rotes `X` für einen verbindlich freien Tag.
 
-Die App startet mit `Typ1`, `Typ25`, `Typ30`, `Typ30a`, `Typ35`, `Typ35a`, `TypAH1` und `TypAH2`. Die Zahl steht grundsätzlich für die Wochenstunden; `Typ1` besitzt 40 Stunden und AH besitzt 10 Stunden. Die Varianten mit `a` dürfen alle Dienste übernehmen. Die übrigen genauen Einsatzmöglichkeiten sind verbindlich in der Mitarbeiter-Roadmap festgehalten.
+Fortbildungen, ein eigenes Wunschfrei und stundenweise Einschränkungen werden für die erste Fassung nicht benötigt. Ein gewünschter verbindlicher freier Tag wird als rotes `X` eingetragen.
+
+Für die Abwesenheitserfassung wurde die Liste um `Typ20`, `Typ20a` und `Typ25a` ergänzt. Die App besitzt elf Starttypen. Die Zahl steht grundsätzlich für die Wochenstunden; `Typ1` besitzt 40 Stunden und AH besitzt 10 Stunden. Typen ohne `a` dürfen Frühdienst, Spätdienst und den Restaurant-Doppeldienst übernehmen. Typen mit `a` dürfen zusätzlich in der Cafeteria und als Springer eingesetzt werden.
 
 Ein Mitarbeitertyp wird gemeinsam verwendet. Ändert die Service-Leitung später einen Typ, gilt die Änderung für alle ihm zugeordneten Mitarbeitenden. Für eine einzelne Person wird stattdessen bewusst ein anderer Typ ausgewählt. Bereits abgenommene Pläne bleiben unverändert.
 
-Für die erste Fassung werden keine zusätzlichen Qualifikationen benötigt. Neue Mitarbeitertypen können später ergänzt werden; die erste Mitarbeiterbedienung zeigt und verwendet zunächst nur die bestätigten Starttypen.
+Für die erste Fassung werden keine zusätzlichen Qualifikationen benötigt. Im eigenen Mitarbeitertypen-Tab können neue normale Typen angelegt und vorhandene Typen bearbeitet werden. Dort werden Name, Wochenstunden, der Tageswert für `U` und `K`, normale Dienste sowie die Berechtigungen für Doppeldienst und Springer gepflegt. Der Typcode bleibt nach dem Anlegen unverändert. Die besondere Planungsart von Typ1 und AH bleibt geschützt.
 
-Deaktivierte Mitarbeitende können später mit derselben Kennung, demselben Namen und demselben Typ wieder aktiviert werden. Dabei darf weiterhin höchstens eine aktive Person vom Typ1 vorhanden sein.
+Ein noch nie verwendeter normaler Typ darf nach einer Sicherheitsabfrage gelöscht werden. Sobald eine Person oder eine andere Fachinformation den Typ verwendet, bleibt er erhalten.
+
+Bei `U` und `K` wird das Wochen-Soll je Tag um den am Typ eingestellten Wert reduziert: vier Stunden bei Typ20, fünf bei Typ25, sechs bei Typ30, sieben bei Typ35 und acht bei Typ1. Das gilt auch am Wochenende und an Feiertagen. Für AH werden `U` und `K` zunächst nicht angeboten; eine krankheitsbedingte Sperre trägt die Service-Leitung als rotes `X` ein. Rote `X` reduzieren das Wochen-Soll nicht.
+
+Deaktivierte Mitarbeitende können mit derselben Kennung, demselben Namen und demselben Typ wieder aktiviert werden. Dabei darf weiterhin höchstens eine aktive Person vom Typ1 vorhanden sein.
 
 Endgültig gelöscht werden dürfen nur deaktivierte Mitarbeitende, die noch in keinem Plan und keinen anderen Fachdaten verwendet wurden. Vorher zeigt die App den vollständigen Namen und warnt, dass das Löschen nicht rückgängig gemacht werden kann. Bereits verwendete Personen bleiben zum Schutz der Historie deaktiviert erhalten.
 
@@ -103,6 +107,8 @@ Die konkreten Regeln werden später gemeinsam einzeln aufgeschrieben und geprüf
 - Nicht besetzbare Dienste und andere Probleme werden verständlich erklärt.
 - Einzelne bereits passende Einteilungen können gesperrt werden.
 - Bei einer neuen automatischen Erstellung dürfen alle nicht gesperrten Einteilungen neu verteilt werden.
+- Die App plant zuerst alle normalen Nicht-AH-Typen. Erst danach setzt sie AH ausschließlich in noch offene, erlaubte Dienste ein. Weniger als sechs AH-Stunden verhindern den Plan nicht, werden aber ebenso wie mehr als zehn Stunden gemeldet. Mehr als zwölf AH-Stunden bleiben verboten.
+- Ein manuell eingetragener Typ1-Früh- oder Spätdienst kann während der Bearbeitung mit `B` als Bürozeit markiert werden. Die Stunden zählen für Typ1, der Dienst deckt aber keinen benötigten Mitarbeiterplatz. Nach der Abnahme bleibt der zugrunde liegende Dienst sichtbar und nur das `B` verschwindet aus Plan und späterer Excel-Ausgabe.
 
 Für Änderungen gibt es einen eigenen Bearbeitungsmodus. Nach dem Speichern berechnet die App Stunden, Bedarfsdeckung und Meldungen neu. Sie erzeugt dabei nicht ungefragt einen komplett neuen Plan.
 

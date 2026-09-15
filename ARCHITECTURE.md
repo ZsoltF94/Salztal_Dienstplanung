@@ -1,8 +1,8 @@
 # Architektur der Salztal-Dienstplanung
 
-Status: Grundarchitektur abgenommen am 2026-09-13; Mitarbeiter-Modell fachlich ergänzt am 2026-09-14
+Status: Grundarchitektur abgenommen am 2026-09-13; System-06-Grenzen fachlich ergänzt am 2026-09-15
 
-Stand: 2026-09-14
+Stand: 2026-09-15
 
 ## Zweck
 
@@ -225,6 +225,7 @@ Ein Mitarbeitertyp ist eine bindende Fachdefinition mit:
 - stabiler Kennung und sichtbarem Code,
 - verständlichem Namen,
 - ungekürztem Wochen-Soll in ganzen Minuten,
+- Zulässigkeit und minutengenauem Tageswert für Urlaub und Krankheit,
 - regulären Einsatzfreigaben,
 - ausdrücklich modellierten kontextabhängigen oder nur vorschlagsfähigen Einsatzmöglichkeiten.
 
@@ -232,7 +233,9 @@ Wochen-Soll und Freigaben bleiben innerhalb der Typdefinition getrennte fachlich
 
 System 04 bleibt Eigentümer von Einsatzorten, normalen Diensttypen und Einsatzmustern. Mitarbeitertypen referenzieren deren stabile Kennungen und duplizieren weder Namen noch Zeiten oder Musterbestandteile. Kontextabhängige Freigaben erlauben insbesondere, dass `TypAH2` Frühdienst innerhalb von `D` übernehmen darf, ohne für einen einzelnen Frühdienst automatisch zulässig zu sein.
 
-Individuelle Verfügbarkeiten und Abwesenheiten bleiben getrennte spätere Planungsdaten. Ein wegen Abwesenheit reduziertes Wochen-Soll wird nicht im Mitarbeiterstammsatz gespeichert, sondern später aus der bestätigten Abwesenheitsregel berechnet.
+Die Service-Leitung darf Mitarbeitertypen datengetrieben anlegen und ihre fachlichen Werte sowie Einsatzfreigaben bearbeiten. Der sichtbare Code bleibt nach dem Anlegen stabil. Neu angelegte Typen erhalten die normale automatische Planungsrolle; die besonderen Rollen von Typ1 und AH werden als strukturierte, geschützte Eigenschaften geführt und niemals aus Code oder Anzeigename abgeleitet. Die Stammdaten und Berechtigungen dieser Sondertypen bleiben bearbeitbar, ihre Sonderrolle kann in der ersten Pflegeoberfläche aber weder entfernt noch einem neuen Typ verliehen werden. Ein normaler Typ darf nur endgültig gelöscht werden, solange weder aktive noch deaktivierte Mitarbeitende noch andere Fachdaten auf ihn verweisen. Die für Typ1 und AH benötigten Sondertypen bleiben erhalten.
+
+Individuelle Verfügbarkeiten und Abwesenheiten bleiben getrennte spätere Planungsdaten. `U`, `K` und ein rotes `X` werden als ganztägige, strukturierte Werte je Mitarbeiter und Kalendertag gespeichert. Ein wegen `U` oder `K` reduziertes Wochen-Soll wird nicht im Mitarbeiterstammsatz gespeichert, sondern je Montag-bis-Sonntag-Woche aus dem ungekürzten Soll und dem in der verwendeten Typdefinition enthaltenen Tageswert berechnet, mindestens jedoch null. Rote und später generierte schwarze `X` verändern das Soll nicht. Für AH sind `U` und `K` zunächst nicht zulässig; eine Sperre wird als rotes `X` geführt.
 
 Für die erste Fassung existiert kein zusätzlicher Qualifikationskatalog. Neue Typkombinationen werden später als Daten ergänzt und nicht als UI- oder Solver-Sondercode programmiert.
 
@@ -316,6 +319,8 @@ Die Optimierung erfolgt hierarchisch:
 
 Die Stufen werden durch getrennte Optimierungsläufe oder nachweisbar dominante Grenzen abgesichert. Viele niedrige Wünsche dürfen zusammen niemals einen höheren Wunsch überstimmen.
 
+AH bildet eine nachgelagerte, fachlich sichtbare Planungsphase: Zuerst werden alle automatisch planbaren Nicht-AH-Typen innerhalb der Regeln verteilt. Erst danach darf AH noch ungedeckte, zulässige Plätze füllen. Die zweite Phase verdrängt keine bereits geplante Nicht-AH-Person und erzeugt keine Überbesetzung. Zehn AH-Stunden bleiben das Ziel, zwölf Stunden die zwingende Obergrenze. Unter sechs oder über zehn geplante AH-Stunden erzeugen strukturierte Berichtshinweise; die Unterschreitung von sechs Stunden ist kein Generierungsverbot.
+
 ### Wiederholbarkeit und Laufzeit
 
 - Solver-Version und Einstellungen werden mit dem Planungsergebnis gespeichert.
@@ -362,6 +367,8 @@ Lösungsvorschläge sind Hinweise. Sie verändern niemals automatisch Stammdaten
 5. Es findet keine automatische vollständige Neugenerierung statt.
 
 Die bestätigte manuelle Sonderzuweisung außerhalb einer normalen Einsatzfreigabe ist ein eigener, ausdrücklich zu bestätigender Vorgang. Sie ändert die Einsatzfreigabe in den Stammdaten nicht, bleibt als Warnung sichtbar und ist für die automatische Planerzeugung weiterhin unzulässig.
+
+Eine manuell vorgetragene Typ1-Zuweisung für Früh- oder Spätdienst kann zusätzlich als Bürozeit markiert werden. Sie bewahrt Dienstkennung und tatsächliche Zeit, zählt vollständig zu den Typ1-Stunden und besitzt zugleich die strukturierte Wirkung „deckt keinen Personalbedarf“. Die Büro-Markierung wird nicht als eigener Diensttyp und nicht als Farbe modelliert. In einer abgenommenen Planansicht und im Export wird nur das sichtbare `B` ausgeblendet; die zugrunde liegende Zuweisung und die interne Markierung bleiben Bestandteil der unveränderlichen Momentaufnahme.
 
 Standardänderungen an Diensttypen oder Bedarfen wirken nur auf neu erzeugte zukünftige Vorgaben. Eine Datums-Ausnahme verändert nur das ausgewählte Datum. Bereits gespeicherte und insbesondere abgenommene Planversionen bewahren ihre tatsächlichen Zeiten, Bezeichnungen und Anzeigedaten unverändert.
 

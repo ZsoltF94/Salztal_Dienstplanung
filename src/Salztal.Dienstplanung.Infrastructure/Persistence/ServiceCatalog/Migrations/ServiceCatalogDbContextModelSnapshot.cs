@@ -17,6 +17,32 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.12");
 
+            modelBuilder.Entity("Salztal.Dienstplanung.Infrastructure.Persistence.Availabilities.AvailabilityEntryEntity", b =>
+                {
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("ChangeVersion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("EmployeeId", "Date");
+
+                    b.HasIndex("Date");
+
+                    b.ToTable("AvailabilityEntries", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_AvailabilityEntries_ChangeVersion", "ChangeVersion > 0");
+
+                            t.HasCheckConstraint("CK_AvailabilityEntries_Kind", "Kind IN (0, 1, 2)");
+                        });
+                });
+
             modelBuilder.Entity("Salztal.Dienstplanung.Infrastructure.Persistence.Employees.EmployeeEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -57,12 +83,19 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("AbsenceDayValueMinutes")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("AllowsAutomaticAssignment")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("AllowsVacationAndSickness")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<int>("ManualSuggestionPriority")
                         .HasColumnType("INTEGER");
@@ -70,6 +103,9 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("PlanningRole")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("PreservesManualAssignmentsOnGeneration")
                         .HasColumnType("INTEGER");
@@ -87,11 +123,17 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
 
                     b.ToTable("EmployeeTypes", null, t =>
                         {
+                            t.HasCheckConstraint("CK_EmployeeTypes_AbsencePolicy", "(AllowsVacationAndSickness = 1 AND AbsenceDayValueMinutes IS NOT NULL AND AbsenceDayValueMinutes > 0 AND AbsenceDayValueMinutes <= 1440) OR (AllowsVacationAndSickness = 0 AND AbsenceDayValueMinutes IS NULL)");
+
                             t.HasCheckConstraint("CK_EmployeeTypes_Code_NotEmpty", "length(trim(Code)) > 0");
 
                             t.HasCheckConstraint("CK_EmployeeTypes_ManualSuggestionPriority", "ManualSuggestionPriority IN (0, 1)");
 
                             t.HasCheckConstraint("CK_EmployeeTypes_Name_NotEmpty", "length(trim(Name)) > 0");
+
+                            t.HasCheckConstraint("CK_EmployeeTypes_PlanningPolicy", "(PlanningRole IN (0, 2) AND AllowsAutomaticAssignment = 1 AND RequiresWeeklyManualAssignment = 0 AND PreservesManualAssignmentsOnGeneration = 0 AND ManualSuggestionPriority = 0) OR (PlanningRole = 1 AND AllowsAutomaticAssignment = 0 AND RequiresWeeklyManualAssignment = 1 AND PreservesManualAssignmentsOnGeneration = 1 AND ManualSuggestionPriority = 1)");
+
+                            t.HasCheckConstraint("CK_EmployeeTypes_PlanningRole", "PlanningRole IN (0, 1, 2)");
 
                             t.HasCheckConstraint("CK_EmployeeTypes_WeeklyWorkTargetMinutes", "WeeklyWorkTargetMinutes > 0 AND WeeklyWorkTargetMinutes <= 10080");
                         });
@@ -100,10 +142,13 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
                         new
                         {
                             Id = new Guid("6197e678-38c8-465c-8d09-fed6812a6f2b"),
+                            AbsenceDayValueMinutes = 480,
                             AllowsAutomaticAssignment = false,
+                            AllowsVacationAndSickness = true,
                             Code = "Typ1",
                             ManualSuggestionPriority = 1,
                             Name = "Serviceleitung",
+                            PlanningRole = 1,
                             PreservesManualAssignmentsOnGeneration = true,
                             RequiresWeeklyManualAssignment = true,
                             WeeklyWorkTargetMinutes = 2400
@@ -111,10 +156,13 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
                         new
                         {
                             Id = new Guid("b75fed95-1c2f-439f-9696-217bed8c4d8f"),
+                            AbsenceDayValueMinutes = 300,
                             AllowsAutomaticAssignment = true,
+                            AllowsVacationAndSickness = true,
                             Code = "Typ25",
                             ManualSuggestionPriority = 0,
                             Name = "Restaurant - 25 Stunden",
+                            PlanningRole = 0,
                             PreservesManualAssignmentsOnGeneration = false,
                             RequiresWeeklyManualAssignment = false,
                             WeeklyWorkTargetMinutes = 1500
@@ -122,10 +170,13 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
                         new
                         {
                             Id = new Guid("6f0feaed-65eb-4568-9c1f-a130cca65e44"),
+                            AbsenceDayValueMinutes = 360,
                             AllowsAutomaticAssignment = true,
+                            AllowsVacationAndSickness = true,
                             Code = "Typ30",
                             ManualSuggestionPriority = 0,
                             Name = "Restaurant - 30 Stunden",
+                            PlanningRole = 0,
                             PreservesManualAssignmentsOnGeneration = false,
                             RequiresWeeklyManualAssignment = false,
                             WeeklyWorkTargetMinutes = 1800
@@ -133,10 +184,13 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
                         new
                         {
                             Id = new Guid("cc8921a3-83f0-419f-a39b-f8bb37c3d6ba"),
+                            AbsenceDayValueMinutes = 360,
                             AllowsAutomaticAssignment = true,
+                            AllowsVacationAndSickness = true,
                             Code = "Typ30a",
                             ManualSuggestionPriority = 0,
                             Name = "Alle Dienste - 30 Stunden",
+                            PlanningRole = 0,
                             PreservesManualAssignmentsOnGeneration = false,
                             RequiresWeeklyManualAssignment = false,
                             WeeklyWorkTargetMinutes = 1800
@@ -144,10 +198,13 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
                         new
                         {
                             Id = new Guid("554d2c92-d67e-439c-9bc4-7bbe564198b5"),
+                            AbsenceDayValueMinutes = 420,
                             AllowsAutomaticAssignment = true,
+                            AllowsVacationAndSickness = true,
                             Code = "Typ35",
                             ManualSuggestionPriority = 0,
                             Name = "Restaurant - 35 Stunden",
+                            PlanningRole = 0,
                             PreservesManualAssignmentsOnGeneration = false,
                             RequiresWeeklyManualAssignment = false,
                             WeeklyWorkTargetMinutes = 2100
@@ -155,10 +212,13 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
                         new
                         {
                             Id = new Guid("e12d71ce-5dca-45b3-bae5-eadebaad93dd"),
+                            AbsenceDayValueMinutes = 420,
                             AllowsAutomaticAssignment = true,
+                            AllowsVacationAndSickness = true,
                             Code = "Typ35a",
                             ManualSuggestionPriority = 0,
                             Name = "Alle Dienste - 35 Stunden",
+                            PlanningRole = 0,
                             PreservesManualAssignmentsOnGeneration = false,
                             RequiresWeeklyManualAssignment = false,
                             WeeklyWorkTargetMinutes = 2100
@@ -167,9 +227,11 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
                         {
                             Id = new Guid("86a88720-bcdb-4f56-9dc8-0acf702f00f7"),
                             AllowsAutomaticAssignment = true,
+                            AllowsVacationAndSickness = false,
                             Code = "TypAH1",
                             ManualSuggestionPriority = 0,
                             Name = "Restaurant-Spätdienst - 10 Stunden",
+                            PlanningRole = 2,
                             PreservesManualAssignmentsOnGeneration = false,
                             RequiresWeeklyManualAssignment = false,
                             WeeklyWorkTargetMinutes = 600
@@ -178,18 +240,63 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
                         {
                             Id = new Guid("b4dd7b2a-2b7b-4a8d-b46b-ba1601a5a5a6"),
                             AllowsAutomaticAssignment = true,
+                            AllowsVacationAndSickness = false,
                             Code = "TypAH2",
                             ManualSuggestionPriority = 0,
                             Name = "Restaurant, Cafeteria B und Doppeldienst - 10 Stunden",
+                            PlanningRole = 2,
                             PreservesManualAssignmentsOnGeneration = false,
                             RequiresWeeklyManualAssignment = false,
                             WeeklyWorkTargetMinutes = 600
+                        },
+                        new
+                        {
+                            Id = new Guid("71cc48ce-172a-4580-a6b2-e1acc77b94f6"),
+                            AbsenceDayValueMinutes = 240,
+                            AllowsAutomaticAssignment = true,
+                            AllowsVacationAndSickness = true,
+                            Code = "Typ20",
+                            ManualSuggestionPriority = 0,
+                            Name = "Restaurant - 20 Stunden",
+                            PlanningRole = 0,
+                            PreservesManualAssignmentsOnGeneration = false,
+                            RequiresWeeklyManualAssignment = false,
+                            WeeklyWorkTargetMinutes = 1200
+                        },
+                        new
+                        {
+                            Id = new Guid("a06b4fcc-dbf1-4b3a-b975-07dc2d488157"),
+                            AbsenceDayValueMinutes = 240,
+                            AllowsAutomaticAssignment = true,
+                            AllowsVacationAndSickness = true,
+                            Code = "Typ20a",
+                            ManualSuggestionPriority = 0,
+                            Name = "Alle Dienste - 20 Stunden",
+                            PlanningRole = 0,
+                            PreservesManualAssignmentsOnGeneration = false,
+                            RequiresWeeklyManualAssignment = false,
+                            WeeklyWorkTargetMinutes = 1200
+                        },
+                        new
+                        {
+                            Id = new Guid("3c553205-5413-4f0c-ad1c-b4037066470c"),
+                            AbsenceDayValueMinutes = 300,
+                            AllowsAutomaticAssignment = true,
+                            AllowsVacationAndSickness = true,
+                            Code = "Typ25a",
+                            ManualSuggestionPriority = 0,
+                            Name = "Alle Dienste - 25 Stunden",
+                            PlanningRole = 0,
+                            PreservesManualAssignmentsOnGeneration = false,
+                            RequiresWeeklyManualAssignment = false,
+                            WeeklyWorkTargetMinutes = 1500
                         });
                 });
 
             modelBuilder.Entity("Salztal.Dienstplanung.Infrastructure.Persistence.Employees.EmployeeTypeShiftEligibilityEntity", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Activation")
@@ -579,6 +686,141 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
                             Mode = 0,
                             ShiftPatternId = new Guid("aa8759ef-2043-4b96-985c-d91d2a20e8a4"),
                             TargetKind = 1
+                        },
+                        new
+                        {
+                            Id = 39,
+                            Activation = 0,
+                            EmployeeTypeId = new Guid("71cc48ce-172a-4580-a6b2-e1acc77b94f6"),
+                            Mode = 0,
+                            ShiftTypeId = new Guid("914e5c77-18d6-4813-8212-8765cc0cd647"),
+                            TargetKind = 0
+                        },
+                        new
+                        {
+                            Id = 40,
+                            Activation = 0,
+                            EmployeeTypeId = new Guid("71cc48ce-172a-4580-a6b2-e1acc77b94f6"),
+                            Mode = 0,
+                            ShiftTypeId = new Guid("573e723a-73c9-4b0f-9e91-ecb2462a8df4"),
+                            TargetKind = 0
+                        },
+                        new
+                        {
+                            Id = 41,
+                            Activation = 0,
+                            EmployeeTypeId = new Guid("71cc48ce-172a-4580-a6b2-e1acc77b94f6"),
+                            Mode = 0,
+                            ShiftPatternId = new Guid("06fc39e4-1b95-4416-a342-7641d3553fb9"),
+                            TargetKind = 1
+                        },
+                        new
+                        {
+                            Id = 42,
+                            Activation = 0,
+                            EmployeeTypeId = new Guid("a06b4fcc-dbf1-4b3a-b975-07dc2d488157"),
+                            Mode = 0,
+                            ShiftTypeId = new Guid("914e5c77-18d6-4813-8212-8765cc0cd647"),
+                            TargetKind = 0
+                        },
+                        new
+                        {
+                            Id = 43,
+                            Activation = 0,
+                            EmployeeTypeId = new Guid("a06b4fcc-dbf1-4b3a-b975-07dc2d488157"),
+                            Mode = 0,
+                            ShiftTypeId = new Guid("573e723a-73c9-4b0f-9e91-ecb2462a8df4"),
+                            TargetKind = 0
+                        },
+                        new
+                        {
+                            Id = 44,
+                            Activation = 0,
+                            EmployeeTypeId = new Guid("a06b4fcc-dbf1-4b3a-b975-07dc2d488157"),
+                            Mode = 0,
+                            ShiftTypeId = new Guid("44fc4ea8-a839-4704-99ef-c8bf2b37f3e0"),
+                            TargetKind = 0
+                        },
+                        new
+                        {
+                            Id = 45,
+                            Activation = 0,
+                            EmployeeTypeId = new Guid("a06b4fcc-dbf1-4b3a-b975-07dc2d488157"),
+                            Mode = 0,
+                            ShiftTypeId = new Guid("4d6e10ea-a4b9-455c-a868-3a1ab992e856"),
+                            TargetKind = 0
+                        },
+                        new
+                        {
+                            Id = 46,
+                            Activation = 0,
+                            EmployeeTypeId = new Guid("a06b4fcc-dbf1-4b3a-b975-07dc2d488157"),
+                            Mode = 0,
+                            ShiftPatternId = new Guid("06fc39e4-1b95-4416-a342-7641d3553fb9"),
+                            TargetKind = 1
+                        },
+                        new
+                        {
+                            Id = 47,
+                            Activation = 0,
+                            EmployeeTypeId = new Guid("a06b4fcc-dbf1-4b3a-b975-07dc2d488157"),
+                            Mode = 0,
+                            ShiftPatternId = new Guid("aa8759ef-2043-4b96-985c-d91d2a20e8a4"),
+                            TargetKind = 1
+                        },
+                        new
+                        {
+                            Id = 48,
+                            Activation = 0,
+                            EmployeeTypeId = new Guid("3c553205-5413-4f0c-ad1c-b4037066470c"),
+                            Mode = 0,
+                            ShiftTypeId = new Guid("914e5c77-18d6-4813-8212-8765cc0cd647"),
+                            TargetKind = 0
+                        },
+                        new
+                        {
+                            Id = 49,
+                            Activation = 0,
+                            EmployeeTypeId = new Guid("3c553205-5413-4f0c-ad1c-b4037066470c"),
+                            Mode = 0,
+                            ShiftTypeId = new Guid("573e723a-73c9-4b0f-9e91-ecb2462a8df4"),
+                            TargetKind = 0
+                        },
+                        new
+                        {
+                            Id = 50,
+                            Activation = 0,
+                            EmployeeTypeId = new Guid("3c553205-5413-4f0c-ad1c-b4037066470c"),
+                            Mode = 0,
+                            ShiftTypeId = new Guid("44fc4ea8-a839-4704-99ef-c8bf2b37f3e0"),
+                            TargetKind = 0
+                        },
+                        new
+                        {
+                            Id = 51,
+                            Activation = 0,
+                            EmployeeTypeId = new Guid("3c553205-5413-4f0c-ad1c-b4037066470c"),
+                            Mode = 0,
+                            ShiftTypeId = new Guid("4d6e10ea-a4b9-455c-a868-3a1ab992e856"),
+                            TargetKind = 0
+                        },
+                        new
+                        {
+                            Id = 52,
+                            Activation = 0,
+                            EmployeeTypeId = new Guid("3c553205-5413-4f0c-ad1c-b4037066470c"),
+                            Mode = 0,
+                            ShiftPatternId = new Guid("06fc39e4-1b95-4416-a342-7641d3553fb9"),
+                            TargetKind = 1
+                        },
+                        new
+                        {
+                            Id = 53,
+                            Activation = 0,
+                            EmployeeTypeId = new Guid("3c553205-5413-4f0c-ad1c-b4037066470c"),
+                            Mode = 0,
+                            ShiftPatternId = new Guid("aa8759ef-2043-4b96-985c-d91d2a20e8a4"),
+                            TargetKind = 1
                         });
                 });
 
@@ -871,6 +1113,17 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
                         });
                 });
 
+            modelBuilder.Entity("Salztal.Dienstplanung.Infrastructure.Persistence.Availabilities.AvailabilityEntryEntity", b =>
+                {
+                    b.HasOne("Salztal.Dienstplanung.Infrastructure.Persistence.Employees.EmployeeEntity", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("Salztal.Dienstplanung.Infrastructure.Persistence.Employees.EmployeeEntity", b =>
                 {
                     b.HasOne("Salztal.Dienstplanung.Infrastructure.Persistence.Employees.EmployeeTypeEntity", "EmployeeType")
@@ -885,7 +1138,7 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
             modelBuilder.Entity("Salztal.Dienstplanung.Infrastructure.Persistence.Employees.EmployeeTypeShiftEligibilityEntity", b =>
                 {
                     b.HasOne("Salztal.Dienstplanung.Infrastructure.Persistence.Employees.EmployeeTypeEntity", "EmployeeType")
-                        .WithMany()
+                        .WithMany("ShiftEligibilities")
                         .HasForeignKey("EmployeeTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -973,6 +1226,11 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
                     b.Navigation("ShiftType");
 
                     b.Navigation("WorkLocation");
+                });
+
+            modelBuilder.Entity("Salztal.Dienstplanung.Infrastructure.Persistence.Employees.EmployeeTypeEntity", b =>
+                {
+                    b.Navigation("ShiftEligibilities");
                 });
 #pragma warning restore 612, 618
         }

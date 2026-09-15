@@ -9,6 +9,7 @@ public sealed class EmployeeType
         EmployeeTypeCode code,
         EmployeeTypeName name,
         WeeklyWorkTarget weeklyWorkTarget,
+        EmployeeTypeAbsencePolicy absencePolicy,
         ReadOnlyCollection<EmployeeTypeShiftEligibility> shiftEligibilities,
         EmployeeTypePlanningPolicy planningPolicy)
     {
@@ -16,6 +17,7 @@ public sealed class EmployeeType
         Code = code;
         Name = name;
         WeeklyWorkTarget = weeklyWorkTarget;
+        AbsencePolicy = absencePolicy;
         ShiftEligibilities = shiftEligibilities;
         PlanningPolicy = planningPolicy;
     }
@@ -27,6 +29,8 @@ public sealed class EmployeeType
     public EmployeeTypeName Name { get; }
 
     public WeeklyWorkTarget WeeklyWorkTarget { get; }
+
+    public EmployeeTypeAbsencePolicy AbsencePolicy { get; }
 
     public IReadOnlyList<EmployeeTypeShiftEligibility> ShiftEligibilities { get; }
 
@@ -43,6 +47,8 @@ public sealed class EmployeeType
             code,
             name,
             weeklyWorkTargetMinutes,
+            false,
+            null,
             Array.Empty<EmployeeTypeShiftEligibility>(),
             EmployeeTypePlanningPolicy.Standard);
     }
@@ -52,6 +58,27 @@ public sealed class EmployeeType
         string? code,
         string? name,
         int weeklyWorkTargetMinutes,
+        IEnumerable<EmployeeTypeShiftEligibility?>? shiftEligibilities,
+        EmployeeTypePlanningPolicy? planningPolicy)
+    {
+        return Create(
+            id,
+            code,
+            name,
+            weeklyWorkTargetMinutes,
+            false,
+            null,
+            shiftEligibilities,
+            planningPolicy);
+    }
+
+    public static EmployeeTypeValidationResult Create(
+        Guid id,
+        string? code,
+        string? name,
+        int weeklyWorkTargetMinutes,
+        bool allowsVacationAndSickness,
+        int? absenceDayValueMinutes,
         IEnumerable<EmployeeTypeShiftEligibility?>? shiftEligibilities,
         EmployeeTypePlanningPolicy? planningPolicy)
     {
@@ -85,6 +112,16 @@ public sealed class EmployeeType
                 targetError == WeeklyWorkTargetValidationCode.MustBePositive
                     ? EmployeeTypeValidationCode.WeeklyWorkTargetMustBePositive
                     : EmployeeTypeValidationCode.WeeklyWorkTargetExceedsWeek));
+        }
+
+        EmployeeTypeValidationCode? absencePolicyError = EmployeeTypeAbsencePolicy.TryCreate(
+            allowsVacationAndSickness,
+            absenceDayValueMinutes,
+            out EmployeeTypeAbsencePolicy? absencePolicy);
+
+        if (absencePolicyError is not null)
+        {
+            errors.Add(new EmployeeTypeValidationError(absencePolicyError.Value));
         }
 
         EmployeeTypeShiftEligibility[] validShiftEligibilities = [];
@@ -134,6 +171,7 @@ public sealed class EmployeeType
             employeeTypeCode!,
             employeeTypeName!,
             weeklyWorkTarget!,
+            absencePolicy!,
             Array.AsReadOnly(validShiftEligibilities),
             planningPolicy!);
 
@@ -144,12 +182,29 @@ public sealed class EmployeeType
         string? name,
         int weeklyWorkTargetMinutes)
     {
+        return WithDetails(
+            name,
+            weeklyWorkTargetMinutes,
+            AbsencePolicy.AllowsVacationAndSickness,
+            AbsencePolicy.DayValue?.Minutes,
+            ShiftEligibilities);
+    }
+
+    public EmployeeTypeValidationResult WithDetails(
+        string? name,
+        int weeklyWorkTargetMinutes,
+        bool allowsVacationAndSickness,
+        int? absenceDayValueMinutes,
+        IEnumerable<EmployeeTypeShiftEligibility?>? shiftEligibilities)
+    {
         return Create(
             Id.Value,
             Code.Value,
             name,
             weeklyWorkTargetMinutes,
-            ShiftEligibilities,
+            allowsVacationAndSickness,
+            absenceDayValueMinutes,
+            shiftEligibilities,
             PlanningPolicy);
     }
 }

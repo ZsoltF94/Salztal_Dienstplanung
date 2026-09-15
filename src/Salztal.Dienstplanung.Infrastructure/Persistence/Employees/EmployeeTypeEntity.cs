@@ -12,6 +12,12 @@ internal sealed class EmployeeTypeEntity
 
     public int WeeklyWorkTargetMinutes { get; set; }
 
+    public bool AllowsVacationAndSickness { get; set; }
+
+    public int? AbsenceDayValueMinutes { get; set; }
+
+    public EmployeeTypePlanningRole PlanningRole { get; set; }
+
     public bool AllowsAutomaticAssignment { get; set; }
 
     public bool RequiresWeeklyManualAssignment { get; set; }
@@ -19,4 +25,6 @@ internal sealed class EmployeeTypeEntity
     public bool PreservesManualAssignmentsOnGeneration { get; set; }
 
     public ManualSuggestionPriority ManualSuggestionPriority { get; set; }
+
+    public List<EmployeeTypeShiftEligibilityEntity> ShiftEligibilities { get; } = [];
 }

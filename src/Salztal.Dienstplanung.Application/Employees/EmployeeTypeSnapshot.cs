@@ -2,6 +2,13 @@ using System.Collections.ObjectModel;
 
 namespace Salztal.Dienstplanung.Application.Employees;
 
+public enum EmployeeTypePlanningRoleKind
+{
+    Normal,
+    ServiceManagement,
+    Auxiliary,
+}
+
 public sealed class EmployeeTypeSnapshot
 {
     internal EmployeeTypeSnapshot(
@@ -10,6 +17,9 @@ public sealed class EmployeeTypeSnapshot
         string name,
         int weeklyWorkTargetMinutes,
         string weeklyWorkTargetDisplay,
+        bool allowsVacationAndSickness,
+        int? absenceDayValueMinutes,
+        EmployeeTypePlanningRoleKind planningRole,
         IEnumerable<EmployeeTypeEligibilitySnapshot> shiftEligibilities)
     {
         Id = id;
@@ -17,6 +27,9 @@ public sealed class EmployeeTypeSnapshot
         Name = name;
         WeeklyWorkTargetMinutes = weeklyWorkTargetMinutes;
         WeeklyWorkTargetDisplay = weeklyWorkTargetDisplay;
+        AllowsVacationAndSickness = allowsVacationAndSickness;
+        AbsenceDayValueMinutes = absenceDayValueMinutes;
+        PlanningRole = planningRole;
         ShiftEligibilities = Array.AsReadOnly(shiftEligibilities.ToArray());
     }
 
@@ -29,6 +42,12 @@ public sealed class EmployeeTypeSnapshot
     public int WeeklyWorkTargetMinutes { get; }
 
     public string WeeklyWorkTargetDisplay { get; }
+
+    public bool AllowsVacationAndSickness { get; }
+
+    public int? AbsenceDayValueMinutes { get; }
+
+    public EmployeeTypePlanningRoleKind PlanningRole { get; }
 
     public ReadOnlyCollection<EmployeeTypeEligibilitySnapshot> ShiftEligibilities { get; }
 }

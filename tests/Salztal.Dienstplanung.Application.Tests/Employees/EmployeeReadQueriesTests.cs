@@ -128,7 +128,7 @@ public sealed class EmployeeReadQueriesTests
         EmployeeTypeCatalogSnapshot result = await query.ExecuteAsync(
             TestContext.Current.CancellationToken);
 
-        Assert.Equal(8, result.EmployeeTypes.Count);
+        Assert.Equal(11, result.EmployeeTypes.Count);
         Assert.True(((ICollection<EmployeeTypeSnapshot>)result.EmployeeTypes).IsReadOnly);
 
         EmployeeTypeSnapshot type25 = Assert.Single(
@@ -137,6 +137,9 @@ public sealed class EmployeeReadQueriesTests
         Assert.Equal("Restaurant - 25 Stunden", type25.Name);
         Assert.Equal(1_500, type25.WeeklyWorkTargetMinutes);
         Assert.Equal("25 Stunden", type25.WeeklyWorkTargetDisplay);
+        Assert.True(type25.AllowsVacationAndSickness);
+        Assert.Equal(300, type25.AbsenceDayValueMinutes);
+        Assert.Equal(EmployeeTypePlanningRoleKind.Normal, type25.PlanningRole);
         Assert.Collection(
             type25.ShiftEligibilities,
             eligibility => Assert.Equal("Frühdienst", eligibility.TargetName),
@@ -144,7 +147,27 @@ public sealed class EmployeeReadQueriesTests
             eligibility => Assert.Equal("D", eligibility.TargetName));
         Assert.All(
             type25.ShiftEligibilities,
-            eligibility => Assert.Equal("Regulär zulässig", eligibility.AvailabilityDisplay));
+            eligibility =>
+            {
+                Assert.Equal(EmployeeTypeEligibilityMode.Regular, eligibility.Mode);
+                Assert.Equal(
+                    EmployeeTypeEligibilityActivation.Always,
+                    eligibility.Activation);
+                Assert.Equal("Regulär zulässig", eligibility.AvailabilityDisplay);
+            });
+
+        EmployeeTypeSnapshot typeAh2 = Assert.Single(
+            result.EmployeeTypes,
+            employeeType => employeeType.Code == "TypAH2");
+        Assert.False(typeAh2.AllowsVacationAndSickness);
+        Assert.Null(typeAh2.AbsenceDayValueMinutes);
+        Assert.Equal(EmployeeTypePlanningRoleKind.Auxiliary, typeAh2.PlanningRole);
+        Assert.Contains(
+            typeAh2.ShiftEligibilities,
+            eligibility => eligibility.TargetName == "Spr"
+                && eligibility.TargetKind == EmployeeTypeEligibilityTargetKind.ShiftPattern
+                && eligibility.Activation
+                    == EmployeeTypeEligibilityActivation.ExplicitPlanningRunOption);
     }
 
     [Fact]

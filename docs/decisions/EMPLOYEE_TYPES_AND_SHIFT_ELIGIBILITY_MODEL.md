@@ -1,8 +1,8 @@
 # Entscheidung: Bindende Mitarbeitertypen und Einsatzfreigaben
 
-Status: Fachlich bestätigt und mit MA-01 am 2026-09-14 ausdrücklich abgenommen
+Status: Fachlich bestätigt und mit MA-01 am 2026-09-14 ausdrücklich abgenommen; Erweiterung für System 06 am 2026-09-15 bestätigt
 
-Stand: 2026-09-14
+Stand: 2026-09-15
 
 ## Anlass
 
@@ -30,7 +30,10 @@ Diese Entscheidung ersetzt die frühere Aussage, Mitarbeitertypen seien lediglic
 | Typ | Wochen-Soll | Einsatzmöglichkeiten |
 |---|---:|---|
 | `Typ1` | 40 Stunden | alle Dienste und Muster; keine automatische Verteilung |
+| `Typ20` | 20 Stunden | Restaurant-Frühdienst, Restaurant-Spätdienst und `D` |
+| `Typ20a` | 20 Stunden | alle Dienste und Muster |
 | `Typ25` | 25 Stunden | Restaurant-Frühdienst, Restaurant-Spätdienst und `D` |
+| `Typ25a` | 25 Stunden | alle Dienste und Muster |
 | `Typ30` | 30 Stunden | Restaurant-Frühdienst, Restaurant-Spätdienst und `D` |
 | `Typ30a` | 30 Stunden | alle Dienste und Muster |
 | `Typ35` | 35 Stunden | Restaurant-Frühdienst, Restaurant-Spätdienst und `D` |
@@ -38,9 +41,33 @@ Diese Entscheidung ersetzt die frühere Aussage, Mitarbeitertypen seien lediglic
 | `TypAH1` | 10 Stunden | regulär Restaurant-Spätdienst; Frühdienst nur als manuelle Lösungsmöglichkeit |
 | `TypAH2` | 10 Stunden | Restaurant-Spätdienst, Cafeteria-Dienst B und `D`; einzelner Frühdienst nur als manuelle Lösungsmöglichkeit; `Spr` optional |
 
-Die acht Typen sind stabile Startwerte. Das Modell bleibt datengetrieben, damit Typen später angelegt, geändert und entfernt werden können. Die erste Bedienfassung enthält diese Katalogpflege noch nicht.
+Die elf Typen sind stabile Startwerte. Das Modell bleibt datengetrieben. Vor der System-06-Abwesenheitserfassung erhält die App eine eigene Mitarbeitertypenpflege für Anlegen, Bearbeiten und das sichere Entfernen noch nie verwendeter normaler Typen.
 
-Ein Typ kann später nur entfernt werden, wenn ihm keine aktive oder deaktivierte Person mehr zugeordnet ist. Die Anwendung nennt die noch zugeordneten Personen; eine automatische Umstellung findet nicht statt.
+Ein Typ kann nur entfernt werden, wenn ihm keine aktive oder deaktivierte Person und keine andere Fachinformation zugeordnet ist. Die Anwendung nennt die blockierenden Bezüge; eine automatische Umstellung findet nicht statt. Die für Typ1 und AH benötigten Sondertypen bleiben erhalten, weil neue Typen nur mit normaler Planungsrolle angelegt werden können.
+
+### Pflege der Mitarbeitertypen
+
+- Beim Anlegen werden ein eindeutiger sichtbarer Code, ein verständlicher Name, Wochen-Soll, `U`-/`K`-Regel und Einsatzfreigaben festgelegt. Der Code bleibt anschließend stabil.
+- Bearbeitbar sind Name, Wochen-Soll, Zulässigkeit und Tageswert für `U` und `K`, die Freigaben aller normalen Dienste sowie die Berechtigungen für `D` und `Spr`.
+- Änderungen wirken für alle aktuell zugeordneten Mitarbeitenden und nachfolgende Planungen. Abgenommene Planversionen bleiben unverändert; vorhandene Entwürfe werden nicht stillschweigend umgeschrieben.
+- Neu angelegte Typen sind normale automatisch planbare Typen mit einem zwingenden Wochenkorridor von minus drei bis plus drei Stunden.
+- Die genannten Werte und Einsatzberechtigungen von `Typ1`, `TypAH1` und `TypAH2` sind ebenfalls bearbeitbar. Ihre besonderen Planungsrollen bleiben geschützt und können in der ersten Pflegeoberfläche weder entfernt noch neu vergeben werden.
+- `Typ20`, `Typ20a` und `Typ25a` erhalten denselben normalen Wochenkorridor. Ohne `a` sind Frühdienst, Spätdienst und `D` erlaubt; mit `a` zusätzlich beide Cafeteria-Dienste und `Spr`.
+
+### Abwesenheits-Tageswert
+
+Der Typ enthält zusätzlich die strukturierte Zulässigkeit und den minutengenauen gemeinsamen Tageswert für `U` und `K`. Die bestätigten Startwerte lauten:
+
+| Typen | Tageswert für `U` und `K` |
+|---|---:|
+| `Typ20`, `Typ20a` | 4 Stunden |
+| `Typ25`, `Typ25a` | 5 Stunden |
+| `Typ30`, `Typ30a` | 6 Stunden |
+| `Typ35`, `Typ35a` | 7 Stunden |
+| `Typ1` | 8 Stunden |
+| `TypAH1`, `TypAH2` | nicht zulässig |
+
+System 06 berechnet daraus je Montag-bis-Sonntag-Woche das wirksame Soll. Eine spätere Typänderung verändert keine bereits abgenommene Planversion.
 
 ### Mitarbeiterlebenszyklus
 
@@ -70,18 +97,19 @@ Diese kontextabhängige Regel präzisiert und ersetzt die frühere System-04-Ann
 - Typ1 wird niemals automatisch eingeteilt.
 - Typ1 kann für jeden weiterhin ungedeckten normalen Dienst als letzte manuell zu bestätigende Lösung genannt werden. Bei einem offenen Frühdienst werden zuerst AH-Möglichkeiten genannt.
 - Ein Stundenwert außerhalb des normalen Korridors verändert die vorgetragenen Dienste nicht und wird deutlich gemeldet.
-- Die Behandlung einer vollständig abwesenden Typ1-Person wird erst mit Verfügbarkeiten und Abwesenheiten festgelegt.
+- Ist Typ1 eine ganze Woche durch `U`, `K` oder rote `X` abwesend, darf ohne vorgetragenen Typ1-Dienst generiert werden und die App zeigt einen deutlichen Hinweis. Bei nur teilweiser Abwesenheit bleibt mindestens ein vorgetragener Typ1-Dienst je Woche erforderlich.
+- Ein vorgetragener Früh- oder Spätdienst kann als Bürozeit `B` markiert werden. Seine tatsächliche Dauer zählt zu den Typ1-Wochenstunden, deckt aber keinen Personalbedarf. Nach der Planabnahme bleibt der zugrunde liegende Dienst sichtbar und nur `B` wird in Plan und Export ausgeblendet; die strukturierte Büroinformation bleibt in der unveränderlichen Planversion erhalten.
 
 ### Wochen-Soll und spätere Generierung
 
 - Die Bewertung erfolgt für jede Person und jede Montag-bis-Sonntag-Woche einzeln.
-- Für Typ25, Typ30, Typ30a, Typ35 und Typ35a ist minus drei bis plus drei Stunden um das Soll eine zwingende äußere Grenze.
+- Für alle normalen Typen einschließlich Typ20, Typ20a und Typ25a ist minus drei bis plus drei Stunden um das Soll eine zwingende äußere Grenze.
 - Bei Typ1 dient dieser Korridor nur der Bewertung und Meldung; vorgetragene Dienste außerhalb des Korridors bleiben zulässig und unverändert.
 - Innerhalb aller zwingenden Grenzen wird zuerst ungedeckter Bedarf minimiert und danach die Sollabweichung minimiert.
-- AH besitzt ein Soll von zehn Stunden und einen zwingenden Korridor von sieben bis zwölf Stunden.
-- AH strebt zuerst zehn Stunden an. Oberhalb von zehn bis zwölf Stunden wird gegenüber unter zehn Stunden bevorzugt; weniger als zehn Stunden wird erst verwendet, wenn es notwendig ist.
-- Mehr als zehn AH-Stunden erzeugen eine Meldung.
-- Ein wegen Abwesenheit reduziertes Soll wird erst in System 06 fachlich berechnet und in System 07 als zentrale Regel definiert.
+- AH besitzt ein Soll von zehn Stunden und eine zwingende Obergrenze von zwölf Stunden.
+- Zuerst werden alle automatisch planbaren Nicht-AH-Typen verteilt. AH wird danach nur für verbleibende zulässige Lücken verwendet und verdrängt keine bereits geplante Nicht-AH-Person.
+- Unter sechs AH-Stunden bleibt ein Ergebnis zulässig und erzeugt eine Meldung. Mehr als zehn AH-Stunden erzeugen ebenfalls eine Meldung; mehr als zwölf Stunden bleiben unzulässig.
+- Das wegen `U` oder `K` reduzierte Soll wird in System 06 je Woche als ungekürztes Soll minus der Summe der Typ-Tageswerte berechnet, mindestens null. Rote und schwarze `X` reduzieren es nicht.
 - Tatsächliche Zuweisungszeiten bestimmen die Stunden. Bei `D` zählt die Unterbrechung nicht; bei `Spr` zählt die bestätigte zusammenhängende Einsatzzeit.
 
 ### Bericht
@@ -94,12 +122,12 @@ Für die erste Fassung wird kein eigener Qualifikationskatalog benötigt. Die er
 
 ## Auswirkungen auf die Systeme
 
-- System 03 speichert Mitarbeiter, Typdefinitionen, Typzuordnung, Wochen-Soll und Einsatzfreigaben.
+- Der Vorbereitungsteil vor System 06 erweitert System 03 um die Mitarbeitertypenpflege, die drei zusätzlichen Starttypen und den Abwesenheits-Tageswert.
 - System 04 bleibt Eigentümer der referenzierten Einsatzorte, Diensttypen und Muster.
-- System 06 bestimmt die Reduktion des Wochen-Solls bei Abwesenheiten und die vollständig abwesende Typ1-Woche.
-- System 07 definiert Korridore, AH-Rangfolge und Typ1-Verhalten als zentrale Regeln.
-- System 08 bewahrt vorgetragene Typ1-Zuweisungen und die verwendete Typmomentaufnahme.
-- System 09 setzt die Generierungslogik und die optionale AH2-Springerfreigabe um.
+- System 06 speichert `U`, `K` und rote `X`, berechnet die bestätigte Sollreduktion und behandelt die vollständig abwesende Typ1-Woche.
+- System 07 definiert Korridore, AH-Nachrang und Typ1-Verhalten als zentrale Regeln.
+- System 08 bewahrt vorgetragene Typ1-Zuweisungen einschließlich Bürokennzeichnung und die verwendete Typmomentaufnahme.
+- System 09 setzt die zweiphasige Nicht-AH-/AH-Generierung und die optionale AH2-Springerfreigabe um.
 - System 10 erzeugt Lösungsvorschläge und den Wochenstundenbericht.
 - Systeme 11 und 12 behandeln manuelle Sonderzuweisungen und unveränderliche Planversionen.
 
@@ -107,9 +135,10 @@ Für die erste Fassung wird kein eigener Qualifikationskatalog benötigt. Die er
 
 | Übergabe aus System 03 | Verbindlicher Inhalt | Späterer Eigentümer |
 |---|---|---|
-| Ungekürztes Wochen-Soll | `WeeklyWorkTarget` bleibt ein positiver, minutengenauer Wert des gemeinsam referenzierten Mitarbeitertyps. | System 06 berechnet die Abwesenheitsreduktion; System 07 definiert den wirksamen Korridor. |
+| Ungekürztes Wochen-Soll und Abwesenheitswert | `WeeklyWorkTarget` bleibt ein positiver, minutengenauer Wert des gemeinsam referenzierten Mitarbeitertyps. Zulässigkeit und Tageswert für `U` und `K` sind getrennte strukturierte Typwerte. | System 06 berechnet die Abwesenheitsreduktion; System 07 definiert den wirksamen Korridor. |
 | Typ1-Richtlinie | Keine automatische Einteilung, mindestens eine manuelle Wochenzuweisung, Schutz manueller Zuweisungen und letzte Vorschlagspriorität sind strukturierte Eigenschaften der Typdefinition. | Systeme 07 bis 10 setzen Prüfung, Planung und Vorschlagsreihenfolge um. |
-| AH-Freigaben | Reguläre, nur vorschlagsfähige und kontextabhängige Freigaben bleiben getrennte strukturierte Werte. Ein einzelner Frühdienst wird für AH nie automatisch freigegeben. | Systeme 07, 09 und 10 setzen Korridor, Generierung und Lösungsvorschläge um. |
+| AH-Freigaben und Nachrang | Reguläre, nur vorschlagsfähige und kontextabhängige Freigaben bleiben getrennte strukturierte Werte. AH folgt erst nach der Nicht-AH-Planung und füllt nur verbleibende zulässige Lücken. | Systeme 07, 09 und 10 setzen Obergrenze, Berichte, Generierung und Lösungsvorschläge um. |
+| Typ1-Bürozeit | Eine Bürokennzeichnung ist nur für vorgetragenen Früh- oder Spätdienst zulässig, zählt Stunden und deckt keinen Bedarf. | Systeme 08 bis 13 bewahren, prüfen, planen, zeigen und exportieren diese Information. |
 | AH2-Springeroption | Die Freigabe für `Spr` trägt `ExplicitPlanningRunOption`; die konkrete Option ist pro Planungslauf standardmäßig ausgeschaltet. | System 09 definiert den Planungslaufeingang und wertet die Option aus. |
 | Planungseingang | Mitarbeitende, Typdefinitionen, Wochen-Soll, Planungsrichtlinie und Einsatzfreigaben werden später als unveränderliche Momentaufnahme übergeben; sichtbare Typcodes sind keine Solver-Schalter. | System 08 definiert den vollständigen Planungseingang. |
 | Wochenstundenbericht | Je Person und Montag-bis-Sonntag-Woche werden Typ, wirksames Soll, geplante Minuten, vorzeichenbehaftete Abweichung sowie AH- und Typ1-Hinweise unveränderlich bewahrt. | System 10 definiert Bericht und verständliche Darstellung; System 12 bewahrt ihn in Planversionen. |
@@ -128,10 +157,8 @@ Wichtiger technischer Anker: `Application.Employees.EmployeeTypeSnapshot` und `E
 
 ## Bewusst noch offen
 
-- genaue Reduktionsformel des Wochen-Solls bei Abwesenheit,
-- Verhalten der Typ1-Generierungsvoraussetzung bei einer vollständig abwesenden Woche,
-- konkrete Pflegeoberfläche für neue oder zu entfernende Mitarbeitertypen,
 - konkrete Darstellung des Wochenstundenberichts,
-- konkrete UI-Anordnung der Mitarbeiterverwaltung.
+- genaue spätere Bedienung der Typ1-Dienste und Bürokennzeichnung in der gemeinsamen Planansicht,
+- endgültige Excel-Zuordnung des ausgeblendeten `B` nach Charakterisierung der echten Vorlage.
 
 Diese Punkte blockieren die aktuellen System-03-Schritte und die Mitarbeiterstammdaten nicht. Sie werden vor dem jeweils betroffenen späteren Schritt festgelegt und abgenommen.

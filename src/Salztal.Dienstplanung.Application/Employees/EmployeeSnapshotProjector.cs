@@ -61,6 +61,9 @@ internal sealed class EmployeeSnapshotProjector
             employeeType.Name.Value,
             employeeType.WeeklyWorkTarget.Minutes,
             CreateWeeklyWorkTargetDisplay(employeeType.WeeklyWorkTarget.Minutes),
+            employeeType.AbsencePolicy.AllowsVacationAndSickness,
+            employeeType.AbsencePolicy.DayValue?.Minutes,
+            CreatePlanningRole(employeeType.PlanningPolicy.Role),
             employeeType.ShiftEligibilities.Select(CreateShiftEligibility));
     }
 
@@ -105,8 +108,54 @@ internal sealed class EmployeeSnapshotProjector
         return new EmployeeTypeEligibilitySnapshot(
             targetId,
             targetName,
-            isShiftPattern,
+            isShiftPattern
+                ? EmployeeTypeEligibilityTargetKind.ShiftPattern
+                : EmployeeTypeEligibilityTargetKind.ShiftType,
+            CreateEligibilityMode(eligibility.Mode),
+            CreateEligibilityActivation(eligibility.Activation),
             CreateAvailabilityDisplay(eligibility));
+    }
+
+    private static EmployeeTypePlanningRoleKind CreatePlanningRole(
+        EmployeeTypePlanningRole role)
+    {
+        return role switch
+        {
+            EmployeeTypePlanningRole.Normal => EmployeeTypePlanningRoleKind.Normal,
+            EmployeeTypePlanningRole.ServiceManagement =>
+                EmployeeTypePlanningRoleKind.ServiceManagement,
+            EmployeeTypePlanningRole.Auxiliary =>
+                EmployeeTypePlanningRoleKind.Auxiliary,
+            _ => throw new InvalidOperationException(
+                $"Unsupported employee-type planning role: {role}"),
+        };
+    }
+
+    private static EmployeeTypeEligibilityMode CreateEligibilityMode(
+        ShiftEligibilityMode mode)
+    {
+        return mode switch
+        {
+            ShiftEligibilityMode.Regular => EmployeeTypeEligibilityMode.Regular,
+            ShiftEligibilityMode.ManualSuggestion =>
+                EmployeeTypeEligibilityMode.ManualSuggestion,
+            _ => throw new InvalidOperationException(
+                $"Unsupported shift-eligibility mode: {mode}"),
+        };
+    }
+
+    private static EmployeeTypeEligibilityActivation CreateEligibilityActivation(
+        ShiftEligibilityActivation activation)
+    {
+        return activation switch
+        {
+            ShiftEligibilityActivation.Always =>
+                EmployeeTypeEligibilityActivation.Always,
+            ShiftEligibilityActivation.ExplicitPlanningRunOption =>
+                EmployeeTypeEligibilityActivation.ExplicitPlanningRunOption,
+            _ => throw new InvalidOperationException(
+                $"Unsupported shift-eligibility activation: {activation}"),
+        };
     }
 
     private static string CreateAvailabilityDisplay(

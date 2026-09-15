@@ -1,8 +1,8 @@
 # Master-Roadmap der Salztal-Dienstplanung
 
-Status: Grundfassung abgenommen am 2026-09-13; System 05 mit abgenommener Teil-Roadmap aktiv
+Status: Grundfassung abgenommen am 2026-09-13; Systeme 05 und 06 abgeschlossen
 
-Stand: 2026-09-14
+Stand: 2026-09-15
 
 ## Zweck
 
@@ -80,11 +80,13 @@ Abhängigkeiten: 01
 
 ### 03 – Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben
 
-Status: `[x]` – abgeschlossen und zur Archivierung freigegeben am 2026-09-14
+Status: `[x]` – abgeschlossen und archiviert am 2026-09-14
 
 Ziel: Mitarbeitende mit getrennten Namen, Aktivstatus und genau einem gemeinsam referenzierten Mitarbeitertyp erfassen und lokal speichern. Jeder Typ stellt sein Wochen-Soll sowie reguläre, kontextabhängige und nur vorschlagsfähige Einsatzfreigaben als strukturierte Fachwerte bereit.
 
 Teil-Roadmap: `docs/roadmaps/completed/EMPLOYEES_EMPLOYEE_TYPES_SHIFT_ELIGIBILITY_ROADMAP.md`
+
+Nachtrag: Vor System 06 erweitert dessen abgenommener Vorbereitungsteil die bereits technisch vorbereitete Mitarbeitertypenpflege um drei weitere Starttypen, den `U`-/`K`-Tageswert sowie Anlegen, Bearbeiten und referenzgeschütztes Löschen in einem eigenen Tab. Der historische Abschluss von System 03 bleibt unverändert.
 
 Abhängigkeiten: 02 und 04
 
@@ -100,21 +102,21 @@ Abhängigkeiten: 02
 
 ### 05 – Personal-, Schicht- und Stundenbedarf
 
-Status: `[~]` – BE-08 abgenommen; BE-09A und BE-09B automatisch geprüft; gemeinsame Sichtprüfung offen
+Status: `[x]` – abgeschlossen und archiviert am 2026-09-15
 
 Ziel: Standardbedarfe und datumsbezogene Ausnahmen je Einsatzort und genau einem verlangten Diensttyp mit tatsächlicher Zeit und Personenzahl erfassen; daraus Personen- und Stundenbedarf nachvollziehbar berechnen.
 
-Teil-Roadmap: `docs/roadmaps/active/STAFFING_DEMAND_ROADMAP.md`
+Teil-Roadmap: `docs/roadmaps/completed/STAFFING_DEMAND_ROADMAP.md`
 
 Abhängigkeiten: 04
 
 ### 06 – Verfügbarkeiten und Abwesenheiten
 
-Status: `[ ]`
+Status: `[x]` – vollständig geprüft, ausdrücklich abgenommen und archiviert
 
-Ziel: Verfügbarkeit, Urlaub, Krankheit, Fortbildung, Wunschfrei und zeitliche Einschränkungen für Planungszeiträume erfassen.
+Ziel: Vorbereitend Mitarbeitertypen einschließlich Abwesenheits-Tageswert und Einsatzberechtigungen pflegen; anschließend Urlaub `U`, Krankheit `K` und verbindliche rote `X` für konkrete Kalendertage in einer Drei-Wochen-Ansicht erfassen, korrigieren und lokal speichern. Fortbildung, Wunschfrei und zeitliche Einschränkungen gehören nicht zur ersten Fassung.
 
-Teil-Roadmap: vor Beginn anzulegen und abzunehmen
+Teil-Roadmap: `docs/roadmaps/completed/AVAILABILITY_ABSENCE_ROADMAP.md`
 
 Abhängigkeiten: 03
 
@@ -122,7 +124,7 @@ Abhängigkeiten: 03
 
 Status: `[ ]`
 
-Ziel: Gemeinsam bestätigte zwingende Regeln und weiche Regeln mit den Prioritäten hoch, mittel und niedrig als eine zentrale fachliche Quelle abbilden.
+Ziel: Gemeinsam bestätigte zwingende Regeln und weiche Regeln mit den Prioritäten hoch, mittel und niedrig als eine zentrale fachliche Quelle abbilden. Dazu gehören der normale Wochenkorridor, die nachgelagerte AH-Planung, höchstens zwölf AH-Stunden sowie Berichtsschwellen unter sechs und über zehn Stunden.
 
 Teil-Roadmap: vor Beginn anzulegen und abzunehmen
 
@@ -132,7 +134,7 @@ Abhängigkeiten: 03 und 04; konkrete Regeln müssen fachlich bestätigt sein
 
 Status: `[ ]`
 
-Ziel: Planungswochen von Montag bis Sonntag, mehrwöchige Zeiträume, tatsächliche Dienstzeiten, Zuweisungen, vollständig oder teilweise ungedeckten Bedarf und einzelne Sperren fachlich und lokal speicherbar machen.
+Ziel: Planungswochen von Montag bis Sonntag, mehrwöchige Zeiträume, tatsächliche Dienstzeiten, Zuweisungen, vollständig oder teilweise ungedeckten Bedarf und einzelne Sperren fachlich und lokal speicherbar machen. Vorgetragene Typ1-Früh- und Spätdienste können strukturiert als bedarfsneutrale Bürozeit gekennzeichnet werden.
 
 Teil-Roadmap: vor Beginn anzulegen und abzunehmen
 
@@ -142,7 +144,7 @@ Abhängigkeiten: 05, 06 und 07
 
 Status: `[ ]`
 
-Ziel: Aus den bestätigten Eingaben einen zulässigen bestmöglichen Plan erzeugen, zwingende Regeln unverletzt lassen, Überbesetzung verhindern und ungedeckte Zeiträume sichtbar offenlassen. Der samstägliche Springer darf nur als Notfall verwendet werden und verdeckt keine Teilunterdeckung vor seinem tatsächlichen Restaurantbeginn. Nur eine ausdrücklich gestartete Neugenerierung darf nicht gesperrte Zuweisungen neu verteilen.
+Ziel: Aus den bestätigten Eingaben einen zulässigen bestmöglichen Plan erzeugen, zwingende Regeln unverletzt lassen, Überbesetzung verhindern und ungedeckte Zeiträume sichtbar offenlassen. Zuerst werden Nicht-AH-Typen geplant; AH füllt danach nur verbleibende zulässige Lücken und verdrängt keine bereits geplante Person. Der samstägliche Springer darf nur als Notfall verwendet werden und verdeckt keine Teilunterdeckung vor seinem tatsächlichen Restaurantbeginn. Nur eine ausdrücklich gestartete Neugenerierung darf nicht gesperrte Zuweisungen neu verteilen.
 
 Teil-Roadmap: vor Beginn anzulegen und abzunehmen
 
@@ -262,4 +264,4 @@ System 16 ergänzt Zeitkonten nach gesonderter Priorisierung, ohne den Abschluss
 
 ## Nächster übergeordneter Schritt
 
-System 05 – Personal-, Schicht- und Stundenbedarf – ist aktiv. Die Wochenübersicht aus BE-08 ist sichtbar geprüft und ausdrücklich abgenommen. BE-09A trennt regelmäßige Bedarfe unter „Einsatzorte und Dienste“ von konkreten Tagesänderungen im Reiter „Bedarf“. BE-09B ergänzt wiederholbare unveränderliche Korrekturfassungen desselben Wirksamkeitsmontags, die einheitliche linke Einsatzortauswahl und eine vollständige Montag-bis-Sonntag-Ansicht. BE-09A und BE-09B sind implementiert und automatisch geprüft; als nächstes steht ihre gemeinsame sichtbare Bedienprüfung aus.
+System 06 ist fachlich, technisch und sichtbar vollständig geprüft, ausdrücklich abgenommen und archiviert. Der Gesamtnachweis bestätigt 495 Tests, einen Build ohne Warnungen oder Fehler, den aktuellen Migrationsstand, die Architekturgrenzen und die Repository-Hygiene. Für System 07 besteht bereits eine aktive Fragensammlung; sie ist noch keine Teil-Roadmap und gibt keine Implementierung frei.

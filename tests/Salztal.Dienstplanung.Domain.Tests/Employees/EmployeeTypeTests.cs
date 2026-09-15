@@ -134,6 +134,98 @@ public sealed class EmployeeTypeTests
     }
 
     [Fact]
+    public void CreateWhenAbsenceIsAllowedWithoutDayValueReturnsRequiredError()
+    {
+        EmployeeTypeValidationResult result = EmployeeType.Create(
+            Guid.NewGuid(),
+            "TypTest",
+            "Testtyp",
+            1_500,
+            true,
+            null,
+            [],
+            EmployeeTypePlanningPolicy.Standard);
+
+        EmployeeTypeValidationError error = Assert.Single(result.Errors);
+        Assert.Equal(EmployeeTypeValidationCode.AbsenceDayValueRequired, error.Code);
+    }
+
+    [Fact]
+    public void CreateWhenAbsenceIsNotAllowedWithDayValueReturnsMustNotBeSetError()
+    {
+        EmployeeTypeValidationResult result = EmployeeType.Create(
+            Guid.NewGuid(),
+            "TypTest",
+            "Testtyp",
+            1_500,
+            false,
+            300,
+            [],
+            EmployeeTypePlanningPolicy.Standard);
+
+        EmployeeTypeValidationError error = Assert.Single(result.Errors);
+        Assert.Equal(EmployeeTypeValidationCode.AbsenceDayValueMustNotBeSet, error.Code);
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(0)]
+    public void CreateWhenAbsenceDayValueIsNotPositiveReturnsError(int minutes)
+    {
+        EmployeeTypeValidationResult result = EmployeeType.Create(
+            Guid.NewGuid(),
+            "TypTest",
+            "Testtyp",
+            1_500,
+            true,
+            minutes,
+            [],
+            EmployeeTypePlanningPolicy.Standard);
+
+        EmployeeTypeValidationError error = Assert.Single(result.Errors);
+        Assert.Equal(EmployeeTypeValidationCode.AbsenceDayValueMustBePositive, error.Code);
+    }
+
+    [Theory]
+    [InlineData(AbsenceDayValue.MaximumMinutes + 1)]
+    [InlineData(int.MaxValue)]
+    public void CreateWhenAbsenceDayValueExceedsDayReturnsError(int minutes)
+    {
+        EmployeeTypeValidationResult result = EmployeeType.Create(
+            Guid.NewGuid(),
+            "TypTest",
+            "Testtyp",
+            1_500,
+            true,
+            minutes,
+            [],
+            EmployeeTypePlanningPolicy.Standard);
+
+        EmployeeTypeValidationError error = Assert.Single(result.Errors);
+        Assert.Equal(EmployeeTypeValidationCode.AbsenceDayValueExceedsDay, error.Code);
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(AbsenceDayValue.MaximumMinutes)]
+    public void CreateWhenAbsenceDayValueIsAtBoundaryPreservesMinutes(int minutes)
+    {
+        EmployeeType employeeType = Assert.IsType<EmployeeType>(
+            EmployeeType.Create(
+                Guid.NewGuid(),
+                "TypTest",
+                "Testtyp",
+                1_500,
+                true,
+                minutes,
+                [],
+                EmployeeTypePlanningPolicy.Standard).Value);
+
+        Assert.True(employeeType.AbsencePolicy.AllowsVacationAndSickness);
+        Assert.Equal(minutes, employeeType.AbsencePolicy.DayValue?.Minutes);
+    }
+
+    [Fact]
     public void EqualBasicValuesWhenCreatedSeparatelyCompareEqual()
     {
         Guid id = new("85243ccb-743f-4544-9d3c-b2b252fcb229");
@@ -167,6 +259,34 @@ public sealed class EmployeeTypeTests
         Assert.Equal(1_560, changed.WeeklyWorkTarget.Minutes);
         Assert.Equal("Teilzeit", original.Name.Value);
         Assert.Equal(1_500, original.WeeklyWorkTarget.Minutes);
+    }
+
+    [Fact]
+    public void WithDetailsWhenPlanningValuesChangePreservesIdentifierCodeAndRole()
+    {
+        EmployeeType original = InitialEmployeeTypeCatalog.Type25;
+        EmployeeTypeShiftEligibility lateShift = Assert.IsType<EmployeeTypeShiftEligibility>(
+            original.ShiftEligibilities.Single(eligibility =>
+                eligibility.ShiftTypeId == InitialShiftTypeCatalog.LateShift.Id));
+
+        EmployeeTypeValidationResult result = original.WithDetails(
+            "Restaurant angepasst",
+            1_560,
+            false,
+            null,
+            [lateShift]);
+
+        EmployeeType changed = Assert.IsType<EmployeeType>(result.Value);
+        Assert.Equal(original.Id, changed.Id);
+        Assert.Equal(original.Code, changed.Code);
+        Assert.Equal(original.PlanningPolicy, changed.PlanningPolicy);
+        Assert.Equal(EmployeeTypePlanningRole.Normal, changed.PlanningPolicy.Role);
+        Assert.False(changed.AbsencePolicy.AllowsVacationAndSickness);
+        Assert.Null(changed.AbsencePolicy.DayValue);
+        Assert.Equal([lateShift], changed.ShiftEligibilities);
+        Assert.True(original.AbsencePolicy.AllowsVacationAndSickness);
+        Assert.Equal(300, original.AbsencePolicy.DayValue?.Minutes);
+        Assert.Equal(3, original.ShiftEligibilities.Count);
     }
 
     [Fact]
