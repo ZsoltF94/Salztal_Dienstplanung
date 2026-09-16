@@ -1,10 +1,12 @@
 # Aktueller Stand
 
-Stand: 15. September 2026
+Stand: 16. September 2026
 
 ## Wo steht das Projekt?
 
 Vier fachliche Systeme sind abgeschlossen: Einsatzorte und Diensttypen, Mitarbeitende und Mitarbeitertypen, Personal-, Schicht- und Stundenbedarf sowie Verfügbarkeiten und Abwesenheiten. System 06 ist fachlich, technisch und sichtbar vollständig geprüft, ausdrücklich abgenommen und archiviert.
+
+Für System 07 sind alle Fachfragen und Folgefragen zum zentralen Regelkatalog beantwortet. Die Antworten wurden in einer Prioritätsmatrix und einer Architekturentscheidung zusammengeführt. Dieser konsolidierte Stand wartet jetzt auf die ausdrückliche Abnahme; programmiert wurde System 07 noch nicht.
 
 Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam besprochen, aufgeschrieben und abgenommen. Das Projekt ist außerdem mit einem GitHub-Repository verbunden, damit der Entwicklungsstand nachvollziehbar gespeichert werden kann.
 
@@ -283,4 +285,4 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 
 ## Nächster geplanter Schritt
 
-System 06 ist abgeschlossen. Als Nächstes kann der Verständnisabgleich für den zentralen Regelkatalog fortgesetzt werden. Erst nach beantworteten Fachfragen und einer eigenen bestätigten Teil-Roadmap darf System 07 implementiert werden.
+Als Nächstes wird der konsolidierte Regelkatalog gemeinsam abgenommen. Danach kann eine eigene kleinschrittige Teil-Roadmap für System 07 entworfen werden. Erst wenn auch diese Roadmap bestätigt ist, darf die Implementierung beginnen.

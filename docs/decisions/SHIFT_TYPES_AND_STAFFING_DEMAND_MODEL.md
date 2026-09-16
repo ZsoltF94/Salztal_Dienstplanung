@@ -1,6 +1,6 @@
 # Entscheidung: Diensttypen, tatsächliche Bedarfszeiten und Springer-Einsatz
 
-Status: Fachlich bestätigt am 2026-09-13; System 04 abgeschlossen; Mitarbeiterfreigaben am 2026-09-14 durch die System-03-Entscheidung präzisiert
+Status: Fachlich bestätigt am 2026-09-13; System 04 abgeschlossen; Mitarbeiterfreigaben am 2026-09-14 präzisiert; manuelle Zusatzbesetzung aus System 07 wartet auf Abnahme
 
 ## Anlass
 
@@ -35,7 +35,7 @@ Außerdem gibt es samstags einen Springer-Einsatz, der einen Cafeteria-Dienst mi
 - Frühere und abgenommene Planversionen behalten ihre damaligen tatsächlichen Zeiten als unveränderliche Momentaufnahme.
 - Arbeits- und Bedarfsstunden werden aus den tatsächlichen Zeiträumen berechnet, nicht aus einer gegebenenfalls abweichenden Standardzeit.
 - Die automatische Planung erfindet weder Diensttypen noch Zeitabweichungen.
-- Automatische Überbesetzung bleibt unzulässig.
+- Automatische Überbesetzung bleibt unzulässig. Nach dem konsolidierten System-07-Verständnis darf die Service-Leitung später eine zusätzliche Person manuell auf einen bereits vollständig gedeckten Dienst setzen. Der Bedarf bleibt dabei unverändert; die Abweichung wird sichtbar bestätigt und die Stunden zählen vollständig.
 
 ### Bestätigte Diensttypen und Einsatzmuster
 

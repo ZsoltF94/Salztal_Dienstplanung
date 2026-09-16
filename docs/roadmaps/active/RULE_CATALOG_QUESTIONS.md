@@ -1,14 +1,14 @@
 # Fragen und Verständnisabgleich: Regelkatalog und Prioritäten
 
-Status: Entwurf – noch nicht beantwortet oder als Grundlage für eine Roadmap freigegeben
+Status: Alle Fragen beantwortet; konsolidierter Verständnisstand zur fachlichen Abnahme vorbereitet
 
-Stand: 2026-09-15
+Stand: 2026-09-16
 
 ## Zweck
 
 Dieses Dokument sammelt die fachlichen und übergeordneten technischen Fragen für System 07 „Regelkatalog und Prioritäten“.
 
-Die Fragen können anhand ihrer Kennung im Chat oder direkt in diesem Dokument beantwortet werden. Jede Frage enthält eine Empfehlung. Eine Empfehlung ist noch keine bestätigte Fachregel. Erst nach der Beantwortung werden die Angaben auf Widersprüche, Vollständigkeit, gesetzliche beziehungsweise betriebliche Quellen und Systemgrenzen geprüft.
+Alle Fragen und Folgefragen sind beantwortet. Die ursprünglichen Antworten bleiben als Entscheidungsverlauf erhalten. Der Abschnitt „Konsolidiertes Verständnis“ fasst ihre gemeinsame Bedeutung widerspruchsfrei für die fachliche Abnahme zusammen. Bis zu dieser Abnahme ist die Zusammenfassung ein Entwurf und noch keine verbindliche Fachregel.
 
 Dieses Dokument ist noch keine Teil-Roadmap und gibt weder Implementierung noch Datenbank-, Bedien- oder Planungscode frei. System 06 ist abgeschlossen und bleibt davon unberührt.
 
@@ -269,7 +269,7 @@ Wie erkennt die spätere Planung einen Feiertag: weiterhin durch manuelle Kennze
 
 **Empfehlung:** In der ersten Fassung bei der bereits bestätigten manuellen Feiertagsbehandlung bleiben. Eine automatische Feiertagsquelle wäre eine eigene Erweiterung und benötigt mindestens das maßgebliche Bundesland sowie eine geprüfte Datenquelle.
 
-Antwort: deine empfehlung. 
+Antwort: deine empfehlung.
 
 ## C – Zeit-, Tages- und Stundenbegriffe
 
@@ -287,7 +287,7 @@ Zählen `D` und `Spr` trotz ihrer zwei Abschnitte jeweils als genau ein Arbeitst
 
 **Empfehlung:** Ja. Beide liegen nach aktuellem Modell innerhalb eines Kalendertages; ihre Arbeitsminuten werden aus den Abschnitten summiert, der Tag wird aber nur einmal gezählt.
 
-Antwort: ja 
+Antwort: ja
 
 ### C-03 – Arbeitszeit eines Einsatzes
 
@@ -390,7 +390,7 @@ Wird der Korridor in einem Drei-Wochen-Plan für jede Woche getrennt geprüft, s
 
 **Empfehlung:** Ja. Dies entspricht der bisherigen Übergabe aus System 03 und macht Abweichungen je Woche nachvollziehbar.
 
-Antwort: ja 
+Antwort: ja
 
 ### D-06 – AH-Ziel von zehn Stunden
 
@@ -414,7 +414,7 @@ Soll eine AH-Person mit weniger als sechs geplanten Stunden nur einen Hinweis er
 
 **Empfehlung:** Ja. Die bestätigte Schwelle ist eine Berichtsschwelle und keine Mindestbedingung.
 
-Antwort: ja. seviceleitung kann entscheiden wie sie damit umgeht 
+Antwort: ja. seviceleitung kann entscheiden wie sie damit umgeht
 
 ### D-09 – Typ1-Dienst je Woche
 
@@ -430,7 +430,7 @@ Zählt ein als Bürozeit markierter vorgetragener Typ1-Früh- oder Spätdienst v
 
 **Empfehlung:** Ja, wie bereits fachlich beschrieben. Die Regeldefinition sollte Bedarfswirkung und Stundenwirkung getrennt ausdrücken.
 
-Antwort: ja 
+Antwort: ja
 
 ## E – Freie Tage, Urlaub, Wochenenden und Arbeitsfolgen
 
@@ -448,7 +448,7 @@ Ist die Regel erfüllt, sobald mindestens ein zusammenhängendes Paar freier Tag
 
 **Empfehlung:** Ja. Die Regel verlangt mindestens ein Paar und begrenzt die Gesamtzahl freier Tage nicht.
 
-Antwort: ja 
+Antwort: ja
 
 ### E-03 – Anschluss an ein rotes `X`
 
@@ -456,7 +456,7 @@ Ist es gleichwertig, ob das zusätzliche schwarze `X` unmittelbar vor oder nach 
 
 **Empfehlung:** Ja. Beide Varianten erfüllen denselben weichen Wunsch. Weitere Regeln und eine stabile Verteilung entscheiden bei Gleichstand.
 
-Antwort: ja 
+Antwort: ja
 
 ### E-04 – Mehrere rote `X` in einer Woche
 
@@ -674,7 +674,7 @@ Bleibt die Reihenfolge zwingend, ungedeckten Bedarf minimieren, hoch, mittel, ni
 
 **Empfehlung:** Ja. Die Stufen werden später getrennt oder mit nachweisbar dominanten Grenzen optimiert; bloße frei gewählte Strafpunkte reichen nicht.
 
-Antwort:
+Antwort: ja
 
 ### H-02 – Regeln innerhalb derselben Priorität
 
@@ -682,7 +682,7 @@ Wie werden mehrere Regeln derselben Priorität gegeneinander abgewogen?
 
 **Empfehlung:** Jede Regel erhält ein fachlich nachvollziehbares Erfüllungsmaß. Zuerst wird die Zahl beziehungsweise das Ausmaß der Verletzungen innerhalb der Stufe minimiert; anschließend wird eine gleichmäßige Verteilung zwischen Personen bevorzugt. Keine Personennamen oder sichtbaren Typcodes als Tie-Breaker verwenden.
 
-Antwort:
+Antwort: deine empfehlung
 
 ### H-03 – Personengerechte Verteilung
 
@@ -690,7 +690,7 @@ Soll die stabile Schlussstufe vermeiden, dass dieselbe Person bei gleichwertigen
 
 **Empfehlung:** Ja, soweit dafür ausreichende strukturierte Historie vorhanden ist. Für die erste Fassung darf diese Stabilitätsregel keine höhere Priorität überstimmen.
 
-Antwort:
+Antwort: ja
 
 ### H-04 – Konflikt zwischen zwingenden Regeln
 
@@ -698,7 +698,7 @@ Was geschieht, wenn eine gesperrte manuelle Zuweisung einer anderen zwingenden R
 
 **Empfehlung:** Die Generierung nicht starten und den konkreten Widerspruch strukturiert melden. Eine Sperre darf weder stillschweigend entfernt noch eine andere Hard Rule verletzt werden.
 
-Antwort:
+Antwort: deine empfehlung
 
 ### H-05 – Manuelle Verletzung weicher Regeln
 
@@ -706,7 +706,7 @@ Darf die Service-Leitung später eine weiche Regel bewusst verletzen und den ge�
 
 **Empfehlung:** Ja, wie bereits grundsätzlich bestätigt. Vor der Abnahme bleibt die Abweichung mit Regelkennung und verständlicher Erklärung sichtbar.
 
-Antwort:
+Antwort: ja
 
 ### H-06 – Manuelle Verletzung zwingender Regeln
 
@@ -714,7 +714,7 @@ Darf die Service-Leitung später eine zwingende Regel manuell übergehen?
 
 **Empfehlung:** Nein. Wenn ein realer betrieblicher Ausnahmefall erforderlich ist, benötigt er eine eigene ausdrücklich definierte und dokumentierte Ausnahmeart; ein allgemeiner „trotzdem speichern“-Schalter wäre zu riskant.
 
-Antwort:
+Antwort: ja, die serviceleitung darf bei manueller barebeitung alle regeln brechen. Die manualle bearbeitung danach kann alles machen. es werden entsprechende Meldungen gegeben
 
 ### H-07 – Regelverletzung und Berichtshinweis
 
@@ -722,7 +722,7 @@ Soll System 07 für jede Regel bereits stabile Ergebnisarten wie erfüllt, verle
 
 **Empfehlung:** Ja. Zusätzlich werden stabile Ursachecodes und fachliche Parameter vorbereitet. Deutsche Sätze formuliert später Application beziehungsweise System 10.
 
-Antwort:
+Antwort: deine empfehlung
 
 ### H-08 – Unbekannte oder nicht übersetzte Regel
 
@@ -730,7 +730,9 @@ Blockiert eine unbekannte oder in System 09 noch nicht unterstützte Regel die G
 
 **Empfehlung:** Ja, zwingend. Andernfalls könnte die App einen scheinbar gültigen Plan erzeugen, obwohl eine bestätigte Regel ignoriert wurde.
 
-Antwort:
+Antwort: Ja. Enthält die Planungsmomentaufnahme eine unbekannte oder von der Planungsengine noch nicht unterstützte Regel, darf die automatische Generierung nicht starten beziehungsweise kein Ergebnis übernehmen. Die Regel darf niemals stillschweigend ignoriert werden.
+Die App nennt die betroffene Regel anhand ihrer stabilen Kennung und meldet verständlich, dass diese Regel technisch noch nicht verarbeitet werden kann. Ein vorhandener Plan oder Entwurf bleibt unverändert erhalten.
+Davon zu unterscheiden ist eine bekannte und korrekt umgesetzte zwingende Regel, durch die ein Bedarf nicht besetzt werden kann. In diesem Fall wird der zulässige Restplan weiterhin erzeugt und der ungedeckte Bedarf sichtbar ausgewiesen.
 
 ## I – Regelfassungen, Wirksamkeit und Nachvollziehbarkeit
 
@@ -740,7 +742,7 @@ Soll eine spätere Änderung nur neue Generierungen und noch nicht abgenommene E
 
 **Empfehlung:** Ja. Bereits abgenommene Planversionen behalten die damals verwendete Regelfassung unverändert.
 
-Antwort:
+Antwort: deine empfehlung
 
 ### I-02 – Regelmomentaufnahme
 
@@ -748,7 +750,7 @@ Soll System 08 jede verwendete Regel mit Kennung, Typ, Priorität und Parametern
 
 **Empfehlung:** Ja. Nur so bleiben Generierung, manuelle Prüfung und spätere Planversion nachvollziehbar, auch wenn sich der aktuelle Katalog ändert.
 
-Antwort:
+Antwort: ja
 
 ### I-03 – Wirksamkeitsdatum
 
@@ -756,7 +758,7 @@ Benötigen Regeln oder Prioritäten ein eigenes Wirksamkeitsdatum?
 
 **Empfehlung:** In der ersten Fassung nein, solange der Katalog nicht in der App bearbeitbar ist. Die verwendete Katalogfassung wird beim Planungslauf festgehalten. Bei späterer Bearbeitbarkeit wäre ein Wirksamkeits- und Revisionsmodell erforderlich.
 
-Antwort:
+Antwort: deine empfehlung
 
 ### I-04 – Katalogversion
 
@@ -764,7 +766,7 @@ Soll der gesamte Startkatalog eine stabile Fassung beziehungsweise Versionskennu
 
 **Empfehlung:** Ja. Eine technische Katalogversion erleichtert Migration, Diagnose und reproduzierbare Tests, ohne sichtbare Fachregeln an Dateinamen oder Programmversionen zu koppeln.
 
-Antwort:
+Antwort: deine empfehlung
 
 ### I-05 – Datenschutz in Regelmeldungen
 
@@ -772,7 +774,7 @@ Dürfen technische Protokolle Namen oder vollständige Planinhalte enthalten, we
 
 **Empfehlung:** Nein. Technische Protokolle verwenden Regelkennungen und synthetisch beziehungsweise intern referenzierbare Kennungen. Personenbezogene Erläuterungen erscheinen nur lokal in der erforderlichen Bedienansicht.
 
-Antwort:
+Antwort: deine empfehlung
 
 ## J – Gemeinsame Beispielszenarien und Abschluss
 
@@ -782,7 +784,7 @@ Ist für jede Regel mindestens je ein synthetischer Fall für erfüllt, verletzt
 
 **Empfehlung:** Als Mindestumfang ja. Zusätzlich braucht jede Regel Grenzwertfälle unmittelbar unter, auf und über ihrem Zahlenwert.
 
-Antwort:
+Antwort: deine empfehlung
 
 ### J-02 – Kombinationsszenarien
 
@@ -800,7 +802,7 @@ Welche Kombinationen müssen zwingend gemeinsam geprüft werden?
 - Typ1-Sperre beziehungsweise Bürozeit gegen Stunden- und Bedarfswirkung,
 - Sonn-/Feiertagsarbeit gegen Ersatzruhetag, soweit diese Regel in den Umfang aufgenommen wird.
 
-Antwort:
+Antwort: deine empfehlung
 
 ### J-03 – Anonymisierte betriebliche Beispiele
 
@@ -808,7 +810,7 @@ Kann die Service-Leitung für ungewöhnliche, aber wichtige Fälle kurze anonymi
 
 **Empfehlung:** Ja, ausschließlich mit Bezeichnungen wie „Person A, Typ30a“ und erfundenen Daten. Besonders wertvoll sind Fälle, in denen heute bewusst zwischen zwei nicht gleichzeitig erfüllbaren Wünschen entschieden wird.
 
-Antwort:
+Antwort: deine empfehlung
 
 ### J-04 – Vollständigkeitsbestätigung
 
@@ -816,7 +818,7 @@ Wer bestätigt am Ende, dass der Fragenkatalog alle für die erste Fassung benö
 
 **Empfehlung:** Die Service-Leitung bestätigt den praktischen Regelbestand. Gesetzliche, tarifliche und betriebsverfassungsrechtliche Einordnungen werden zusätzlich durch die dafür zuständige fachkundige Stelle bestätigt.
 
-Antwort:
+Antwort: die serviceleitung bestätigt den kompletten regelkatalog für die erste Fassung. Hier werden erstmal nur Ihre regeln berücksichtigt.
 
 ### J-05 – Freigabe für den Roadmap-Entwurf
 
@@ -831,26 +833,242 @@ Wann darf aus den Antworten eine Teil-Roadmap für System 07 erstellt werden?
 - ausschließlich synthetische Beispiele verwendet werden,
 - der Auftraggeber den beantworteten Katalog ausdrücklich als Roadmap-Grundlage freigibt.
 
-Antwort:
+Antwort: deine empfehlung
 
-## Besonders kritische Fragen vor einer Roadmap
+## K – Folgefragen aus dem Verständnisabgleich
 
-Die folgenden Punkte können Umfang oder Architektur von System 07 wesentlich verändern und sollten zuerst beantwortet werden:
+Die bisherigen Antworten sind vollständig gelesen. Die folgenden Folgefragen betreffen nur noch mehrdeutige Formulierungen, Widersprüche zwischen einzelnen Antworten oder Änderungen gegenüber den bisherigen Architektur- und Produktgrundlagen. Sie müssen vor dem Roadmap-Entwurf eindeutig beantwortet werden.
 
-1. A-02 bis A-06: Sind Regeln oder Prioritäten in der App bearbeitbar und benötigen sie deshalb UI, Speicherung und Historie?
-2. B-01 und B-02: Welche tariflichen, betrieblichen oder sonstigen verbindlichen Quellen gelten und wer bestätigt ihre Auslegung?
-3. B-07: Besitzen die bisherigen siebenstündigen Dienste eine echte Ruhepause, die bisher noch nicht im Dienstmodell abgebildet ist?
-4. D-03: Bleibt die Mindestseite des Wochenkorridors trotz möglicher Kollision mit fehlendem Bedarf zwingend?
-5. E-09: Bleibt das freie Wochenende nach Urlaub wirklich zwingend oder wird es weich mit Priorität hoch?
-6. B-09 und G-06: Welche langfristigen Sonn-/Feiertags- und Ausgleichsregeln soll die erste Fassung trotz begrenzter Historie zuverlässig prüfen?
+### K-01 – Abgrenzung von gesetzlichen und tariflichen Regeln
 
-## Nächster Schritt nach der Beantwortung
+Soll für die erste Fassung ausdrücklich gelten:
 
-Nach den Antworten werden:
+> Die App prüft ausschließlich die gemeinsam bestätigten internen Planungsregeln. Sie erhebt keinen Anspruch, die vollständige Einhaltung gesetzlicher, tariflicher, betriebsverfassungsrechtlicher oder arbeitsvertraglicher Arbeitszeitregeln zu bestätigen.
 
-1. bestätigte und noch offene Punkte getrennt,
-2. Widersprüche zwischen Regeln und bereits bestehenden Fachmodellen aufgezeigt,
-3. rechtlich begründete Regeln nur mit bestätigter Quelle als zwingend übernommen,
-4. Regelarten, Geltungsbereiche, Parameter, Prioritäten und Beispielszenarien konsolidiert,
-5. die Grenzen zu den Systemen 08 bis 12 nochmals geprüft,
-6. erst danach eine eigene kleinschrittige Teil-Roadmap für System 07 entworfen.
+**Empfehlung:** Ja. Externe Regeln dürfen später nur nach bestätigter Quelle und fachlicher Einordnung ergänzt werden. Aussagen wie „gesetzlich zulässig“ oder „tariflich vollständig geprüft“ werden in der ersten Fassung vermieden.
+
+Antwort: ja
+
+### K-02 – Gemeinte Zehn-Stunden-Ruhezeit
+
+Ist mit B-08 gemeint, dass zwischen dem Ende des letzten Arbeitsabschnitts und dem Beginn des nächsten Arbeitsabschnitts mindestens zehn zusammenhängende Stunden liegen müssen?
+
+Soll dies unabhängig von seiner rechtlichen oder tariflichen Einordnung als interne zwingende Regel der automatischen Planung gelten?
+
+**Empfehlung:** Zweimal ja, falls dies die tatsächlich gewünschte interne Planungsregel ist. Die Formulierung lautet „mindestens zehn Stunden Ruhezeit“, nicht „maximal zehn Stunden“. Ohne bestätigte Quelle wird sie nicht als vollständiger Nachweis gesetzlicher oder tariflicher Zulässigkeit bezeichnet.
+
+Antwort: nein. die ruhezeiten sollen nicht extra als regeln gelten. Die Arbeitszeiten sind von Der Serviceleitung generell so gewählt dass 10 stunden immer zutreffen. Wir müssen das nicht weiter kontrollieren.
+
+### K-03 – Keine Ersatzruhetage und Zuschläge in der ersten Fassung
+
+Soll B-09 ausschließlich bedeuten:
+
+- Ersatzruhetage werden in der ersten App-Version weder verwaltet noch geprüft,
+- Zuschläge werden ebenfalls nicht verwaltet,
+- die App behauptet nicht, dass ein Zuschlag einen möglicherweise außerhalb der App bestehenden Ersatzruhetag rechtlich ersetzt?
+
+**Empfehlung:** Ja. Zuschläge und externe Sonn-/Feiertagsregelungen bleiben vollständig außerhalb der ersten Fassung.
+
+Antwort: ja
+
+### K-04 – Zehn-Stunden-Beispiel und tägliche Höchstgrenze
+
+War bei B-06 mit der beispielhaften zehnstündigen Einteilung der Doppeldienst `D` und nicht der Springer `Spr` gemeint?
+
+Soll System 07 in der ersten Fassung keine allgemeine tägliche Höchstarbeitszeit definieren, während der bestätigte Doppeldienst mit zehn tatsächlichen Arbeitsstunden zulässig bleibt und weiterhin möglichst vermieden wird?
+
+**Empfehlung:** Zweimal ja. `Spr` behält seine tatsächlichen Abschnitte und wird nicht pauschal als zehnstündiger Einsatz behandelt.
+
+Antwort: ja
+
+### K-05 – Fachliche Einordnung der Korridorgrenzen
+
+Soll der normale Wochenkorridor für die automatische Planung wie folgt eingeordnet werden?
+
+- Die Untergrenze ist weich mit Priorität hoch. Die Automatik versucht sie zu erreichen, darf bei fehlendem zulässigem Bedarf darunterbleiben und meldet die Unterschreitung.
+- Die Obergrenze ist für die Automatik zwingend und wird automatisch niemals überschritten.
+- Beide Grenzen dürfen bei einer späteren manuellen Bearbeitung nach Warnung und ausdrücklicher Bestätigung übergangen werden.
+
+**Empfehlung:** Ja. Eine Untergrenze, die bei einer Kollision mit dem Überbesetzungsverbot verlieren darf, kann nicht zugleich eine ausnahmslos zwingende Regel sein.
+
+Antwort: ja
+
+### K-06 – Drei Stufen für automatische und manuelle Regeln
+
+Soll die App folgende drei Stufen unterscheiden?
+
+1. **Zwingend für die automatische Planung:** Die Generierung darf diese Regeln niemals verletzen.
+2. **Manuell übersteuerbare Planungsregeln:** Die Service-Leitung darf beispielsweise Wochenkorridor, AH-Obergrenze, Einsatzfreigaben, freie Tage oder Doppeldienstgrenzen nach sichtbarer Warnung und ausdrücklicher Bestätigung übergehen.
+3. **Nicht übersteuerbare Strukturregeln:** Keine zeitlichen Überschneidungen; nur vorhandene Personen, Dienste und Einsatzmuster; keine direkte Einteilung auf `U`, `K` oder rotes `X`; keine Veränderung einer abgenommenen Planversion. Ein vorhandenes Tageskennzeichen muss zuerst bewusst entfernt werden.
+
+**Empfehlung:** Ja. Ein allgemeines „alle Regeln brechen“ darf keine widersprüchlichen oder technisch ungültigen Plandaten erzeugen.
+
+Antwort:ja
+
+### K-07 – Genaue Bedeutung manueller Überbesetzung
+
+Soll manuelle Überbesetzung folgendermaßen funktionieren?
+
+- Die automatische Generierung erzeugt niemals Überbesetzung.
+- Die Service-Leitung darf bei der manuellen Bearbeitung zusätzliche Personen auf einen bereits vollständig gedeckten vorhandenen Dienst setzen.
+- Der gespeicherte Personalbedarf wird dadurch nicht geändert.
+- Jede zusätzliche Besetzung wird als Überbesetzung sichtbar gemeldet und muss vor der Abnahme ausdrücklich bestätigt werden.
+- Die zusätzlichen Personen erhalten ihre tatsächlichen Dienststunden vollständig angerechnet.
+
+**Empfehlung:** Ja. System 08 muss solche zusätzlichen manuellen Zuweisungen ausdrücklich modellieren, weil sie keinem noch freien Bedarfsplatz entsprechen.
+
+Antwort: ja
+
+### K-08 – Teildeckung nur als bestätigter Springer-Sonderfall
+
+Soll für die erste Fassung gelten:
+
+- Eine normale Zuweisung deckt immer den vollständigen tatsächlichen Zeitraum eines Bedarfsplatzes.
+- Eine Person kann außerhalb eines bestätigten Einsatzmusters nicht nur einen frei gewählten Teil übernehmen.
+- `Spr` ist die einzige Ausnahme: Der Springer deckt den Restaurant-Spätdienst erst ab seinem tatsächlichen Wechsel aus der Cafeteria.
+- Der Restaurant-Zeitraum davor bleibt ausdrücklich ungedeckt.
+
+**Empfehlung:** Ja. Dadurch wird keine allgemeine frei wählbare Teilzeitzuteilung eingeführt und der bestätigte Springer-Sonderfall bleibt sichtbar.
+
+Antwort:ja
+
+### K-09 – Unterschiedliche Wirkung von `U`, `K` und `X`
+
+Soll C-09 konkret so verstanden werden?
+
+- `U`, `K`, rote `X` und schwarze `X` unterbrechen jeweils eine Folge tatsächlicher Arbeitstage.
+- Für die Regel „zwei zusammenhängende freie Tage“ zählen rote und schwarze `X`.
+- `U` und `K` zählen nicht als die zwei regulär geplanten freien Tage.
+
+**Empfehlung:** Ja. Die vier Kennzeichen verhindern zwar jeweils einen Arbeitstag, besitzen aber für Sollreduzierung und planbare Erholung unterschiedliche fachliche Bedeutungen.
+
+Antwort: ja
+
+### K-10 – Zusammenspiel von Urlaub, rotem `X` und angrenzenden Wochenenden
+
+Ist die gemeinsame Bedeutung von E-07 bis E-09 folgende?
+
+- Ein rotes `X` garantiert einen von der Service-Leitung vorgegebenen freien Tag.
+- Ein leeres Wochenend- oder Feiertagsfeld wird nicht automatisch gesperrt.
+- Beginnt ein Urlaub am Montag, versucht die Generierung mit hoher Priorität, das unmittelbar vorherige Wochenende freizuhalten.
+- Endet ein Urlaub am Freitag, muss die automatische Planung das unmittelbar folgende Wochenende freihalten; nötigenfalls bleibt bestätigter Bedarf ungedeckt.
+- Die Service-Leitung darf diese Wochenendregel bei einer späteren manuellen Bearbeitung nach Warnung übergehen.
+
+**Empfehlung:** Ja. Eine vorherige rote Markierung bleibt die Möglichkeit, einen freien Tag unabhängig vom Optimierungsergebnis sicher vorzugeben.
+
+Antwort: ja
+
+### K-11 – Typ1 und die allgemeinen Tagesgrenzen
+
+Bedeutet „Typ1 darf überall ohne Einschränkungen eingesetzt werden“ nur, dass Typ1 für alle bestätigten Dienste und Einsatzorte berechtigt ist?
+
+Gelten für Typ1 trotzdem höchstens eine Zuweisung beziehungsweise ein zusammengesetztes Einsatzmuster pro Kalendertag und das Verbot zeitlicher Überschneidungen?
+
+**Empfehlung:** Zweimal ja. Die umfassende Einsatzberechtigung darf keine widersprüchlichen gleichzeitigen Zuweisungen erzeugen.
+
+Antwort: ja
+
+### K-12 – Benötigte Historie und faire Verteilung
+
+Soll G-05 zusammen mit B-08 und H-03 folgendermaßen gelten?
+
+- Für höchstens sieben Arbeitstage in Folge werden die unmittelbar vorausgehenden Arbeitstage benötigt.
+- Falls die interne Zehn-Stunden-Ruhezeit bestätigt wird, werden zusätzlich das Ende des letzten Arbeitsabschnitts vor dem Zeitraum und gegebenenfalls ein bereits vorhandener erster Arbeitsabschnitt danach benötigt.
+- Die personengerechte Verteilung aus H-03 wird in der ersten Fassung nur innerhalb der aktuell geplanten drei Wochen bewertet und verwendet keine längerfristige Belastungshistorie.
+
+**Empfehlung:** Ja. Eine planübergreifende faire Rotation wäre eine zusätzliche Regel mit weiterem Historienbedarf.
+
+Antwort: ja
+
+### K-13 – Prioritätsmatrix und synthetische Beispiele
+
+Ist mit der in E-12 gewünschten Matrix zunächst eine verständliche Tabelle in der System-07-Dokumentation gemeint und keine zusätzliche Bedienoberfläche?
+
+Darf die Entwicklung aus den bestätigten Regeln synthetische Beispielszenarien für J-03 entwerfen und sie anschließend der Service-Leitung zur fachlichen Prüfung vorlegen?
+
+**Empfehlung:** Zweimal ja. Die Matrix wird Bestandteil des Verständnisabgleichs und der späteren Roadmap-Grundlage; dieselben freigegebenen Beispiele werden später für Domain- und Planning-Tests verwendet.
+
+Antwort: ja
+
+### K-14 – Nur dokumentierter oder sichtbarer Regelkatalog
+
+Bei A-05 wurde die Empfehlung ohne eigene Oberfläche übernommen. Im Abschnitt „Besonders kritische Fragen“ steht zusätzlich, dass es einen Regelkatalog zur Ansicht geben kann. Soll eine schreibgeschützte Regelkatalog-Ansicht bereits zu System 07 gehören oder nur als mögliche spätere Erweiterung vorgemerkt werden?
+
+**Empfehlung:** In System 07 zunächst nur den fachlichen Katalog, den Application-Lesevertrag und die dokumentierte Prioritätsmatrix umsetzen. Eine sichtbare WPF-Ansicht erst nach gesonderter Freigabe ergänzen; andernfalls würde System 07 ein zusätzliches visuelles Abnahmegate erhalten.
+
+Antwort: ja. wir brauchen die matrizen erstmal für uns und für die Serviceleitung zur überprüfung vor der implementierung. Eine WPF ansicht brauchen wir noch nicht
+
+## Konsolidiertes Verständnis zur Abnahme
+
+Dieser Abschnitt löst die während des Fragebogens entstandenen scheinbaren Widersprüche auf. Er ersetzt nicht die Einzelantworten, sondern beschreibt ihre gemeinsame fachliche Bedeutung.
+
+### Umfang und Aussagegrenze
+
+- Die erste Fassung bildet ausschließlich die bestätigten internen Planungsregeln der Service-Leitung ab.
+- Sie prüft keine vollständige gesetzliche, tarifliche oder sonstige externe Regelkonformität und darf eine solche auch nicht behaupten.
+- Pausen, eine allgemeine tägliche Höchstarbeitszeit, Ruhezeiten zwischen Arbeitstagen, Ersatzruhetage, Zuschläge, Nachtarbeit, mehrere Arbeitgeber und besondere Personengruppen gehören nicht zum Regelkatalog der ersten Fassung.
+- Feiertage werden weiterhin manuell über die Bedarfe und Tageskennzeichen behandelt; es gibt keine externe Feiertagsquelle.
+- Der Regelkatalog ist fest definiert. Regelarten, Grenzwerte, Prioritäten und Aktivierung sind in der App nicht frei bearbeitbar und werden nicht in der Datenbank gepflegt.
+- System 07 erhält keine WPF-Regelkatalogansicht. Die Dokumentation, der fachliche Katalog und ein Application-Lesevertrag genügen für diesen Schritt.
+
+### Drei Regelwirkungen
+
+| Wirkung | Bedeutung |
+|---|---|
+| Für die Automatik zwingend | Die Generierung verletzt die Regel niemals. Ist dadurch keine zulässige Besetzung möglich, bleibt Bedarf sichtbar ungedeckt. |
+| Manuell übersteuerbare Planungsregel | Die Service-Leitung darf im Bearbeitungsmodus bewusst abweichen. Die App zeigt Regel, Auswirkung und Warnung und verlangt vor Speicherung beziehungsweise Abnahme eine ausdrückliche Bestätigung. |
+| Nicht übersteuerbare Strukturregel | Die App speichert keinen innerlich widersprüchlichen Plan. Dazu gehören zeitliche Überschneidungen, mehr als eine Zuweisung oder ein zusammengesetztes Muster pro Person und Tag, unbekannte Personen, Dienste oder Muster, eine direkte Zuweisung auf `U`, `K` oder rotes `X` sowie die Veränderung einer bereits abgenommenen Planversion. Ein Tageskennzeichen muss vor einer Zuweisung bewusst entfernt werden. |
+
+Die Service-Leitung kann damit fachliche Planungsgrenzen bewusst übergehen, aber keine technisch oder fachlich widersprüchlichen Plandaten erzeugen. Automatische und manuelle Bewertung verwenden dieselbe Regeldefinition; nur der zulässige Umgang mit einer Verletzung unterscheidet sich.
+
+### Prioritätsmatrix der automatischen Planung
+
+| Stufe | Regeln und Ziele der ersten Fassung |
+|---|---|
+| 1 – zwingend | Strukturregeln; `U`, `K` und rote `X` sperren den Tag; nur aktive Personen; Einsatzfreigaben und Laufoptionen; Typ1 nie automatisch; normaler Wochenkorridor höchstens Soll plus drei Stunden; AH höchstens zwölf Stunden; höchstens sieben Arbeitstage in Folge; Wochenende nach einem am Freitag endenden Urlaub frei; automatische Überbesetzung verboten; unbekannte oder nicht übersetzte Regeln blockieren den Lauf. |
+| 2 – Bedarfsdeckung | Innerhalb aller zwingenden Regeln vollständig ungedeckten Bedarf minimieren. Ein regulärer Bedarfsplatz wird vollständig besetzt oder bleibt vollständig ungedeckt. Nur `Spr` darf den bestätigten Restaurant-Spätdienst ab dem tatsächlichen Wechsel teilweise decken; der frühere Zeitraum bleibt sichtbar ungedeckt. |
+| 3 – hoch | Normalen Wochenkorridor mindestens Soll minus drei Stunden anstreben; zwei zusammenhängende freie Tage je Woche; ein rotes `X` möglichst zu einem freien Zweierblock ergänzen; Wochenende vor einem am Montag beginnenden Urlaub freihalten; höchstens ein `D` pro Person und Woche. |
+| 4 – mittel | Mindestens ein vollständiges freies Wochenende innerhalb der geplanten drei Wochen; Zahl der Doppeldienste zusätzlich minimieren; AH möglichst auf zehn Stunden bringen. |
+| 5 – niedrig | Derzeit ist keine eigene Regel mit niedriger Priorität bestätigt. Die Stufe bleibt Bestandteil des allgemeinen Regelmodells. |
+| 6 – Stabilität | Bei ansonsten gleichwertigen Plänen Belastungen innerhalb der aktuell geplanten drei Wochen möglichst gleichmäßig verteilen. Es wird noch keine längerfristige Fairnesshistorie verwendet. |
+
+Regeln derselben Priorität werden zunächst nach Zahl beziehungsweise Ausmaß ihrer Verletzungen und anschließend möglichst gleichmäßig zwischen Personen bewertet. Viele Regeln einer niedrigeren Stufe dürfen keine höhere Stufe überstimmen.
+
+### Manuelle Abweichungen
+
+- Manuell übersteuerbar sind insbesondere beide Seiten des normalen Wochenkorridors, die AH-Obergrenze, Einsatzfreigaben, Regeln zu freien Tagen und Urlaubswochenenden sowie die Doppeldienstgrenzen.
+- Die Service-Leitung darf zusätzliche Personen auf einen bereits vollständig gedeckten vorhandenen Dienst setzen. Der Bedarf selbst bleibt unverändert, die zusätzlichen Stunden zählen vollständig und die Überbesetzung bleibt bis zur ausdrücklichen Bestätigung sichtbar.
+- System 08 muss deshalb manuelle zusätzliche Zuweisungen unabhängig von freien Bedarfsplätzen modellieren.
+- Eine gespeicherte Regelabweichung ändert weder die Regeldefinition noch Stammdaten oder zukünftige Planungsläufe.
+
+### Stunden, Dienste und Sonderrollen
+
+- Der normale Wochenkorridor wird je Person und Montag-bis-Sonntag-Woche gegen das nach `U` und `K` wirksame Soll geprüft. Die Untergrenze ist weich mit Priorität hoch; die Obergrenze ist für die Automatik zwingend. Beide sind manuell übersteuerbar.
+- AH wird erst nach allen automatisch planbaren Nicht-AH-Typen eingesetzt. Zehn Stunden sind das mittlere Ziel; unter sechs und über zehn Stunden entstehen Hinweise; automatisch sind höchstens zwölf Stunden zulässig. Mehr als zwölf Stunden kann nur manuell und bestätigt eingetragen werden.
+- Typ1 muss in jeder nicht vollständig abwesenden Woche mindestens einen geschützten vorgetragenen Dienst besitzen, wird nie automatisch eingeteilt und ist für alle bestätigten Dienste und Einsatzorte berechtigt. Die allgemeinen Tages- und Überschneidungsgrenzen gelten trotzdem.
+- `D` bleibt mit zehn tatsächlichen Arbeitsstunden zulässig, soll höchstens einmal pro Woche vorkommen und zusätzlich minimiert werden. Eine allgemeine tägliche Höchstarbeitszeit wird in der ersten Fassung nicht geprüft.
+- `Spr` bleibt ein samstäglicher Notfalleinsatz und darf nur eine sonst verbleibende Restaurant-Unterdeckung ab dem tatsächlichen Wechsel reduzieren. Besondere laufabhängige Freigaben sind vor jedem Lauf neu und ausdrücklich zu aktivieren.
+
+### Freie Tage, Urlaub und Historie
+
+- Rote und schwarze `X` zählen als regulär freie Tage und unterbrechen eine Arbeitsfolge. `U` und `K` unterbrechen ebenfalls die Arbeitsfolge, zählen aber nicht als die zwei regulär geplanten freien Tage.
+- Ein rotes `X` ist ein von der Service-Leitung garantierter freier Tag. Wochenenden und Feiertage werden nur dann Teil eines freien Urlaubsblocks, wenn sie ausdrücklich mit rotem `X` markiert sind.
+- Beginnt `U` am Montag, wird das unmittelbar vorherige Wochenende mit hoher Priorität freigehalten. Endet `U` am Freitag, hält die Automatik das unmittelbar folgende Wochenende zwingend frei und weist nötigenfalls ungedeckten Bedarf aus. Die spätere manuelle Bearbeitung darf davon nach Warnung abweichen.
+- Für höchstens sieben Arbeitstage in Folge werden die unmittelbar vorhergehenden Arbeitstage benötigt. Weiterer Vor- oder Nachlauf ist in der ersten Fassung nicht erforderlich. Fehlt diese Historie, läuft die Planung mit einem Hinweis weiter und behauptet keine vollständige Prüfung.
+
+### Übergaben an spätere Systeme
+
+- System 08 übernimmt Regelkatalog, Katalogversion, benötigte Arbeitstagshistorie und Laufoptionen in eine unveränderliche Planungsmomentaufnahme. Es modelliert außerdem manuelle Zusatzbesetzungen.
+- System 09 übersetzt jede automatische Regel eindeutig in Solver-Bedingung oder Optimierungsziel. Unbekannte oder nicht übersetzte Regeln blockieren die Generierung sichtbar.
+- System 10 verwendet stabile Regel-, Ergebnis- und Ursachecodes für erfüllt, verletzt, nicht anwendbar und nicht vollständig prüfbar und formuliert daraus verständliche Meldungen.
+- System 11 prüft manuelle Änderungen, blockiert Strukturverletzungen und verlangt für übersteuerbare Planungsregeln eine sichtbare Bestätigung.
+- System 12 bewahrt Regelkatalogversion, verwendete Regelparameter, Laufoptionen und bestätigte manuelle Abweichungen in der unveränderlichen Planversion.
+
+Die dazugehörige Architekturentscheidung ist in `docs/decisions/RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md` als Entwurf zur Abnahme dokumentiert.
+
+## Ergebnis des Verständnisabgleichs
+
+- Alle 85 Ausgangsfragen und alle 14 Folgefragen sind beantwortet.
+- Es bestehen keine offenen fachlichen Rückfragen, die den Roadmap-Entwurf verhindern.
+- Die Konsolidierung und die neue Architekturentscheidung benötigen noch die ausdrückliche fachliche Abnahme.
+- Erst nach dieser Abnahme wird eine kleinschrittige Teil-Roadmap für System 07 entworfen und wiederum vor der Implementierung abgenommen.

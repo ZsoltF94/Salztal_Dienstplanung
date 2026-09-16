@@ -17,7 +17,7 @@ Die Architektur muss:
 - eine klassische, vollständig offline nutzbare Windows-11-App ermöglichen,
 - eine portable Auslieferung als selbstständigen `win-x64`-Ordner unterstützen,
 - die Planungsregeln unabhängig von Oberfläche und Datenbank testbar halten,
-- zwingende Regeln unverletzbar behandeln,
+- für die automatische Planung zwingende Regeln bei der Generierung unverletzbar behandeln,
 - trotz nicht besetzbarer Dienste einen brauchbaren Restplan erzeugen,
 - Konflikte fachlich verständlich erklären,
 - manuelle Änderungen ohne ungefragte Neugenerierung unterstützen,
@@ -178,11 +178,12 @@ Für Domain, Application, Planning, Infrastructure und Excel werden getrennte Te
 
 ## Eine einzige fachliche Regelquelle
 
-Jede Planungsregel wird genau einmal als unveränderliche fachliche Regeldefinition in `Domain` beschrieben. Sie enthält mindestens:
+Jede Planungsregel wird genau einmal als unveränderliche fachliche Regeldefinition in `Domain` beschrieben. Die Ausführungskontexte und Durchsetzungsstufen folgen der zur Abnahme vorbereiteten Entscheidung `docs/decisions/RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md`. Eine Regeldefinition enthält mindestens:
 
 - eine stabile Regelkennung,
 - Regelart und Geltungsbereich,
-- zwingend oder weich,
+- ihre Wirkung bei automatischer Generierung und manueller Bearbeitung,
+- zwingend oder weich für die automatische Planung,
 - bei weichen Regeln die Priorität hoch, mittel oder niedrig,
 - fachliche Parameter,
 - einen kurzen neutralen Beschreibungsschlüssel.
@@ -263,7 +264,7 @@ Ein Bedarf bezeichnet eine feste Zahl benötigter Plätze für:
 
 Der verlangte Diensttyp ist immer ein normaler Ein-Ort-Diensttyp. Doppeldienst `D` und Springer `Spr` sind zusammengesetzte Muster, die jeweils zwei getrennte Bedarfe beziehungsweise Zuweisungen verbinden und niemals selbst von einem einzelnen Bedarf verlangt werden.
 
-Der Diensttyp liefert seine Standardzeit als Ausgangswert. Die Service-Leitung darf entweder den zukünftigen Standard oder nur die tatsächliche Bedarfszeit eines konkreten Datums ändern. Die benötigten Stunden werden aus Anzahl der Plätze mal tatsächlicher Bedarfsdauer berechnet. Ein unabhängiger zweiter Stundenwert wird nicht eingegeben. Überbesetzung ist nicht zulässig.
+Der Diensttyp liefert seine Standardzeit als Ausgangswert. Die Service-Leitung darf entweder den zukünftigen Standard oder nur die tatsächliche Bedarfszeit eines konkreten Datums ändern. Die benötigten Stunden werden aus Anzahl der Plätze mal tatsächlicher Bedarfsdauer berechnet. Ein unabhängiger zweiter Stundenwert wird nicht eingegeben. Automatische Überbesetzung ist nicht zulässig. Eine später bewusst bestätigte manuelle Zusatzbesetzung verändert den Bedarf nicht und wird als eigene Planabweichung modelliert.
 
 Eine von der Standardzeit abweichende Bedarfszeit ändert den verlangten Diensttyp nicht. So kann beispielsweise ein ausdrücklich verkürzter Restaurantbedarf weiterhin genau den Diensttyp Frühdienst verlangen. Die automatische Planung darf weder einen Diensttyp noch eine Zeitabweichung selbst erfinden.
 
@@ -293,16 +294,13 @@ Während einer Berechnung liest die Engine nicht erneut aus der Datenbank. Dadur
 
 ### Gedeckter und ungedeckter Bedarf
 
-Jeder benötigte Platz mit seinem tatsächlichen Zeitraum wird abgebildet:
+Jeder normale benötigte Platz mit seinem tatsächlichen Zeitraum wird entweder durch einen zulässigen Mitarbeiter vollständig gedeckt oder vollständig als ungedeckt ausgewiesen. Frei wählbare Teilzuweisungen gehören nicht zur ersten Fassung.
 
-- durch einen zulässigen Mitarbeiter für den vollständig oder teilweise tatsächlich gedeckten Zeitraum und
-- für jeden verbleibenden Zeitraum als ausdrücklich ungedeckt.
-
-Es gibt keine zusätzlichen Plätze. So kann keine automatische Überbesetzung entstehen. Ein nur teilweise gedeckter Platz wird nicht fälschlich als vollständig besetzt gemeldet. Die Möglichkeit „ungedeckt“ verhindert zugleich, dass die gesamte Generierung wegen Personalmangels scheitert.
+Nur das bestätigte `Spr`-Muster darf den Restaurant-Spätdienst ab dem tatsächlichen Wechsel teilweise decken; jeder frühere ungedeckte Zeitraum bleibt ausdrücklich sichtbar. Die automatische Planung erzeugt weder zusätzliche Plätze noch Überbesetzung. Eine manuelle Zusatzbesetzung auf einem bereits vollständig gedeckten Dienst wird unabhängig von freien Bedarfsplätzen bewahrt, verändert den Bedarf nicht und bleibt als bestätigungspflichtige Abweichung sichtbar.
 
 ### Zwingende Regeln
 
-Zwingende Regeln werden als unverletzbare Bedingungen modelliert. Eine Person wird niemals automatisch so eingeplant, dass eine zwingende Regel verletzt wird. Ist für einen Platz keine durchgehend zulässige Besetzung vorhanden, bleibt sein tatsächlicher Zeitraum vollständig oder teilweise ungedeckt.
+Für die automatische Planung zwingende Regeln werden als unverletzbare Bedingungen modelliert. Eine Person wird niemals automatisch so eingeplant, dass eine solche Regel verletzt wird. Ist für einen normalen Platz keine durchgehend zulässige Besetzung vorhanden, bleibt sein tatsächlicher Zeitraum vollständig ungedeckt; nur beim bestätigten `Spr`-Muster ist die beschriebene Teildeckung zulässig.
 
 Gesperrte Zuweisungen sind für eine Neugenerierung ebenfalls zwingend. Widerspricht eine neue Eingabe einer Sperre, startet keine irreführende Planung; die App meldet den Widerspruch konkret.
 
@@ -319,7 +317,7 @@ Die Optimierung erfolgt hierarchisch:
 
 Die Stufen werden durch getrennte Optimierungsläufe oder nachweisbar dominante Grenzen abgesichert. Viele niedrige Wünsche dürfen zusammen niemals einen höheren Wunsch überstimmen.
 
-AH bildet eine nachgelagerte, fachlich sichtbare Planungsphase: Zuerst werden alle automatisch planbaren Nicht-AH-Typen innerhalb der Regeln verteilt. Erst danach darf AH noch ungedeckte, zulässige Plätze füllen. Die zweite Phase verdrängt keine bereits geplante Nicht-AH-Person und erzeugt keine Überbesetzung. Zehn AH-Stunden bleiben das Ziel, zwölf Stunden die zwingende Obergrenze. Unter sechs oder über zehn geplante AH-Stunden erzeugen strukturierte Berichtshinweise; die Unterschreitung von sechs Stunden ist kein Generierungsverbot.
+AH bildet eine nachgelagerte, fachlich sichtbare Planungsphase: Zuerst werden alle automatisch planbaren Nicht-AH-Typen innerhalb der Regeln verteilt. Erst danach darf AH noch ungedeckte, zulässige Plätze füllen. Die zweite Phase verdrängt keine bereits geplante Nicht-AH-Person und erzeugt keine Überbesetzung. Zehn AH-Stunden bleiben das mittlere Ziel, zwölf Stunden die zwingende Obergrenze der Automatik. Unter sechs oder über zehn geplante AH-Stunden erzeugen strukturierte Berichtshinweise; die Unterschreitung von sechs Stunden ist kein Generierungsverbot. Mehr als zwölf Stunden sind nur als später bestätigte manuelle Abweichung zulässig.
 
 ### Wiederholbarkeit und Laufzeit
 
@@ -365,6 +363,8 @@ Lösungsvorschläge sind Hinweise. Sie verändern niemals automatisch Stammdaten
 3. Fachliche Prüfungen kennzeichnen unzulässige oder bewusst übergangene Einteilungen.
 4. Beim Speichern werden Stunden, Bedarf und Konflikte neu berechnet.
 5. Es findet keine automatische vollständige Neugenerierung statt.
+
+Manuell übersteuerbare Planungsregeln dürfen nur nach sichtbarer Warnung und ausdrücklicher Bestätigung verletzt werden. Nicht übersteuerbare Strukturregeln blockieren die Änderung. Dazu gehören insbesondere zeitliche Überschneidungen, mehr als eine Zuweisung oder ein zusammengesetztes Muster pro Person und Tag, unbekannte Katalogbezüge, eine direkte Zuweisung auf `U`, `K` oder rotes `X` sowie die Veränderung einer abgenommenen Planversion.
 
 Die bestätigte manuelle Sonderzuweisung außerhalb einer normalen Einsatzfreigabe ist ein eigener, ausdrücklich zu bestätigender Vorgang. Sie ändert die Einsatzfreigabe in den Stammdaten nicht, bleibt als Warnung sichtbar und ist für die automatische Planerzeugung weiterhin unzulässig.
 
@@ -446,7 +446,7 @@ ClosedXML wird zuerst geprüft. Falls es Bestandteile nicht zuverlässig erhält
 - Farbe ist nie der einzige Informationsträger; Text und Symbole erklären denselben Zustand.
 - Cafeteria wird in der ersten Fassung gelb, das zusammengefasste Restaurant rot und der Springer-Einsatz `Spr` blau gekennzeichnet; konkrete barrierearme Farbtöne werden im UI-Schritt abgenommen.
 - Manuelle Bearbeitung benötigt einen ausdrücklichen Start- und Speichervorgang.
-- Zwingende Verstöße werden blockiert; bewusst erlaubte Abweichungen werden bestätigt und sichtbar markiert.
+- Nicht übersteuerbare Strukturverstöße werden blockiert; bewusst erlaubte Abweichungen von Planungsregeln werden bestätigt und sichtbar markiert.
 - Lange Planungs- oder Exportvorgänge blockieren die Oberfläche nicht.
 
 Konkrete Bedienabläufe und Gestaltung werden in eigenen UI-Roadmaps festgelegt.

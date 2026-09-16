@@ -1,8 +1,8 @@
 # Master-Roadmap der Salztal-Dienstplanung
 
-Status: Grundfassung abgenommen am 2026-09-13; Systeme 05 und 06 abgeschlossen
+Status: Grundfassung abgenommen am 2026-09-13; Systeme 05 und 06 abgeschlossen; System-07-Verständnis zur Abnahme konsolidiert
 
-Stand: 2026-09-15
+Stand: 2026-09-16
 
 ## Zweck
 
@@ -122,9 +122,9 @@ Abhängigkeiten: 03
 
 ### 07 – Regelkatalog und Prioritäten
 
-Status: `[ ]`
+Status: `[~]` – Fachfragen beantwortet und konsolidiert; fachliche Abnahme und Teil-Roadmap noch offen
 
-Ziel: Gemeinsam bestätigte zwingende Regeln und weiche Regeln mit den Prioritäten hoch, mittel und niedrig als eine zentrale fachliche Quelle abbilden. Dazu gehören der normale Wochenkorridor, die nachgelagerte AH-Planung, höchstens zwölf AH-Stunden sowie Berichtsschwellen unter sechs und über zehn Stunden.
+Ziel: Gemeinsam bestätigte Regeln mit ihrer Wirkung für automatische Generierung und manuelle Bearbeitung als eine zentrale fachliche Quelle abbilden. Dazu gehören nicht übersteuerbare Strukturregeln, automatische Hard Rules, weiche Regeln mit den Prioritäten hoch, mittel und niedrig, der normale Wochenkorridor, die nachgelagerte AH-Planung sowie stabile Bewertungs- und Ursachecodes. Der feste Katalog wird nicht in WPF oder SQLite gepflegt.
 
 Teil-Roadmap: vor Beginn anzulegen und abzunehmen
 
@@ -134,7 +134,7 @@ Abhängigkeiten: 03 und 04; konkrete Regeln müssen fachlich bestätigt sein
 
 Status: `[ ]`
 
-Ziel: Planungswochen von Montag bis Sonntag, mehrwöchige Zeiträume, tatsächliche Dienstzeiten, Zuweisungen, vollständig oder teilweise ungedeckten Bedarf und einzelne Sperren fachlich und lokal speicherbar machen. Vorgetragene Typ1-Früh- und Spätdienste können strukturiert als bedarfsneutrale Bürozeit gekennzeichnet werden.
+Ziel: Planungswochen von Montag bis Sonntag, mehrwöchige Zeiträume, tatsächliche Dienstzeiten, Zuweisungen, vollständig ungedeckte normale Bedarfsplätze, den bestätigten `Spr`-Teildeckungsfall und einzelne Sperren fachlich und lokal speicherbar machen. Vorgetragene Typ1-Früh- und Spätdienste können strukturiert als bedarfsneutrale Bürozeit gekennzeichnet werden. Manuelle Zusatzbesetzungen werden unabhängig von freien Bedarfsplätzen modelliert und verändern den Bedarf nicht.
 
 Teil-Roadmap: vor Beginn anzulegen und abzunehmen
 
@@ -144,7 +144,7 @@ Abhängigkeiten: 05, 06 und 07
 
 Status: `[ ]`
 
-Ziel: Aus den bestätigten Eingaben einen zulässigen bestmöglichen Plan erzeugen, zwingende Regeln unverletzt lassen, Überbesetzung verhindern und ungedeckte Zeiträume sichtbar offenlassen. Zuerst werden Nicht-AH-Typen geplant; AH füllt danach nur verbleibende zulässige Lücken und verdrängt keine bereits geplante Person. Der samstägliche Springer darf nur als Notfall verwendet werden und verdeckt keine Teilunterdeckung vor seinem tatsächlichen Restaurantbeginn. Nur eine ausdrücklich gestartete Neugenerierung darf nicht gesperrte Zuweisungen neu verteilen.
+Ziel: Aus den bestätigten Eingaben einen zulässigen bestmöglichen Plan erzeugen, automatische Hard Rules unverletzt lassen, automatische Überbesetzung verhindern und ungedeckte Zeiträume sichtbar offenlassen. Normale Zuweisungen decken einen Bedarfsplatz vollständig; nur der bestätigte `Spr`-Sonderfall erzeugt Teildeckung. Zuerst werden Nicht-AH-Typen geplant; AH füllt danach nur verbleibende zulässige Lücken und verdrängt keine bereits geplante Person. Nur eine ausdrücklich gestartete Neugenerierung darf nicht gesperrte Zuweisungen neu verteilen.
 
 Teil-Roadmap: vor Beginn anzulegen und abzunehmen
 
@@ -154,7 +154,7 @@ Abhängigkeiten: 08
 
 Status: `[ ]`
 
-Ziel: Vollständig oder teilweise ungedeckte Bedarfszeiträume und verletzte weiche Regeln mit Ursache, Priorität und hilfreichen, nicht automatisch ausgeführten Lösungsmöglichkeiten verständlich erklären.
+Ziel: Vollständig oder im `Spr`-Sonderfall teilweise ungedeckte Bedarfszeiträume, verletzte Planungsregeln, unvollständig prüfbare Regeln und bestätigungspflichtige manuelle Abweichungen mit Ursache, Priorität und hilfreichen, nicht automatisch ausgeführten Lösungsmöglichkeiten verständlich erklären.
 
 Teil-Roadmap: vor Beginn anzulegen und abzunehmen
 
@@ -164,7 +164,7 @@ Abhängigkeiten: 07 und 09
 
 Status: `[ ]`
 
-Ziel: Mitarbeitende als Zeilen und Tage als Spalten sowie eine Einsatzortansicht bereitstellen; Pläne bewusst manuell ändern, einzelne Zuweisungen sperren, prüfen und speichern, ohne eine automatische Neugenerierung auszulösen. Bewusst erlaubte manuelle Regelabweichungen bleiben sichtbar.
+Ziel: Mitarbeitende als Zeilen und Tage als Spalten sowie eine Einsatzortansicht bereitstellen; Pläne bewusst manuell ändern, einzelne Zuweisungen sperren, prüfen und speichern, ohne eine automatische Neugenerierung auszulösen. Nicht übersteuerbare Strukturverletzungen werden blockiert. Übersteuerbare Planungsregeln und manuelle Zusatzbesetzungen benötigen eine sichtbare Warnung und ausdrückliche Bestätigung und bleiben nachvollziehbar.
 
 Teil-Roadmap: vor Beginn anzulegen und abzunehmen
 
@@ -264,4 +264,4 @@ System 16 ergänzt Zeitkonten nach gesonderter Priorisierung, ohne den Abschluss
 
 ## Nächster übergeordneter Schritt
 
-System 06 ist fachlich, technisch und sichtbar vollständig geprüft, ausdrücklich abgenommen und archiviert. Der Gesamtnachweis bestätigt 495 Tests, einen Build ohne Warnungen oder Fehler, den aktuellen Migrationsstand, die Architekturgrenzen und die Repository-Hygiene. Für System 07 besteht bereits eine aktive Fragensammlung; sie ist noch keine Teil-Roadmap und gibt keine Implementierung frei.
+System 06 ist fachlich, technisch und sichtbar vollständig geprüft, ausdrücklich abgenommen und archiviert. Für System 07 sind alle Fragen und Folgefragen beantwortet. Der konsolidierte Verständnisstand und die dazugehörige Architekturentscheidung warten auf ausdrückliche Abnahme. Erst danach wird eine eigene Teil-Roadmap entworfen und abgenommen; Implementierung ist weiterhin nicht freigegeben.

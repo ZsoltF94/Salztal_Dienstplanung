@@ -240,6 +240,7 @@ Salztal.Dienstplanung.Desktop.Shared
 
 - Jede Regel besitzt eine stabile `RuleId` und einen eindeutigen Regeltyp.
 - Parameter und Priorität liegen ausschließlich in der fachlichen Regeldefinition.
+- Die Regeldefinition beschreibt zusätzlich ihre Wirkung bei automatischer Generierung und manueller Bearbeitung; eine bestätigte Abweichung erzeugt keine zweite Regelkopie.
 - UI, Datenbank und Solver dürfen keine eigenen Kopien derselben Grenzwerte führen.
 - Eine unbekannte Regel wird sichtbar abgelehnt und nie ignoriert.
 - Jede neue Regel benötigt Beispiele für erfüllt, verletzt und nicht anwendbar.
@@ -271,8 +272,8 @@ Salztal.Dienstplanung.Desktop.Shared
 - Jede Solver-Bedingung bleibt über eine fachliche Regelkennung rückverfolgbar.
 - Solver-Variablen erhalten stabile, diagnostisch hilfreiche Namen ohne echte Personennamen.
 - Unbesetzte Plätze sind ausdrückliche Modellwerte und keine technische Ausnahme.
-- Teilweise gedeckte Bedarfszeiträume behalten den ungedeckten Zeitraum als ausdrückliches fachliches Ergebnis; eine bloße Diensttypzuordnung darf ihn nicht verbergen.
-- Überbesetzung wird nicht nachträglich aus einem Ergebnis entfernt, sondern bereits im Modell ausgeschlossen.
+- Normale Bedarfsplätze werden vollständig gedeckt oder vollständig als ungedeckt ausgewiesen. Nur der bestätigte `Spr`-Sonderfall darf eine Teildeckung erzeugen; dessen früherer ungedeckter Zeitraum bleibt ein ausdrückliches fachliches Ergebnis.
+- Automatische Überbesetzung wird nicht nachträglich aus einem Ergebnis entfernt, sondern bereits im Modell ausgeschlossen. Bestätigte manuelle Zusatzbesetzungen werden getrennt von freien Bedarfsplätzen und ohne Änderung des Bedarfs modelliert.
 - Prioritätsstufen werden hierarchisch abgesichert. Beliebige magische Strafwerte ohne Dominanznachweis sind untersagt.
 - Solver-Status, Laufzeit, Version und relevante Einstellungen werden im Ergebnis dokumentiert.
 - Abbruch und Zeitüberschreitung sind reguläre Ergebnisse und keine Erfolgsmeldung.
@@ -414,8 +415,10 @@ Jede Regel benötigt mindestens:
 - Bedarf mit einer ausdrücklich von der Diensttyp-Standardzeit abweichenden tatsächlichen Zeit,
 - genau ein verlangter Diensttyp je Bedarf,
 - samstäglicher Springer-Einsatz nur als Notfall und mit sichtbar verbleibender Teilunterdeckung vor dem Einsatzortwechsel,
-- keine Überbesetzung,
-- unverletzte Hard Rules,
+- keine automatische Überbesetzung,
+- unverletzte automatische Hard Rules,
+- vollständige normale Bedarfsdeckung oder vollständig ungedeckter Platz sowie ausschließlich der bestätigte `Spr`-Teildeckungsfall,
+- blockierte Strukturverletzungen und ausdrücklich bestätigte manuelle Planungsabweichungen,
 - Prioritätsreihenfolge hoch vor mittel vor niedrig,
 - gesperrte Zuweisungen,
 - Doppeldienstbedingungen,

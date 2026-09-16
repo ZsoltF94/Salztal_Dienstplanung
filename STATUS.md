@@ -1,17 +1,17 @@
 # Projektstatus
 
-Stand: 2026-09-15
+Stand: 2026-09-16
 
-Status dieses Dokuments: Aktuell – System 06 vollständig abgeschlossen und archiviert
+Status dieses Dokuments: Aktuell – System 07 fachlich konsolidiert, Abnahme noch offen
 
 ## Aktueller Überblick
 
 | Bereich | Aktueller Stand |
 |---|---|
-| Projektphase | Systeme 05 und 06 abgeschlossen; System 07 im Verständnisabgleich |
-| Aktives System | Keine Implementierung freigegeben; für System 07 besteht nur eine Fragensammlung |
+| Projektphase | Systeme 05 und 06 abgeschlossen; System-07-Verständnis zur Abnahme konsolidiert |
+| Aktives System | Keine Implementierung freigegeben; System-07-Fragen und Folgefragen sind beantwortet |
 | Aktive Teil-Roadmap | Keine; System 06 liegt unter `docs/roadmaps/completed/AVAILABILITY_ABSENCE_ROADMAP.md` |
-| Aktueller Stand | System 06 fachlich, technisch und sichtbar abgenommen; Roadmap und Fragen archiviert |
+| Aktueller Stand | System-07-Prioritätsmatrix und Architekturentscheidung erstellt; fachliche Abnahme steht aus |
 | Zuletzt abgenommener Schritt | VA-06 – Gesamtnachweis und ausdrückliche Abnahme von System 06 |
 | Funktionsfähige App | Einsatzorte, Diensttyp-Standardzeiten, Mitarbeitende, regelmäßige Bedarfe und einzelne Tagesänderungen können im bestätigten Umfang verwaltet werden; noch keine Dienstplanfunktion |
 | Echte Mitarbeiter- oder Plandaten im Repository | Keine Daten übernommen; `dienstplan beispiel blank.jpeg` wurde als reines Beispiel ohne personenbezogene oder reale Planungsdaten bestätigt, bleibt unversioniert und wird nicht als Fachdatenquelle verwendet |
@@ -33,6 +33,12 @@ Status dieses Dokuments: Aktuell – System 06 vollständig abgeschlossen und ar
 - System 05 – Personal-, Schicht- und Stundenbedarf – ist vollständig geprüft, abgenommen und archiviert.
 
 ## Aktuell
+
+- Alle 85 Ausgangsfragen und 14 Folgefragen für System 07 sind beantwortet und in `docs/roadmaps/active/RULE_CATALOG_QUESTIONS.md` konsolidiert.
+- Die Konsolidierung unterscheidet automatische Hard Rules, manuell übersteuerbare Planungsregeln und nicht übersteuerbare Strukturregeln. Sie enthält außerdem die fachliche Prioritätsmatrix und die Übergaben an Systeme 08 bis 12.
+- `docs/decisions/RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md` dokumentiert die daraus folgende Architekturänderung als Entwurf zur Abnahme.
+- Die erste Fassung bildet nur die bestätigten internen Regeln der Service-Leitung ab und behauptet keine vollständige gesetzliche oder tarifliche Regelprüfung.
+- Noch nicht freigegeben sind die System-07-Teil-Roadmap, Implementierung, WPF-Oberfläche, Datenbankspeicherung oder Solver-Übersetzung.
 
 - Die Fachfragen für System 06 sind beantwortet und in `docs/roadmaps/completed/AVAILABILITY_ABSENCE_QUESTIONS.md` archiviert.
 - Die vollständig abgenommene Teil-Roadmap `docs/roadmaps/completed/AVAILABILITY_ABSENCE_ROADMAP.md` enthält den Mitarbeitertypen-Vorbereitungsteil und die Drei-Wochen-Erfassung.
@@ -201,7 +207,7 @@ Status dieses Dokuments: Aktuell – System 06 vollständig abgeschlossen und ar
 
 ## Noch nicht implementiert
 
-- Systeme 07 bis 14; für System 07 läuft bisher nur der Verständnisabgleich, keine Implementierung
+- Systeme 07 bis 14; für System 07 ist nur der konsolidierte Verständnisstand vorbereitet, keine Implementierung
 - System 15 – Portable Windows-Auslieferung und Endabnahme der Kernversion
 - System 16 – Zeitkonten als spätere Ausbaustufe
 
@@ -252,7 +258,7 @@ Diese Entscheidungen und die umgesetzten Code-Anker stehen in `docs/roadmaps/com
 - höchstens eine aktive Typ1-Person; vor einer späteren Planung wird genau eine aktive Person verlangt,
 - Typ1 wird manuell vorgetragen, automatisch geschützt und nur als letzte manuelle Lösung vorgeschlagen,
 - kontextabhängige Doppeldienstfreigabe für TypAH2 sowie standardmäßig ausgeschaltete Planungslaufoption für dessen Springer-Verwendung,
-- zwingender Wochenkorridor von plus/minus drei Stunden für die normalen Typen; Typ1 wird nur bewertet und gemeldet; die frühere AH-Untergrenze von sieben Stunden ist durch die System-06-Entscheidung ersetzt,
+- normaler Wochenkorridor von plus/minus drei Stunden; die Untergrenze ist weich mit Priorität hoch, die Obergrenze für die Automatik zwingend, und Typ1 wird nur bewertet und gemeldet; die frühere AH-Untergrenze von sieben Stunden ist durch die System-06-Entscheidung ersetzt,
 - unveränderlicher Wochenstundenbericht als Bestandteil jedes späteren Planungsergebnisses,
 - Mitarbeitende können deaktiviert und reaktiviert werden; eine zweite aktive Typ1-Person bleibt ausgeschlossen,
 - nur deaktivierte, noch nie fachlich verwendete Mitarbeitende können nach einer eigenen Unwiderruflichkeitswarnung endgültig gelöscht werden,
@@ -266,7 +272,7 @@ Die vollständige Fachentscheidung steht in `docs/decisions/EMPLOYEE_TYPES_AND_S
 
 - Vor der Abwesenheitserfassung werden `Typ20`, `Typ20a` und `Typ25a` mit 20, 20 beziehungsweise 25 Wochenstunden ergänzt. Ohne `a` gelten Restaurant-Frühdienst, Restaurant-Spätdienst und `D`; mit `a` zusätzlich beide Cafeteria-Dienste und `Spr`.
 - Ein Mitarbeitertypen-Tab erlaubt Codevergabe beim Anlegen sowie Bearbeiten von Name, Wochen-Soll, `U`-/`K`-Regel, normalen Dienstfreigaben und `D`-/`Spr`-Berechtigungen. Vorhandene Codes bleiben stabil.
-- Neue Typen besitzen die normale automatische Planungsrolle und den zwingenden Korridor von minus drei bis plus drei Stunden. Typ1- und AH-Stammdaten sind bearbeitbar, ihre besonderen Rollen bleiben geschützt.
+- Neue Typen besitzen die normale automatische Planungsrolle und den Korridor von minus drei bis plus drei Stunden. Die Untergrenze ist weich mit Priorität hoch, die Obergrenze für die Automatik zwingend; beide sind später manuell nur nach Warnung und Bestätigung übersteuerbar. Typ1- und AH-Stammdaten sind bearbeitbar, ihre besonderen Rollen bleiben geschützt.
 - Noch nie referenzierte normale Typen dürfen nach Sicherheitsabfrage gelöscht werden. Verwendete Typen und die benötigten Sondertypen bleiben erhalten.
 - `U` und `K` sind ganztägig, sperren die Generierung und reduzieren das Wochen-Soll um den Typ-Tageswert, mindestens auf null. Bestätigte Werte sind 4, 5, 6, 7 beziehungsweise 8 Stunden für die Typgruppen 20, 25, 30, 35 beziehungsweise Typ1.
 - Für AH sind `U` und `K` zunächst nicht auswählbar; eine krankheitsbedingte Sperre wird als rotes `X` eingetragen. Rote und schwarze `X` reduzieren das Soll nicht.
@@ -278,7 +284,7 @@ Die vollständige Fachentscheidung steht in `docs/decisions/EMPLOYEE_TYPES_AND_S
 
 ## Offene Entscheidungen für spätere Systeme
 
-- vollständige zwingende und priorisierte weiche Regeln,
+- ausdrückliche Abnahme des konsolidierten System-07-Regelkatalogs und seiner Architekturentscheidung,
 - Inhalt und Aufbau der noch bereitzustellenden Excel-Vorlage,
 - endgültige Bestätigung der Excel-Bibliothek nach dem Vorlagentest,
 - praktische Voraussetzungen der portablen Ausgabe auf dem vorgesehenen Windows-11-Rechner.
@@ -321,4 +327,4 @@ Keines dieser späteren Gates wird vorzeitig als bestanden geführt.
 
 ## Nächster minimaler Schritt
 
-System 06 ist vollständig abgenommen und unter `docs/roadmaps/completed` archiviert. Als nächster möglicher Arbeitsbereich kann der bereits begonnene Verständnisabgleich für System 07 fortgesetzt werden. Vor jeglicher Implementierung muss daraus eine eigene Teil-Roadmap entstehen und ausdrücklich abgenommen werden.
+Der konsolidierte Verständnisstand für System 07 wartet auf ausdrückliche fachliche und architektonische Abnahme. Danach ist der nächste minimale Schritt der Entwurf einer eigenen kleinschrittigen Teil-Roadmap. Vor jeglicher Implementierung muss auch diese Roadmap ausdrücklich abgenommen werden.

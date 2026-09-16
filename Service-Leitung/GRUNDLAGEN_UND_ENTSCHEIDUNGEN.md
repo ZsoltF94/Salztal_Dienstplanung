@@ -88,31 +88,32 @@ Die für die erste Fassung vollständigen Startwerte sind: Cafeteria Montag bis 
 
 ## Regeln für den Wochenplan
 
-Es wird zwei Arten von Regeln geben:
+Für den automatisch erzeugten Plan und die spätere manuelle Bearbeitung werden drei Wirkungen unterschieden:
 
-1. **Zwingende Regeln:** Diese dürfen nicht verletzt werden.
-2. **Wünsche:** Diese sollen möglichst erfüllt werden. Sie erhalten die Priorität hoch, mittel oder niedrig.
+1. **Zwingend für die Automatik:** Die automatische Planung darf diese Regeln nicht verletzen.
+2. **Manuell übersteuerbare Planungsregeln:** Die Service-Leitung darf bewusst abweichen. Die App zeigt vorher eine Warnung und verlangt eine Bestätigung.
+3. **Nicht übersteuerbare Strukturregeln:** Widersprüchliche Pläne bleiben ausgeschlossen, zum Beispiel zeitlich überlappende Dienste oder ein Dienst auf einem Tag mit `U`, `K` oder rotem `X`.
 
-Kann ein Bedarf wegen einer zwingenden Regel nicht oder nur teilweise gedeckt werden, erstellt die App trotzdem den übrigen Plan. Der vollständig oder teilweise ungedeckte Zeitraum wird deutlich angezeigt. Die App erklärt außerdem den Grund und nennt mögliche Lösungen.
+Kann ein Bedarf wegen einer zwingenden automatischen Regel nicht gedeckt werden, erstellt die App trotzdem den übrigen Plan. Ein normaler Dienst wird vollständig besetzt oder als ungedeckt angezeigt. Nur beim bestätigten Springer-Einsatz darf ein Teil des Restaurant-Spätdienstes besetzt sein; der frühere offene Zeitraum bleibt sichtbar. Die App erklärt außerdem den Grund und nennt mögliche Lösungen.
 
-Wünsche dürfen nur dann unerfüllt bleiben, wenn keine bessere erlaubte Lösung gefunden wird. Die Service-Leitung kann bei einer manuellen Änderung bewusst von einem Wunsch abweichen. Die App zeigt diese Abweichung sichtbar an.
+Wünsche erhalten die Priorität hoch, mittel oder niedrig und dürfen nur dann unerfüllt bleiben, wenn keine bessere erlaubte Lösung gefunden wird. Eine bewusst bestätigte manuelle Abweichung bleibt sichtbar und ändert die Regel für zukünftige Pläne nicht.
 
-Die konkreten Regeln werden später gemeinsam einzeln aufgeschrieben und geprüft.
+Der konkrete Regelkatalog und seine Prioritätsmatrix sind vollständig beantwortet und zur gemeinsamen Abnahme vorbereitet. Die erste Fassung prüft nur die internen Regeln der Service-Leitung und behauptet keine vollständige gesetzliche oder tarifliche Prüfung.
 
 ## Erstellen und Bearbeiten eines Plans
 
 - Die Service-Leitung wählt aus, welche Mitarbeitenden im Planungszeitraum verfügbar sind.
 - Sie bestimmt, für wie viele Wochen der Plan erstellt wird.
-- Die App erzeugt einen vollständigen Vorschlag, soweit dies mit den zwingenden Regeln möglich ist.
+- Die App erzeugt einen vollständigen Vorschlag, soweit dies mit den zwingenden Regeln der Automatik möglich ist.
 - Nicht besetzbare Dienste und andere Probleme werden verständlich erklärt.
 - Einzelne bereits passende Einteilungen können gesperrt werden.
 - Bei einer neuen automatischen Erstellung dürfen alle nicht gesperrten Einteilungen neu verteilt werden.
-- Die App plant zuerst alle normalen Nicht-AH-Typen. Erst danach setzt sie AH ausschließlich in noch offene, erlaubte Dienste ein. Weniger als sechs AH-Stunden verhindern den Plan nicht, werden aber ebenso wie mehr als zehn Stunden gemeldet. Mehr als zwölf AH-Stunden bleiben verboten.
+- Die App plant zuerst alle normalen Nicht-AH-Typen. Erst danach setzt sie AH ausschließlich in noch offene, erlaubte Dienste ein. Weniger als sechs AH-Stunden verhindern den Plan nicht, werden aber ebenso wie mehr als zehn Stunden gemeldet. Automatisch sind höchstens zwölf AH-Stunden erlaubt; eine höhere manuelle Einteilung benötigt Warnung und Bestätigung.
 - Ein manuell eingetragener Typ1-Früh- oder Spätdienst kann während der Bearbeitung mit `B` als Bürozeit markiert werden. Die Stunden zählen für Typ1, der Dienst deckt aber keinen benötigten Mitarbeiterplatz. Nach der Abnahme bleibt der zugrunde liegende Dienst sichtbar und nur das `B` verschwindet aus Plan und späterer Excel-Ausgabe.
 
 Für Änderungen gibt es einen eigenen Bearbeitungsmodus. Nach dem Speichern berechnet die App Stunden, Bedarfsdeckung und Meldungen neu. Sie erzeugt dabei nicht ungefragt einen komplett neuen Plan.
 
-Die Service-Leitung darf eine Person manuell auch außerhalb ihrer normalen Freigaben eintragen. Die App zeigt dabei eine klare Warnung.
+Die Service-Leitung darf eine Person manuell auch außerhalb ihrer normalen Freigaben oder zusätzlich auf einen bereits vollständig besetzten Dienst eintragen. Die App zeigt dabei eine klare Warnung, verlangt eine Bestätigung und verändert den gespeicherten Bedarf nicht.
 
 ## Abnahme und frühere Versionen
 

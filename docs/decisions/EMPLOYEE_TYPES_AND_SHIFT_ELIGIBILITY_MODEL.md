@@ -1,8 +1,8 @@
 # Entscheidung: Bindende Mitarbeitertypen und Einsatzfreigaben
 
-Status: Fachlich bestätigt und mit MA-01 am 2026-09-14 ausdrücklich abgenommen; Erweiterung für System 06 am 2026-09-15 bestätigt
+Status: Fachlich bestätigt und mit MA-01 am 2026-09-14 ausdrücklich abgenommen; Erweiterung für System 06 am 2026-09-15 bestätigt; Korridorpräzisierung aus System 07 wartet auf Abnahme
 
-Stand: 2026-09-15
+Stand: 2026-09-16
 
 ## Anlass
 
@@ -50,7 +50,7 @@ Ein Typ kann nur entfernt werden, wenn ihm keine aktive oder deaktivierte Person
 - Beim Anlegen werden ein eindeutiger sichtbarer Code, ein verständlicher Name, Wochen-Soll, `U`-/`K`-Regel und Einsatzfreigaben festgelegt. Der Code bleibt anschließend stabil.
 - Bearbeitbar sind Name, Wochen-Soll, Zulässigkeit und Tageswert für `U` und `K`, die Freigaben aller normalen Dienste sowie die Berechtigungen für `D` und `Spr`.
 - Änderungen wirken für alle aktuell zugeordneten Mitarbeitenden und nachfolgende Planungen. Abgenommene Planversionen bleiben unverändert; vorhandene Entwürfe werden nicht stillschweigend umgeschrieben.
-- Neu angelegte Typen sind normale automatisch planbare Typen mit einem zwingenden Wochenkorridor von minus drei bis plus drei Stunden.
+- Neu angelegte Typen sind normale automatisch planbare Typen mit einem Wochenkorridor von minus drei bis plus drei Stunden. Nach dem konsolidierten System-07-Verständnis ist die Untergrenze weich mit Priorität hoch und die Obergrenze für die Automatik zwingend; beide Grenzen sind später manuell nur nach Warnung und Bestätigung übersteuerbar.
 - Die genannten Werte und Einsatzberechtigungen von `Typ1`, `TypAH1` und `TypAH2` sind ebenfalls bearbeitbar. Ihre besonderen Planungsrollen bleiben geschützt und können in der ersten Pflegeoberfläche weder entfernt noch neu vergeben werden.
 - `Typ20`, `Typ20a` und `Typ25a` erhalten denselben normalen Wochenkorridor. Ohne `a` sind Frühdienst, Spätdienst und `D` erlaubt; mit `a` zusätzlich beide Cafeteria-Dienste und `Spr`.
 
@@ -103,12 +103,12 @@ Diese kontextabhängige Regel präzisiert und ersetzt die frühere System-04-Ann
 ### Wochen-Soll und spätere Generierung
 
 - Die Bewertung erfolgt für jede Person und jede Montag-bis-Sonntag-Woche einzeln.
-- Für alle normalen Typen einschließlich Typ20, Typ20a und Typ25a ist minus drei bis plus drei Stunden um das Soll eine zwingende äußere Grenze.
+- Für alle normalen Typen einschließlich Typ20, Typ20a und Typ25a wird minus drei bis plus drei Stunden um das Soll geprüft. Die Untergrenze ist weich mit Priorität hoch, die Obergrenze für die Automatik zwingend; beide Grenzen sind bei manueller Bearbeitung bestätigungspflichtig übersteuerbar.
 - Bei Typ1 dient dieser Korridor nur der Bewertung und Meldung; vorgetragene Dienste außerhalb des Korridors bleiben zulässig und unverändert.
 - Innerhalb aller zwingenden Grenzen wird zuerst ungedeckter Bedarf minimiert und danach die Sollabweichung minimiert.
-- AH besitzt ein Soll von zehn Stunden und eine zwingende Obergrenze von zwölf Stunden.
+- AH besitzt ein Soll von zehn Stunden und eine zwingende automatische Obergrenze von zwölf Stunden. Eine manuelle Überschreitung benötigt Warnung und Bestätigung.
 - Zuerst werden alle automatisch planbaren Nicht-AH-Typen verteilt. AH wird danach nur für verbleibende zulässige Lücken verwendet und verdrängt keine bereits geplante Nicht-AH-Person.
-- Unter sechs AH-Stunden bleibt ein Ergebnis zulässig und erzeugt eine Meldung. Mehr als zehn AH-Stunden erzeugen ebenfalls eine Meldung; mehr als zwölf Stunden bleiben unzulässig.
+- Unter sechs AH-Stunden bleibt ein Ergebnis zulässig und erzeugt eine Meldung. Mehr als zehn AH-Stunden erzeugen ebenfalls eine Meldung; automatisch bleiben mehr als zwölf Stunden unzulässig.
 - Das wegen `U` oder `K` reduzierte Soll wird in System 06 je Woche als ungekürztes Soll minus der Summe der Typ-Tageswerte berechnet, mindestens null. Rote und schwarze `X` reduzieren es nicht.
 - Tatsächliche Zuweisungszeiten bestimmen die Stunden. Bei `D` zählt die Unterbrechung nicht; bei `Spr` zählt die bestätigte zusammenhängende Einsatzzeit.
 

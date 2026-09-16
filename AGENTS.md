@@ -25,7 +25,7 @@ Eine aktuelle ausdrückliche Anweisung des Auftraggebers kann eine frühere Proj
 - Einzelbenutzer: Service-Leitung einer Rehaklinik,
 - gastronomische Einsatzorte zunächst Cafeteria und Restaurant,
 - automatische mehrwöchige Dienstplanung aus normalen Diensttypen mit bearbeitbaren Standardzeiten, zusammengesetzten Einsatzmustern und ausdrücklich festgelegten tatsächlichen Bedarfszeiten,
-- zwingende Regeln und priorisierte weiche Regeln,
+- für die automatische Planung zwingende Regeln, priorisierte weiche Regeln und später ausdrücklich bestätigbare manuelle Planungsabweichungen,
 - verständliche Konflikte und Lösungsmöglichkeiten,
 - manuelle Bearbeitung ohne ungefragte Neugenerierung,
 - unveränderliche Planversionen bei jeder Abnahme,
@@ -154,8 +154,9 @@ Eine Änderung dieser Grenzen benötigt vor ihrer Umsetzung einen dokumentierten
 - Planning übersetzt bestätigte Regelarten in Solver-Bedingungen.
 - Eine unbekannte oder nicht übersetzte Regel blockiert die Generierung sichtbar und wird niemals ignoriert.
 - Fachliche Prüfung und Solver-Übersetzung verwenden dieselben Beispielszenarien.
-- Zwingende Regeln bleiben unverletzt; bei fehlender zulässiger Besetzung bleibt der betroffene Zeitraum vollständig oder teilweise sichtbar ungedeckt.
+- Für die automatische Planung zwingende Regeln bleiben bei der Generierung unverletzt; bei fehlender zulässiger Besetzung bleibt der betroffene Zeitraum vollständig oder im bestätigten `Spr`-Sonderfall teilweise sichtbar ungedeckt.
 - Automatische Überbesetzung ist nicht erlaubt.
+- Spätere manuelle Bearbeitung darf nur ausdrücklich als übersteuerbar definierte Planungsregeln nach sichtbarer Warnung und Bestätigung verletzen. Nicht übersteuerbare Strukturregeln verhindern widersprüchliche Plandaten.
 - Optimierung erfolgt hierarchisch: ungedeckter Bedarf, hoch, mittel, niedrig, anschließend Stabilität.
 
 ## Konflikterklärung
@@ -164,7 +165,7 @@ Eine Änderung dieser Grenzen benötigt vor ihrer Umsetzung einen dokumentierten
 - Planning formuliert keine deutschen UI-Sätze.
 - Application übersetzt strukturierte Konflikte in verständliche deutsche Meldungen.
 - Desktop stellt Meldungen dar, erfindet aber keine Ursachen oder Lösungsvorschläge.
-- Vorschläge verändern niemals automatisch Regeln, Abwesenheiten, Sperren oder Stammdaten.
+- Vorschläge und bestätigte manuelle Abweichungen verändern niemals automatisch Regeln, Abwesenheiten, Sperren oder Stammdaten.
 - Konflikte werden sachlich beschrieben und geben keiner Person die Schuld.
 
 ## Datenschutz und reale Daten

@@ -4,13 +4,13 @@
 
 Dieses Dokument hält das gemeinsam bestätigte Grundverständnis, bereits getroffene Entscheidungen und noch offene Grundsatzfragen fest. Es ist noch keine technische Spezifikation und enthält bewusst noch nicht die später zu erfassenden Detailregeln für Mitarbeitertypen, Dienste und Einsatzorte.
 
-Status: Grundfassung abgenommen am 2026-09-13; Ergänzungen bis System 06 fachlich bestätigt am 2026-09-15
+Status: Grundfassung abgenommen am 2026-09-13; Ergänzungen bis System 06 fachlich bestätigt am 2026-09-15; System-07-Konsolidierung vom 2026-09-16 wartet auf Abnahme
 
 ## Ziel der App
 
 Entwickelt werden soll eine klassische Windows-Anwendung für die Service-Leitung einer Rehaklinik. Die Anwendung unterstützt die Planung der Mitarbeitenden im gastronomischen Servicebereich und erzeugt für einen wählbaren Zeitraum automatisch einen möglichst guten Wochenplan.
 
-Der erzeugte Plan muss zwingende Regeln einhalten und priorisierte Wünsche möglichst gut erfüllen. Falls keine vollständig passende Besetzung möglich ist, soll die Anwendung einen bestmöglichen Plan erstellen und jeden Konflikt konkret und verständlich erklären.
+Der automatisch erzeugte Plan muss die für die Generierung zwingenden Regeln einhalten und priorisierte Wünsche möglichst gut erfüllen. Falls keine vollständig passende Besetzung möglich ist, soll die Anwendung einen bestmöglichen Plan erstellen und jeden Konflikt konkret und verständlich erklären.
 
 Nach manueller Prüfung wird ein Plan abgenommen. Erst danach kann er in eine noch bereitzustellende Excel-Vorlage exportiert werden. Darstellung, Aufteilung und Format dieser Vorlage müssen exakt eingehalten werden.
 
@@ -43,7 +43,7 @@ Nach manueller Prüfung wird ein Plan abgenommen. Erst danach kann er in eine no
 - Eine spätere Änderung eines Typs gilt für alle ihm zugeordneten Mitarbeitenden und für nachfolgende Planungen. Bereits abgenommene Pläne bleiben unveränderliche Momentaufnahmen.
 - Die Starttypen werden vor System 06 um `Typ20`, `Typ20a` und `Typ25a` ergänzt. Typen ohne `a` besitzen nur Restaurant-Freigaben einschließlich `D`; Typen mit `a` dürfen zusätzlich in der Cafeteria und als `Spr` eingesetzt werden.
 - Mitarbeitertypen können in einem eigenen Tab angelegt und bearbeitet werden. Bearbeitbar sind Name, Wochen-Soll, Zulässigkeit und Tageswert für `U` und `K`, normale Dienstfreigaben sowie Berechtigungen für `D` und `Spr`. Der beim Anlegen vergebene eindeutige Typcode bleibt stabil.
-- Neu angelegte Typen sind normale automatisch planbare Typen mit einem zwingenden Wochenkorridor von minus drei bis plus drei Stunden. Die besonderen Planungsrollen von Typ1 und AH bleiben geschützt, während ihre bestätigten Stammdaten und Einsatzberechtigungen bearbeitbar sind.
+- Neu angelegte Typen sind normale automatisch planbare Typen mit einem Wochenkorridor von minus drei bis plus drei Stunden. Die Untergrenze ist weich mit Priorität hoch, die Obergrenze für die Automatik zwingend; beide Grenzen dürfen später manuell nur nach Warnung und Bestätigung übergangen werden. Die besonderen Planungsrollen von Typ1 und AH bleiben geschützt, während ihre bestätigten Stammdaten und Einsatzberechtigungen bearbeitbar sind.
 - Ein noch nie referenzierter normaler Typ darf nach Sicherheitsabfrage endgültig gelöscht werden. Verwendete Typen sowie die für die geschützten Typ1- und AH-Rollen benötigten Starttypen bleiben erhalten.
 - Für die erste Fassung werden keine zusätzlichen Qualifikationen benötigt. Die Einsatzmöglichkeiten werden über die Mitarbeitertypen abgebildet.
 - Deaktivierte Mitarbeitende können mit unveränderter Kennung, unveränderten Namen und unverändertem Mitarbeitertyp wieder aktiviert werden. Die Grenze von höchstens einer aktiven Typ1-Person bleibt dabei zwingend.
@@ -74,17 +74,25 @@ Nach manueller Prüfung wird ein Plan abgenommen. Erst danach kann er in eine no
 
 ### Regeln und Optimierung
 
-- Es gibt zwingende Regeln, die nicht verletzt werden dürfen.
+- Es gibt Regeln, die von der automatischen Generierung nicht verletzt werden dürfen.
 - Daneben gibt es Wünsche beziehungsweise weiche Regeln, die möglichst erfüllt werden sollen.
 - Weiche Regeln sollen priorisiert werden können.
 - Beispiele für weiche Ziele sind zwei freie Tage in Folge oder ein freies Wochenende im Monat; ihre endgültige Einordnung wird erst mit dem vollständigen Regelwerk festgelegt.
 - Wenn nicht alle Anforderungen erfüllbar sind, soll die App einen bestmöglichen Plan erzeugen.
 - Nicht erfüllte Anforderungen müssen in einer präzisen Konfliktliste erklärt werden.
 - Die Service-Leitung kann den erzeugten Vorschlag manuell bearbeiten.
+- Manuell übersteuerbare Planungsregeln dürfen dabei nur nach sichtbarer Warnung und ausdrücklicher Bestätigung verletzt werden. Nicht übersteuerbare Strukturregeln verhindern widersprüchliche Plandaten.
 - Einzelne Dienste oder Zuweisungen können gesperrt werden, damit eine erneute Generierung sie unverändert lässt.
 - Bei der automatischen Generierung werden zuerst alle Nicht-AH-Typen geplant. AH wird danach ausschließlich für verbleibende zulässige Lücken verwendet; bereits gedeckte Plätze werden nicht zugunsten von AH freigeräumt.
-- Für AH bleiben zehn Wochenstunden das Ziel und zwölf Stunden die zwingende Obergrenze. Weniger als sechs sowie mehr als zehn geplante Stunden werden im Generierungsbericht gemeldet; weniger als sechs Stunden blockieren den Plan nicht.
+- Für AH bleiben zehn Wochenstunden das Ziel und zwölf Stunden die zwingende Obergrenze der Automatik. Weniger als sechs sowie mehr als zehn geplante Stunden werden im Generierungsbericht gemeldet; weniger als sechs Stunden blockieren den Plan nicht. Mehr als zwölf Stunden ist nur als bestätigte manuelle Abweichung zulässig.
 - Ein manuell vorgetragener Typ1-Früh- oder Spätdienst kann als Bürozeit `B` gekennzeichnet werden. Seine tatsächliche Dauer zählt zu den Typ1-Wochenstunden, deckt aber keinen Personalbedarf. Nach der Abnahme bleibt der zugrunde liegende Dienst sichtbar; nur `B` wird im Plan und späteren Excel-Export ausgeblendet. Die Büroinformation bleibt intern in der unveränderlichen Planversion erhalten.
+
+### Aussagegrenze des Regelkatalogs
+
+- Die erste Fassung bildet ausschließlich die bestätigten internen Regeln der Service-Leitung ab.
+- Sie prüft keine vollständige gesetzliche, tarifliche oder sonstige externe Regelkonformität und darf diese nicht behaupten.
+- Pausen, allgemeine tägliche Höchstarbeitszeit, Ruhezeiten, Ersatzruhetage, Zuschläge, mehrere Arbeitgeber und besondere Personengruppen werden in der ersten Fassung nicht geprüft.
+- Der feste Regelkatalog, seine Prioritätsmatrix und die Abgrenzung manueller Abweichungen sind in `docs/roadmaps/active/RULE_CATALOG_QUESTIONS.md` und `docs/decisions/RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md` zur Abnahme vorbereitet. Sie geben noch keine Implementierung frei.
 
 ### Historie, Änderungen und Zeitkonten
 
@@ -155,13 +163,14 @@ Die folgenden Bereiche sollen getrennt bleiben, damit spätere Änderungen ohne 
 
 ### C. Zwingende Regeln, Wünsche und Konflikte
 
-- Eine zwingende Regel ist unverletzbar.
-- Falls dadurch ein Bedarf nicht oder nur teilweise gedeckt werden kann, wird der übrige Plan trotzdem erzeugt.
-- Jeder vollständig oder teilweise ungedeckte Bedarfszeitraum wird konkret gemeldet.
+- Eine für die automatische Planung zwingende Regel ist für die Generierung unverletzbar.
+- Falls dadurch ein Bedarf nicht gedeckt werden kann, wird der übrige Plan trotzdem erzeugt. Normale Bedarfsplätze werden vollständig besetzt oder vollständig ungedeckt ausgewiesen; nur der bestätigte `Spr`-Sonderfall darf eine sichtbare Teildeckung erzeugen.
+- Jeder vollständig oder im `Spr`-Sonderfall teilweise ungedeckte Bedarfszeitraum wird konkret gemeldet.
 - Eine Konfliktmeldung beschreibt das Problem, dessen Ursache und hilfreiche Lösungsmöglichkeiten.
 - Weiche Regeln werden mit den drei Stufen hoch, mittel und niedrig priorisiert.
 - Eine weiche Regel darf bei der automatischen Planung nur verletzt werden, wenn keine bessere zulässige Lösung gefunden wird.
 - Die Service-Leitung darf bei einer manuellen Änderung eine weiche Regel bewusst übergehen. Die App kennzeichnet die entstehende Abweichung sichtbar.
+- Auch dafür ausdrücklich freigegebene automatische Planungsgrenzen dürfen manuell nach Warnung und Bestätigung übergangen werden. Zeitliche Überschneidungen, mehr als eine Zuweisung oder ein zusammengesetztes Muster je Person und Tag, unbekannte Katalogbezüge, direkte Einteilungen auf `U`, `K` oder rotes `X` und Veränderungen abgenommener Planversionen bleiben blockiert.
 
 ### D. Planung und manuelle Bearbeitung
 
@@ -171,6 +180,7 @@ Die folgenden Bereiche sollen getrennt bleiben, damit spätere Änderungen ohne 
 - Zunächst können einzelne Dienste beziehungsweise Zuweisungen gesperrt werden. Sperren für ganze Tage, Personen oder Wochen gehören vorerst nicht zum Umfang.
 - Bei einer ausdrücklich gestarteten Neugenerierung dürfen alle nicht gesperrten Zuweisungen neu verteilt werden.
 - Die Service-Leitung darf Mitarbeitende manuell auch außerhalb ihrer normalen Einsatzfreigaben eintragen. Die App soll die Regelabweichung sichtbar kennzeichnen.
+- Die Service-Leitung darf einen vorhandenen vollständig gedeckten Dienst manuell mit einer zusätzlichen Person besetzen. Der Bedarf bleibt unverändert, die Stunden zählen vollständig und die Überbesetzung muss vor der Abnahme sichtbar bestätigt werden.
 
 ### E. Planstunden und Zeitkonten
 
@@ -242,12 +252,11 @@ Diese Versionsverwaltung ist bestätigt.
 ## Zum Zeitpunkt der Grundlagenklärung noch nicht festgelegt
 
 - konkrete Mitarbeitertypen und Vertragsmodelle; diese wurden am 2026-09-14 für System 03 fachlich bestätigt,
-- vollständige Regeln je Einsatzort,
-- gesetzliche und betriebliche zwingende Regeln,
-- Prioritäten der weichen Regeln,
+- der vollständige interne Regelkatalog und seine Prioritäten; diese wurden am 2026-09-16 für die fachliche Abnahme konsolidiert,
+- mögliche spätere gesetzliche, tarifliche oder sonstige externe Regeln außerhalb der ersten Fassung,
 - genaue Personal- und Stundenbedarfe; die Startbedarfe und Änderungsgrundsätze wurden am 2026-09-14 für System 05 fachlich bestätigt,
 - verwendete Planungs- beziehungsweise Optimierungsmethode,
 - endgültige technische Architektur,
 - Aufbau der Excel-Vorlage.
 
-Die Planungs- beziehungsweise Optimierungsmethode und die technische Architektur wurden anschließend in `ARCHITECTURE.md` festgelegt und abgenommen. Konkrete Einsatzorte, Diensttypen, Doppeldienst und Springer-Einsatz wurden am 2026-09-13 für System 04 bestätigt. Bindende Mitarbeitertypen, ihre Wochen-Sollwerte und Einsatzfreigaben wurden am 2026-09-14 für System 03 bestätigt und stehen in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`. Die vollständigen Startbedarfe, ihre Änderungswirkung und die Datumsausnahmen wurden für das am 2026-09-15 abgeschlossene System 05 bestätigt und stehen in `docs/roadmaps/completed/STAFFING_DEMAND_ROADMAP.md`. Die übrigen fachlichen Detailpunkte werden weiterhin erst vor den jeweils betroffenen Systemen gemeinsam geklärt.
+Die Planungs- beziehungsweise Optimierungsmethode und die technische Architektur wurden anschließend in `ARCHITECTURE.md` festgelegt und abgenommen. Konkrete Einsatzorte, Diensttypen, Doppeldienst und Springer-Einsatz wurden am 2026-09-13 für System 04 bestätigt. Bindende Mitarbeitertypen, ihre Wochen-Sollwerte und Einsatzfreigaben wurden am 2026-09-14 für System 03 bestätigt und stehen in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`. Die vollständigen Startbedarfe, ihre Änderungswirkung und die Datumsausnahmen wurden für das am 2026-09-15 abgeschlossene System 05 bestätigt und stehen in `docs/roadmaps/completed/STAFFING_DEMAND_ROADMAP.md`. Der interne Regelkatalog und seine manuellen Ausnahmen sind am 2026-09-16 vollständig beantwortet und konsolidiert worden, warten aber noch auf ausdrückliche Abnahme. Die übrigen fachlichen Detailpunkte werden weiterhin erst vor den jeweils betroffenen Systemen gemeinsam geklärt.
