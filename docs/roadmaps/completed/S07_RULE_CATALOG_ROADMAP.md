@@ -1,6 +1,6 @@
 # Teil-Roadmap System 07 – Regelkatalog und Prioritäten
 
-Status: Entwurf – noch nicht abgenommen und nicht zur Implementierung freigegeben
+Status: Abgeschlossen, am 2026-09-16 vollständig geprüft und ausdrücklich abgenommen
 
 Stand: 2026-09-16
 
@@ -34,11 +34,11 @@ System 07 erzeugt noch keinen Dienstplan, bewertet noch keinen vollständigen Pl
 - `docs/decisions/S07_RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md`
 - `docs/decisions/S03_EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`
 - `docs/decisions/S04_SHIFT_TYPES_AND_STAFFING_DEMAND_MODEL.md`
-- `docs/roadmaps/active/S07_RULE_CATALOG_QUESTIONS.md`
+- `docs/roadmaps/completed/S07_RULE_CATALOG_QUESTIONS.md`
 - die abgeschlossenen Roadmaps der Systeme 03 bis 06
 - ausschließlich erfundene Personen und synthetische Planungsdaten in Dokumentation und Tests
 
-Die fachliche Konsolidierung und die Architekturentscheidung für System 07 wurden am 2026-09-16 ausdrücklich abgenommen. Diese Abnahme bestätigt den Inhalt, ersetzt aber nicht die noch ausstehende Abnahme dieser Teil-Roadmap.
+Die fachliche Konsolidierung, die Architekturentscheidung und diese Teil-Roadmap für System 07 wurden am 2026-09-16 ausdrücklich abgenommen.
 
 ## Abhängigkeiten und Voraussetzungen
 
@@ -250,7 +250,7 @@ Für diese Roadmap gilt nach ihrer ausdrücklichen Abnahme die bedingte automati
 
 ### RK-01 – Fachliche Regelsprache und Ergebnisvokabular
 
-Status: `[ ]`
+Status: `[x]` – umgesetzt, automatisch geprüft und am 2026-09-16 ausdrücklich abgenommen
 
 Umfang:
 
@@ -275,7 +275,7 @@ Abnahmebedingung:
 
 ### RK-02 – Strukturregeln und automatische Hard Rules
 
-Status: `[ ]`
+Status: `[x]` – umgesetzt, automatisch geprüft und am 2026-09-16 ausdrücklich abgenommen
 
 Umfang:
 
@@ -299,7 +299,7 @@ Abnahmebedingung:
 
 ### RK-03 – Weiche Regeln, Berichtsschwellen und Stabilität
 
-Status: `[ ]`
+Status: `[x]` – umgesetzt, automatisch geprüft und am 2026-09-16 ausdrücklich abgenommen
 
 Umfang:
 
@@ -324,7 +324,7 @@ Abnahmebedingung:
 
 ### RK-04 – Vollständiger Startkatalog und Katalogversion 1
 
-Status: `[ ]`
+Status: `[x]` – umgesetzt, automatisch geprüft und am 2026-09-16 ausdrücklich abgenommen
 
 Umfang:
 
@@ -350,7 +350,7 @@ Abnahmebedingung:
 
 ### RK-05 – Unveränderlicher Application-Lesevertrag
 
-Status: `[ ]`
+Status: `[x]` – umgesetzt, automatisch geprüft und am 2026-09-16 ausdrücklich abgenommen
 
 Umfang:
 
@@ -375,7 +375,7 @@ Abnahmebedingung:
 
 ### RK-06 – Gemeinsame synthetische Beispielszenarien
 
-Status: `[ ]`
+Status: `[x]` – umgesetzt, automatisch geprüft und am 2026-09-16 fachlich ausdrücklich abgenommen
 
 Umfang:
 
@@ -401,7 +401,7 @@ Abnahmebedingung:
 
 ### RK-07 – System-07-Gesamtnachweis und Übergaben
 
-Status: `[ ]`
+Status: `[x]` – Gesamtnachweis vollständig grün und am 2026-09-16 ausdrücklich abgenommen
 
 Umfang:
 
@@ -420,6 +420,15 @@ Prüfung:
 - `dotnet format Salztal.Dienstplanung.sln --verify-no-changes --no-restore`,
 - Katalogvollständigkeit, Szenarioabdeckung, Pfade, Datenschutz und `git diff --check`,
 - bestätigtes fachliches Dokument-Gate aus RK-06.
+
+Nachweis am 2026-09-16:
+
+- gesperrte Paketwiederherstellung erfolgreich,
+- alle 13 Projekte mit 0 Warnungen und 0 Fehlern gebaut,
+- 87 fokussierte Domain-, 7 fokussierte Application- und 18 Architekturtests bestanden,
+- alle 590 vorhandenen Tests bestanden; die leeren Planning- und Excel-Testprojekte wurden mit der bestätigten Exitcode-8-Behandlung einbezogen,
+- Formatierung, Katalog- und Szenarioabdeckung, Architekturgrenzen, Dokumentpfade, Datenschutz, Artefaktsuche und `git diff --check` ohne Befund,
+- bestätigtes fachliches Dokument-Gate aus RK-06 nachgewiesen.
 
 Abnahmebedingung:
 
@@ -441,8 +450,9 @@ Abnahmebedingung:
 ## Echte externe und manuelle Gates
 
 - Die fachliche Konsolidierung und die Architekturentscheidung wurden am 2026-09-16 ausdrücklich abgenommen; dieses Gate ist bestanden.
-- Diese Teil-Roadmap selbst muss vor RK-01 ausdrücklich abgenommen werden.
-- Die synthetischen Beispielszenarien aus RK-06 benötigen eine fachliche Dokumentprüfung durch die Service-Leitung.
+- Diese Teil-Roadmap wurde am 2026-09-16 ausdrücklich abgenommen; dieses Gate ist bestanden.
+- Die synthetischen Beispielszenarien aus RK-06 wurden am 2026-09-16 fachlich ausdrücklich abgenommen; dieses Gate ist bestanden.
+- System 07 wurde nach dem vollständigen RK-07-Gesamtnachweis am 2026-09-16 ausdrücklich abgenommen; dieses Gate ist bestanden.
 - System 07 besitzt bewusst kein WPF-Gate, keine Datenbankmigration und keinen OR-Tools-Lauf.
 - Ein erfolgreicher Build ersetzt weder die fachliche Prüfung der Beispiele noch die abschließende Systemabnahme.
 - Portable Windows-Ausgabe, echter Solverbetrieb, Planbearbeitung, Excel und fachliche Endabnahme der Gesamtanwendung bleiben spätere Gates.
@@ -474,4 +484,4 @@ Nach jedem Schritt werden kurz genannt:
 
 ## Nächster minimaler Schritt
 
-Diese Roadmap ist ein Entwurf. Der nächste Schritt ist ihre fachliche und technische Prüfung durch den Auftraggeber. Erst nach ausdrücklicher Abnahme darf RK-01 beginnen. Die Abnahme der Konsolidierung allein ist keine Implementierungsfreigabe.
+System 07 und alle Schritte RK-01 bis RK-07 sind vollständig geprüft, ausdrücklich abgenommen und archiviert. Der nächste mögliche Arbeitsschritt ist die Vorbereitung einer eigenen Teil-Roadmap für System 08; System 08 wurde noch nicht begonnen.

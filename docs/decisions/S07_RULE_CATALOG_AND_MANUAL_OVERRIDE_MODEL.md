@@ -1,6 +1,6 @@
 # Entscheidung: Regelkatalog und manuelle Abweichungen
 
-Status: Fachlich und architektonisch am 2026-09-16 ausdrücklich abgenommen; noch nicht implementiert
+Status: Mit System 07 am 2026-09-16 fachlich, architektonisch und insgesamt ausdrücklich abgenommen und archiviert
 
 Stand: 2026-09-16
 
@@ -8,7 +8,7 @@ Stand: 2026-09-16
 
 Die bisherigen Grundlagen unterschieden nur zwischen zwingenden und weichen Regeln. Die vollständige Befragung für System 07 hat zusätzlich ergeben, dass die Service-Leitung bestimmte für die Automatik zwingende Planungsregeln später bewusst manuell übergehen darf, während widersprüchliche Plandaten weiterhin unmöglich bleiben müssen.
 
-Diese Entscheidung konsolidiert die beantworteten Fragen aus `docs/roadmaps/active/S07_RULE_CATALOG_QUESTIONS.md`. Sie wurde am 2026-09-16 ausdrücklich abgenommen. Die Abnahme gibt weder die System-07-Roadmap noch Implementierung frei.
+Diese Entscheidung konsolidiert die beantworteten Fragen aus `docs/roadmaps/completed/S07_RULE_CATALOG_QUESTIONS.md`. Sie wurde am 2026-09-16 ausdrücklich abgenommen. Die System-07-Teil-Roadmap wurde anschließend vollständig umgesetzt, abgenommen und archiviert.
 
 ## Entscheidung
 
@@ -105,4 +105,4 @@ Regelarten, Grenzwerte, Prioritäten und Aktivierung sind nicht frei bearbeitbar
 
 ## Abnahme
 
-Der Auftraggeber hat am 2026-09-16 bestätigt, dass diese Entscheidung und der konsolidierte Abschnitt des Fragenkatalogs das fachliche Verständnis vollständig und widerspruchsfrei wiedergeben. Auf dieser Grundlage wurde `docs/roadmaps/active/S07_RULE_CATALOG_ROADMAP.md` als eigener, noch abzunehmender Roadmap-Entwurf erstellt.
+Der Auftraggeber hat am 2026-09-16 bestätigt, dass diese Entscheidung und der konsolidierte Abschnitt des Fragenkatalogs das fachliche Verständnis vollständig und widerspruchsfrei wiedergeben. Auf dieser Grundlage wurde `docs/roadmaps/completed/S07_RULE_CATALOG_ROADMAP.md` vollständig umgesetzt, geprüft, ausdrücklich abgenommen und archiviert.

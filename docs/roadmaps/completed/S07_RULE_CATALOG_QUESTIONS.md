@@ -1,6 +1,6 @@
 # Fragen und Verständnisabgleich: Regelkatalog und Prioritäten
 
-Status: Alle Fragen beantwortet; konsolidierter Verständnisstand am 2026-09-16 ausdrücklich abgenommen
+Status: Alle Fragen beantwortet, am 2026-09-16 ausdrücklich abgenommen und mit System 07 archiviert
 
 Stand: 2026-09-16
 
@@ -1071,4 +1071,4 @@ Die dazugehörige Architekturentscheidung ist in `docs/decisions/S07_RULE_CATALO
 - Alle 85 Ausgangsfragen und alle 14 Folgefragen sind beantwortet.
 - Es bestehen keine offenen fachlichen Rückfragen, die den Roadmap-Entwurf verhindern.
 - Die Konsolidierung und die neue Architekturentscheidung wurden am 2026-09-16 ausdrücklich fachlich und architektonisch abgenommen.
-- `docs/roadmaps/active/S07_RULE_CATALOG_ROADMAP.md` ist der daraus entstandene kleinschrittige Roadmap-Entwurf. Er benötigt vor der Implementierung eine eigene ausdrückliche Abnahme.
+- `docs/roadmaps/completed/S07_RULE_CATALOG_ROADMAP.md` ist die daraus entstandene kleinschrittige Teil-Roadmap und wurde mit System 07 am 2026-09-16 vollständig abgenommen und archiviert.

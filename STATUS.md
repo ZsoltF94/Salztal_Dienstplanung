@@ -2,17 +2,17 @@
 
 Stand: 2026-09-16
 
-Status dieses Dokuments: Aktuell – System-07-Roadmap entworfen, Abnahme noch offen
+Status dieses Dokuments: Aktuell – System 07 abgeschlossen und archiviert
 
 ## Aktueller Überblick
 
 | Bereich | Aktueller Stand |
 |---|---|
-| Projektphase | Systeme 05 und 06 abgeschlossen; System-07-Roadmap im Abnahmeverfahren |
-| Aktives System | Keine Implementierung freigegeben; Roadmap-Entwurf für System 07 liegt vor |
-| Aktive Teil-Roadmap | `docs/roadmaps/active/S07_RULE_CATALOG_ROADMAP.md` – Entwurf, noch nicht abgenommen |
-| Aktueller Stand | Fachliche Konsolidierung und Architekturentscheidung abgenommen; Roadmap wartet auf Abnahme |
-| Zuletzt abgenommener Schritt | Fachliche und architektonische System-07-Konsolidierung am 2026-09-16 |
+| Projektphase | Systeme 05, 06 und 07 abgeschlossen; System 08 noch nicht begonnen |
+| Aktives System | Keines; System 07 ist abgeschlossen und archiviert |
+| Aktive Teil-Roadmap | Keine; System 08 benötigt vor Beginn eine eigene Teil-Roadmap |
+| Aktueller Stand | System 07 vollständig geprüft, ausdrücklich abgenommen und archiviert |
+| Zuletzt abgenommener Schritt | RK-07 und damit System 07 am 2026-09-16 |
 | Funktionsfähige App | Einsatzorte, Diensttyp-Standardzeiten, Mitarbeitende, regelmäßige Bedarfe und einzelne Tagesänderungen können im bestätigten Umfang verwaltet werden; noch keine Dienstplanfunktion |
 | Echte Mitarbeiter- oder Plandaten im Repository | Keine Daten übernommen; `dienstplan beispiel blank.jpeg` wurde als reines Beispiel ohne personenbezogene oder reale Planungsdaten bestätigt, bleibt unversioniert und wird nicht als Fachdatenquelle verwendet |
 
@@ -34,12 +34,19 @@ Status dieses Dokuments: Aktuell – System-07-Roadmap entworfen, Abnahme noch o
 
 ## Aktuell
 
-- Alle 85 Ausgangsfragen und 14 Folgefragen für System 07 sind beantwortet und in `docs/roadmaps/active/S07_RULE_CATALOG_QUESTIONS.md` konsolidiert.
+- Alle 85 Ausgangsfragen und 14 Folgefragen für System 07 sind beantwortet und in `docs/roadmaps/completed/S07_RULE_CATALOG_QUESTIONS.md` archiviert.
 - Die Konsolidierung unterscheidet automatische Hard Rules, manuell übersteuerbare Planungsregeln und nicht übersteuerbare Strukturregeln. Sie enthält außerdem die fachliche Prioritätsmatrix und die Übergaben an Systeme 08 bis 12.
 - Die Konsolidierung und `docs/decisions/S07_RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md` wurden am 2026-09-16 ausdrücklich fachlich und architektonisch abgenommen.
-- `docs/roadmaps/active/S07_RULE_CATALOG_ROADMAP.md` gliedert System 07 in sieben kleine Schritte von der Regelsprache bis zum Gesamtnachweis. Der Entwurf wartet auf ausdrückliche Abnahme.
+- `docs/roadmaps/completed/S07_RULE_CATALOG_ROADMAP.md` gliedert System 07 in sieben kleine Schritte von der Regelsprache bis zum Gesamtnachweis und wurde am 2026-09-16 vollständig abgenommen und archiviert.
 - Die erste Fassung bildet nur die bestätigten internen Regeln der Service-Leitung ab und behauptet keine vollständige gesetzliche oder tarifliche Regelprüfung.
-- Noch nicht freigegeben sind RK-01 und jede weitere Implementierung. WPF-Oberfläche, Datenbankspeicherung und Solver-Übersetzung gehören nicht zu System 07.
+- RK-01 führt die unveränderliche Regelsprache mit stabiler Kennung und Katalogversion, geschlossenen Wirkungs- und Prioritätswerten, typisierten Parameterbasen sowie den vier strukturierten Bewertungszuständen ein. Der Schritt wurde am 2026-09-16 ausdrücklich abgenommen.
+- RK-02 definiert alle sechs Strukturregeln und elf automatischen Hard Rules mit stabilen Kennungen, Geltungsbereichen, typisierten Grenzwerten und ihrer bestätigten manuellen Wirkung. Der Schritt wurde am 2026-09-16 ausdrücklich abgenommen.
+- RK-03 definiert alle fünf hohen und drei mittleren weichen Regeln, beide AH-Berichtsschwellen und das nachgelagerte Stabilitätsziel. Die niedrige Priorität bleibt gültig, enthält aber noch keine Regel. `U`, `K`, rote und schwarze `X` sind für Arbeitsfolgen und reguläre freie Tage typisiert getrennt. Der Schritt wurde am 2026-09-16 ausdrücklich abgenommen.
+- RK-04 führt alle 28 Definitionen in Katalogversion 1 zusammen. Reihenfolge, Eindeutigkeit, Vollständigkeit und exakte Zuordnung sind automatisch geprüft; unbekannte Kennungen und Versionen liefern strukturierte Fehler ohne stillen Standard. Der Schritt wurde am 2026-09-16 ausdrücklich abgenommen.
+- RK-05 stellt den vollständigen Katalog als unveränderlichen Application-Snapshot bereit. Der Leseablauf dupliziert keine Regelwerte, besitzt keinen Store und keinen technischen Adapter und erkennt jeden derzeit unterstützten Parametertyp ausdrücklich. Der Schritt wurde am 2026-09-16 ausdrücklich abgenommen.
+- RK-06 dokumentiert für jede der 28 Regeln je einen erfüllten, verletzten und nicht anwendbaren synthetischen Fall. Die Sieben-Tage-Regel besitzt zusätzlich den Fall einer nicht vollständig prüfbaren Vorgeschichte. Neun Kombinationsszenarien erklären die bestätigten Wechselwirkungen. Der Schritt und das fachliche Dokument-Gate wurden am 2026-09-16 ausdrücklich abgenommen.
+- RK-07 gleicht Domain-Katalog, Application-Lesevertrag, Beispielszenarien und die Übergaben an Systeme 08 bis 12 abschließend ab. Gesperrte Wiederherstellung, Build, fokussierte und vollständige Tests, Formatierung, Pfade, Datenschutz, Artefaktsuche und Diff-Hygiene sind grün. RK-07 und System 07 wurden am 2026-09-16 ausdrücklich abgenommen.
+- WPF-Oberfläche, Datenbankspeicherung und Solver-Übersetzung bleiben unverändert und gehören nicht zu System 07.
 
 - Die Fachfragen für System 06 sind beantwortet und in `docs/roadmaps/completed/S06_AVAILABILITY_ABSENCE_QUESTIONS.md` archiviert.
 - Die vollständig abgenommene Teil-Roadmap `docs/roadmaps/completed/S06_AVAILABILITY_ABSENCE_ROADMAP.md` enthält den Mitarbeitertypen-Vorbereitungsteil und die Drei-Wochen-Erfassung.
@@ -208,7 +215,7 @@ Status dieses Dokuments: Aktuell – System-07-Roadmap entworfen, Abnahme noch o
 
 ## Noch nicht implementiert
 
-- Systeme 07 bis 14; für System 07 ist nur der konsolidierte Verständnisstand vorbereitet, keine Implementierung
+- Systeme 08 bis 14; System 08 benötigt vor Beginn eine eigene Teil-Roadmap
 - System 15 – Portable Windows-Auslieferung und Endabnahme der Kernversion
 - System 16 – Zeitkonten als spätere Ausbaustufe
 
@@ -285,7 +292,7 @@ Die vollständige Fachentscheidung steht in `docs/decisions/S03_EMPLOYEE_TYPES_A
 
 ## Offene Entscheidungen für spätere Systeme
 
-- ausdrückliche Abnahme der entworfenen System-07-Teil-Roadmap,
+- ausdrückliche Sammelabnahme der automatisch weitergeführten System-07-Schritte vor dem nächsten manuellen Gate,
 - Inhalt und Aufbau der noch bereitzustellenden Excel-Vorlage,
 - endgültige Bestätigung der Excel-Bibliothek nach dem Vorlagentest,
 - praktische Voraussetzungen der portablen Ausgabe auf dem vorgesehenen Windows-11-Rechner.
@@ -294,7 +301,7 @@ Diese Entscheidungen sind für den Abschluss der Dokumentationsgrundlage noch ni
 
 ## Echte Blockaden
 
-Für die abgeschlossenen Systeme 03, 04, 05 und 06 besteht keine technische oder fachliche Blockade.
+Für die abgeschlossenen Systeme 03, 04, 05, 06 und 07 besteht keine technische oder fachliche Blockade.
 
 Das unversionierte lokale Referenzbild `dienstplan beispiel blank.jpeg` liegt weiterhin im Arbeitsordner. Die Service-Leitung hat es am 2026-09-15 als reines Beispiel ohne personenbezogene oder reale Planungsdaten bestätigt; es wurde nicht als Fachdatenquelle oder Roadmap-Anlage übernommen.
 
@@ -302,7 +309,9 @@ Die fehlende Excel-Vorlage blockiert später den Excel-Vorlagentest und System 1
 
 ## Offene Prüf- und Abnahmegates
 
-- Alle 13 Produktions- und Testprojekte kompilieren erfolgreich; 153 von 153 Application-Tests, 180 von 180 Domain-Tests, 57 von 57 Infrastructure-Tests, 88 von 88 Desktop-Tests und 17 von 17 Architekturtests bestehen. Insgesamt bestehen alle 495 vorhandenen Tests. Planning- und Excel-Testprojekte enthalten im aktuellen Ausbauzustand noch keine Tests; ihr Exitcode 8 wird beim Gesamtlauf ausdrücklich als „keine Tests vorhanden“ behandelt.
+- Alle 13 Produktions- und Testprojekte kompilieren erfolgreich; 160 von 160 Application-Tests, 267 von 267 Domain-Tests, 57 von 57 Infrastructure-Tests, 88 von 88 Desktop-Tests und 18 von 18 Architekturtests bestehen. Insgesamt bestehen alle 590 vorhandenen Tests. Planning- und Excel-Testprojekte enthalten im aktuellen Ausbauzustand noch keine Tests; ihr leerer Teststand wird beim Gesamtlauf ausdrücklich berücksichtigt.
+- RK-07 ist technisch und dokumentarisch vollständig geprüft und ausdrücklich abgenommen: `dotnet restore --locked-mode`, Build mit 0 Warnungen und 0 Fehlern, 87 fokussierte Domain-, 7 fokussierte Application- und 18 Architekturtests, der grüne Gesamtlauf mit 590 Tests, Formatprüfung, Pfad- und Artefaktsuche sowie `git diff --check` sind bestanden. Das fachliche RK-06-Dokument-Gate ist bestätigt.
+- RK-01 ist mit 38 fokussierten Domain-Tests geprüft. Sie decken gültige und ungültige Regelkennungen und Katalogversionen, alle zulässigen und unzulässigen Wirkungs-/Prioritätskombinationen, unveränderliche Wertgleichheit, typisierte Parameterbasen und alle vier Bewertungszustände ab. Der zusätzliche Architekturtest bestätigt, dass Domain keine direkte Paketabhängigkeit besitzt.
 - MT-01 ist automatisch geprüft und ausdrücklich abgenommen: Die elf Starttypen, ihre Tageswerte, Rollen und Einsatzfreigaben sowie gültige und ungültige Tageswertgrenzen sind durch fokussierte Domain-Tests abgedeckt. Der vollständige Testlauf bestätigt zusätzlich, dass die bisherigen System-03-Abläufe grün bleiben und EF keine vorgezogene Migration verlangt.
 - MT-02 ist automatisch geprüft: 22 zusätzliche Application-Tests decken den vollständigen strukturierten Lesestand, Erfolg, Validierung, Abbruch, doppelte Codes, unbekannte Katalogbezüge, geschützte Rollen, parallele Änderungen und Referenzkonflikte ab. Build, vollständiger Testlauf und Formatprüfung sind grün.
 - MT-02 wurde am 2026-09-15 ausdrücklich abgenommen.
@@ -328,4 +337,4 @@ Keines dieser späteren Gates wird vorzeitig als bestanden geführt.
 
 ## Nächster minimaler Schritt
 
-Der konsolidierte Verständnisstand und die Architekturentscheidung für System 07 sind ausdrücklich abgenommen. Der nächste minimale Schritt ist die Prüfung und ausdrückliche Abnahme von `docs/roadmaps/active/S07_RULE_CATALOG_ROADMAP.md`. Erst danach darf RK-01 beginnen.
+System 07 und alle Schritte RK-01 bis RK-07 sind vollständig geprüft, ausdrücklich abgenommen und archiviert. Als nächstes kann eine eigene Teil-Roadmap für System 08 vorbereitet und vor jeder Implementierung abgenommen werden. System 08 wurde noch nicht begonnen.

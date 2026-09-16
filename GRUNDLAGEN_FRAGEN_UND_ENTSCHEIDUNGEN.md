@@ -92,7 +92,7 @@ Nach manueller Prüfung wird ein Plan abgenommen. Erst danach kann er in eine no
 - Die erste Fassung bildet ausschließlich die bestätigten internen Regeln der Service-Leitung ab.
 - Sie prüft keine vollständige gesetzliche, tarifliche oder sonstige externe Regelkonformität und darf diese nicht behaupten.
 - Pausen, allgemeine tägliche Höchstarbeitszeit, Ruhezeiten, Ersatzruhetage, Zuschläge, mehrere Arbeitgeber und besondere Personengruppen werden in der ersten Fassung nicht geprüft.
-- Der feste Regelkatalog, seine Prioritätsmatrix und die Abgrenzung manueller Abweichungen sind in `docs/roadmaps/active/S07_RULE_CATALOG_QUESTIONS.md` und `docs/decisions/S07_RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md` abgenommen. Die Umsetzung benötigt weiterhin eine eigene abgenommene Teil-Roadmap.
+- Der feste Regelkatalog, seine Prioritätsmatrix und die Abgrenzung manueller Abweichungen sind in `docs/roadmaps/completed/S07_RULE_CATALOG_QUESTIONS.md` und `docs/decisions/S07_RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md` abgenommen. Die zugehörige Teil-Roadmap wurde am 2026-09-16 vollständig abgenommen und unter `docs/roadmaps/completed/S07_RULE_CATALOG_ROADMAP.md` archiviert.
 
 ### Historie, Änderungen und Zeitkonten
 

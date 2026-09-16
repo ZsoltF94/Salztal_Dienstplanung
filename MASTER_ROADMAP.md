@@ -1,6 +1,6 @@
 # Master-Roadmap der Salztal-Dienstplanung
 
-Status: Grundfassung abgenommen am 2026-09-13; Systeme 05 und 06 abgeschlossen; System-07-Roadmap im Entwurf
+Status: Grundfassung abgenommen am 2026-09-13; Systeme 05, 06 und 07 abgeschlossen
 
 Stand: 2026-09-16
 
@@ -122,11 +122,11 @@ Abhängigkeiten: 03
 
 ### 07 – Regelkatalog und Prioritäten
 
-Status: `[~]` – Fachliche Grundlage abgenommen; Teil-Roadmap entworfen und noch nicht abgenommen
+Status: `[x]` – vollständig geprüft, ausdrücklich abgenommen und archiviert am 2026-09-16
 
 Ziel: Gemeinsam bestätigte Regeln mit ihrer Wirkung für automatische Generierung und manuelle Bearbeitung als eine zentrale fachliche Quelle abbilden. Dazu gehören nicht übersteuerbare Strukturregeln, automatische Hard Rules, weiche Regeln mit den Prioritäten hoch, mittel und niedrig, der normale Wochenkorridor, die nachgelagerte AH-Planung sowie stabile Bewertungs- und Ursachecodes. Der feste Katalog wird nicht in WPF oder SQLite gepflegt.
 
-Teil-Roadmap: `docs/roadmaps/active/S07_RULE_CATALOG_ROADMAP.md` – Entwurf, noch nicht abgenommen
+Teil-Roadmap: `docs/roadmaps/completed/S07_RULE_CATALOG_ROADMAP.md`
 
 Abhängigkeiten: 03, 04, 05 und 06; fachliche Regeln sind bestätigt
 
@@ -264,4 +264,4 @@ System 16 ergänzt Zeitkonten nach gesonderter Priorisierung, ohne den Abschluss
 
 ## Nächster übergeordneter Schritt
 
-System 06 ist fachlich, technisch und sichtbar vollständig geprüft, ausdrücklich abgenommen und archiviert. Der konsolidierte Verständnisstand und die Architekturentscheidung für System 07 wurden am 2026-09-16 ausdrücklich abgenommen. `docs/roadmaps/active/S07_RULE_CATALOG_ROADMAP.md` liegt als kleinschrittiger Entwurf vor und wartet auf eigene Abnahme; Implementierung ist weiterhin nicht freigegeben.
+System 07 ist fachlich, technisch und dokumentarisch vollständig geprüft, am 2026-09-16 ausdrücklich abgenommen und archiviert. Der nächste mögliche übergeordnete Schritt ist die Vorbereitung einer eigenen Teil-Roadmap für System 08; System 08 wurde noch nicht begonnen.

@@ -4,9 +4,9 @@ Stand: 16. September 2026
 
 ## Wo steht das Projekt?
 
-Vier fachliche Systeme sind abgeschlossen: Einsatzorte und Diensttypen, Mitarbeitende und Mitarbeitertypen, Personal-, Schicht- und Stundenbedarf sowie Verfügbarkeiten und Abwesenheiten. System 06 ist fachlich, technisch und sichtbar vollständig geprüft, ausdrücklich abgenommen und archiviert.
+Fünf fachliche Systeme sind abgeschlossen: Einsatzorte und Diensttypen, Mitarbeitende und Mitarbeitertypen, Personal-, Schicht- und Stundenbedarf, Verfügbarkeiten und Abwesenheiten sowie der zentrale Regelkatalog.
 
-Für System 07 sind alle Fachfragen und Folgefragen zum zentralen Regelkatalog beantwortet. Die Antworten wurden in einer Prioritätsmatrix und einer Architekturentscheidung zusammengeführt und am 16. September 2026 ausdrücklich bestätigt. Eine kleinschrittige Roadmap mit sieben Schritten ist jetzt als Entwurf vorbereitet; programmiert wurde System 07 noch nicht.
+System 07 ist fachlich, technisch und dokumentarisch vollständig geprüft, am 16. September 2026 ausdrücklich abgenommen und archiviert. Alle 28 bestätigten Regeln sind in der festen Katalogversion 1 vollständig, unveränderlich und eindeutig sortiert zusammengeführt. Die Anwendung kann den vollständigen Katalog als unveränderliche Momentaufnahme lesen, ohne Datenbank oder Bedienoberfläche. Die gemeinsamen erfundenen Beispiele und neun Kombinationsfälle sind fachlich bestätigt. System 08 wurde noch nicht begonnen.
 
 Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam besprochen, aufgeschrieben und abgenommen. Das Projekt ist außerdem mit einem GitHub-Repository verbunden, damit der Entwicklungsstand nachvollziehbar gespeichert werden kann.
 
@@ -278,11 +278,11 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 ## Abschließender System-06-Nachweis
 
 - Alle 13 Projekte lassen sich ohne Warnung und ohne Fehler erstellen.
-- Alle 495 vorhandenen automatischen Prüfungen sind grün. Die später benötigten Planning- und Excel-Prüfprojekte sind noch leer und melden dies erwartungsgemäß.
+- Alle 590 vorhandenen automatischen Prüfungen sind grün. Die später benötigten Planning- und Excel-Prüfprojekte sind weiterhin leer und werden im Gesamtlauf berücksichtigt.
 - Datenbankmigrationen, Architekturgrenzen, Formatierung und Dokumentpfade sind geprüft.
 - Im Projektordner liegen keine Datenbanken, Sicherungen oder Exporte mit Anwendungsdaten. Das bestätigte Beispielbild bleibt unversioniert.
 - Die späteren Übergaben für Regelkatalog, Planmomentaufnahme, Generierung, Berichte, Bearbeitung, Planversionen und Excel sind klar getrennt dokumentiert.
 
 ## Nächster geplanter Schritt
 
-Als Nächstes wird die Teil-Roadmap für System 07 gemeinsam geprüft und abgenommen. Erst danach darf der erste kleine Implementierungsschritt für die fachliche Regelsprache beginnen.
+Als Nächstes kann eine eigene Teil-Roadmap für System 08 vorbereitet und vor jeder Umsetzung gemeinsam abgenommen werden. System 08 wurde noch nicht begonnen.

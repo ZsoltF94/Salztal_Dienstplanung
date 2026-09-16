@@ -4,6 +4,7 @@ namespace Salztal.Dienstplanung.Architecture.Tests;
 
 public sealed class PackageBoundaryTests
 {
+    private const string DomainProject = "Salztal.Dienstplanung.Domain";
     private const string DesktopProject = "Salztal.Dienstplanung.Desktop";
     private const string ExcelProject = "Salztal.Dienstplanung.Excel";
     private const string InfrastructureProject = "Salztal.Dienstplanung.Infrastructure";
@@ -36,6 +37,14 @@ public sealed class PackageBoundaryTests
                 Assert.Null(GetResponsibleProductionProject(packageReference));
             }
         }
+    }
+
+    [Fact]
+    public void DomainProjectWhenLoadedHasNoDirectPackageReference()
+    {
+        ProjectDescriptor domainProject = RepositoryLayout.ProductionProjects[DomainProject];
+
+        Assert.Empty(domainProject.PackageReferences);
     }
 
     [Theory]
