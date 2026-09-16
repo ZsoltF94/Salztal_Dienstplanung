@@ -1,12 +1,14 @@
 # Aktueller Stand
 
-Stand: 16. September 2026
+Stand: 17. September 2026
 
 ## Wo steht das Projekt?
 
 Sechs fachliche Systeme sind abgeschlossen: Einsatzorte und Diensttypen, Mitarbeitende und Mitarbeitertypen, Personal-, Schicht- und Stundenbedarf, Verfügbarkeiten und Abwesenheiten, der zentrale Regelkatalog sowie Planmodell und Planungszeiträume.
 
 System 08 ist fachlich, technisch, modular, persistent und sichtbar vollständig geprüft, am 16. September 2026 ausdrücklich abgenommen und archiviert. Zeitraum, einzelne Bedarfsplätze, erlaubte Einteilungen und ein widerspruchsfreier aktueller Entwurf einschließlich der Typ1-Wochenvoraussetzung sind umgesetzt. Der gemeinsame Anwendungsablauf kann einen Zeitraum ohne Überschneidung anlegen oder wieder öffnen und seinen vollständigen 21-Tage-Arbeitsstand bereitstellen. Typ1-Dienste einschließlich `B`, `D` und `Spr` sowie Wechsel zu `U`, `K` oder rotem `X` besitzen einen gemeinsamen, bestätigungspflichtigen Änderungsablauf. Eine bewusste Planungsvorbereitung hält alle bestätigten Eingaben und Regeln unveränderlich fest und macht spätere Änderungen sichtbar. Entwurf und Vorbereitung bleiben dauerhaft in der lokalen Datenbank gespeichert. Die Service-Leitung hat die vollständige sichtbare Bedienung der modularen Ansicht „Dienstplan SER“ ausdrücklich bestätigt.
+
+Die Fragenklärung für System 09 „Automatische Plangenerierung“ hat begonnen. Festgehalten sind bereits eine unverbindliche Größenordnung von ungefähr 17 bis 20 Mitarbeitenden mit bis zu fünf AH, eine mögliche Laufzeit von ungefähr zwei Minuten, reproduzierbare Ergebnisse bei gleichen Eingaben, schwarze `X` für jeden sonst freien Tag und die faire Verteilung ungünstiger Einsätze. Der Fragenkatalog klärt nun insbesondere Bedarfsbewertung, Solver-Ergebnisse, Übernahme, Modulgrenzen und die umfangreichen Korrektheitsprüfungen. Mit der Implementierung der automatischen Planung wurde noch nicht begonnen.
 
 Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam besprochen, aufgeschrieben und abgenommen. Das Projekt ist außerdem mit einem GitHub-Repository verbunden, damit der Entwicklungsstand nachvollziehbar gespeichert werden kann.
 
@@ -285,4 +287,4 @@ Die Wünsche und wichtigsten Grundlagen der Service-Leitung wurden gemeinsam bes
 
 ## Nächster geplanter Schritt
 
-System 08 ist vollständig abgeschlossen. Als Nächstes können die Fachfragen für System 09 „Automatische Plangenerierung“ vorbereitet und daraus eine eigene kleinschrittige Teil-Roadmap erstellt werden. Vor deren ausdrücklicher Abnahme beginnt keine automatische Planung. Die bereits abgenommenen Typ1-Zuweisungen und Planungsmomentaufnahmen bleiben dabei unverändert die Grundlage.
+System 08 ist vollständig abgeschlossen. Als Nächstes werden die offenen Fragen für System 09 „Automatische Plangenerierung“ abschnittsweise beantwortet. Danach wird eine eigene kleinschrittige Teil-Roadmap entworfen und zur Abnahme vorgelegt. Vor deren ausdrücklicher Abnahme beginnt keine automatische Planung. Die bereits abgenommenen Typ1-Zuweisungen und Planungsmomentaufnahmen bleiben dabei unverändert die Grundlage.

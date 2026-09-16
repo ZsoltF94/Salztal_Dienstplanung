@@ -1,17 +1,17 @@
 # Projektstatus
 
-Stand: 2026-09-16
+Stand: 2026-09-17
 
-Status dieses Dokuments: Aktuell – System 08 abgeschlossen und archiviert
+Status dieses Dokuments: Aktuell – Fragenklärung für System 09 begonnen
 
 ## Aktueller Überblick
 
 | Bereich | Aktueller Stand |
 |---|---|
-| Projektphase | Systeme 05, 06, 07 und 08 abgeschlossen; System 09 noch nicht begonnen |
-| Aktives System | Kein aktives System; als Nächstes kann System 09 vorbereitet werden |
-| Aktive Teil-Roadmap | Keine |
-| Aktueller Stand | System 08 und PM-01 bis PM-10 am 2026-09-16 vollständig geprüft, ausdrücklich abgenommen und archiviert |
+| Projektphase | Systeme 05, 06, 07 und 08 abgeschlossen; System 09 wird fachlich vorbereitet, aber noch nicht implementiert |
+| Aktives System | System 09 „Automatische Plangenerierung“ – Fragenklärung |
+| Aktive Teil-Roadmap | Keine; aktiver Fragenkatalog: `docs/roadmaps/active/S09_AUTOMATIC_SCHEDULE_GENERATION_QUESTIONS.md` |
+| Aktueller Stand | Fragenkatalog für System 09 begonnen; erste Rahmenentscheidungen zu Größenordnung, Laufzeit, Wiederholbarkeit, schwarzen `X`, fairer Verteilung, Bedienumfang und Neugenerierung festgehalten |
 | Zuletzt abgenommener Schritt | PM-10 und damit System 08 am 2026-09-16 |
 | Funktionsfähige App | Einsatzorte, Diensttyp-Standardzeiten, Mitarbeitende, regelmäßige Bedarfe, einzelne Tagesänderungen und der dreiwöchige Dienstplanentwurf mit Typ1 und Planungsvorbereitung können im bestätigten Umfang verwaltet werden; noch keine automatische Plangenerierung |
 | Echte Mitarbeiter- oder Plandaten im Repository | Keine Daten übernommen; `dienstplan beispiel blank.jpeg` wurde als reines Beispiel ohne personenbezogene oder reale Planungsdaten bestätigt, bleibt unversioniert und wird nicht als Fachdatenquelle verwendet |
@@ -34,6 +34,9 @@ Status dieses Dokuments: Aktuell – System 08 abgeschlossen und archiviert
 
 ## Aktuell
 
+- Der Fragenkatalog für System 09 wurde unter `docs/roadmaps/active/S09_AUTOMATIC_SCHEDULE_GENERATION_QUESTIONS.md` begonnen. Er ist noch keine Teil-Roadmap und gibt keine Implementierung frei.
+- Als unverbindliche Testgrößenordnung gelten ungefähr 17 bis 20 Mitarbeitende mit bis zu fünf AH; ein Lauf darf in Version 1 ungefähr bis zu zwei Minuten benötigen. Identische Eingaben sollen reproduzierbare Ergebnisse liefern. Jeder sonst freie Tag erhält ein schwarzes `X`.
+- `Spr`, `D` und Spätdienste werden als ungünstige Einsätze berücksichtigt; `Spr` und `D` sollen besonders vermieden werden, ohne die höhere Bedarfsdeckung oder die bestätigte `Spr`-Notfallregel zu überstimmen. Ein späteres Punktesystem und bewusst alternative gleichwertige Pläne bleiben vorgemerkte Erweiterungen, werden jetzt aber nicht implementiert.
 - Alle 85 Ausgangsfragen und 14 Folgefragen für System 07 sind beantwortet und in `docs/roadmaps/completed/S07_RULE_CATALOG_QUESTIONS.md` archiviert.
 - Die Konsolidierung unterscheidet automatische Hard Rules, manuell übersteuerbare Planungsregeln und nicht übersteuerbare Strukturregeln. Sie enthält außerdem die fachliche Prioritätsmatrix und die Übergaben an Systeme 08 bis 12.
 - Die Konsolidierung und `docs/decisions/S07_RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md` wurden am 2026-09-16 ausdrücklich fachlich und architektonisch abgenommen.
@@ -357,4 +360,4 @@ Keines dieser späteren Gates wird vorzeitig als bestanden geführt.
 
 ## Nächster minimaler Schritt
 
-System 08 und PM-01 bis PM-10 sind vollständig geprüft, ausdrücklich abgenommen und archiviert. Der nächste mögliche Arbeitsschritt ist die Vorbereitung der Fachfragen und einer eigenen Teil-Roadmap für System 09. Vor deren ausdrücklicher Abnahme beginnt keine Implementierung von System 09.
+System 08 und PM-01 bis PM-10 sind vollständig geprüft, ausdrücklich abgenommen und archiviert. Als Nächstes werden die offenen Fragen im aktiven System-09-Fragenkatalog abschnittsweise beantwortet und konsolidiert. Erst nach dessen vollständiger Abnahme wird eine eigene Teil-Roadmap entworfen; vor deren ausdrücklicher Abnahme beginnt keine Implementierung von System 09.

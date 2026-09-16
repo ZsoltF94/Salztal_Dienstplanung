@@ -1,8 +1,8 @@
 # Master-Roadmap der Salztal-Dienstplanung
 
-Status: Grundfassung abgenommen am 2026-09-13; Systeme 05, 06 und 07 abgeschlossen
+Status: Grundfassung abgenommen am 2026-09-13; Systeme 05, 06, 07 und 08 abgeschlossen
 
-Stand: 2026-09-16
+Stand: 2026-09-17
 
 ## Zweck
 
@@ -144,6 +144,8 @@ Abhängigkeiten: 05, 06 und 07
 
 Status: `[ ]`
 
+Vorbereitung: Der Fragenkatalog `docs/roadmaps/active/S09_AUTOMATIC_SCHEDULE_GENERATION_QUESTIONS.md` wurde am 2026-09-17 begonnen. Er ist noch keine Teil-Roadmap und gibt keine Implementierung frei.
+
 Ziel: Aus den bestätigten Eingaben einen zulässigen bestmöglichen Plan erzeugen, automatische Hard Rules unverletzt lassen, automatische Überbesetzung verhindern und ungedeckte Zeiträume sichtbar offenlassen. Normale Zuweisungen decken einen Bedarfsplatz vollständig; nur der bestätigte `Spr`-Sonderfall erzeugt Teildeckung. Zuerst werden Nicht-AH-Typen geplant; AH füllt danach nur verbleibende zulässige Lücken und verdrängt keine bereits geplante Person. Nur eine ausdrücklich gestartete Neugenerierung darf nicht gesperrte Zuweisungen neu verteilen.
 
 Teil-Roadmap: vor Beginn anzulegen und abzunehmen
@@ -264,4 +266,4 @@ System 16 ergänzt Zeitkonten nach gesonderter Priorisierung, ohne den Abschluss
 
 ## Nächster übergeordneter Schritt
 
-System 08 und alle Schritte PM-01 bis PM-10 sind fachlich, technisch, modular, persistent und sichtbar vollständig geprüft, am 2026-09-16 ausdrücklich abgenommen und archiviert. Der nächste mögliche Arbeitsschritt ist die Vorbereitung der Fachfragen und einer eigenen Teil-Roadmap für System 09. System 09 wurde noch nicht begonnen.
+System 08 und alle Schritte PM-01 bis PM-10 sind fachlich, technisch, modular, persistent und sichtbar vollständig geprüft, am 2026-09-16 ausdrücklich abgenommen und archiviert. Die Fachfragen für System 09 werden seit dem 2026-09-17 im aktiven Fragenkatalog geklärt. System 09 wurde noch nicht implementiert; eine eigene Teil-Roadmap entsteht erst nach Abschluss und Abnahme des Fragenkatalogs.
