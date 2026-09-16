@@ -1,16 +1,16 @@
 using System.IO;
-using Salztal.Dienstplanung.Application.Availabilities;
 using Salztal.Dienstplanung.Application.Employees;
+using Salztal.Dienstplanung.Application.Scheduling;
 using Salztal.Dienstplanung.Application.ServiceCatalog;
 using Salztal.Dienstplanung.Application.StaffingDemands;
-using Salztal.Dienstplanung.Desktop.Features.Availabilities;
 using Salztal.Dienstplanung.Desktop.Features.Employees;
 using Salztal.Dienstplanung.Desktop.Features.EmployeeTypes;
+using Salztal.Dienstplanung.Desktop.Features.Scheduling;
 using Salztal.Dienstplanung.Desktop.Features.ServiceCatalog;
 using Salztal.Dienstplanung.Desktop.Features.StaffingDemands;
 using Salztal.Dienstplanung.Desktop.Shared;
-using Salztal.Dienstplanung.Infrastructure.Persistence.Availabilities;
 using Salztal.Dienstplanung.Infrastructure.Persistence.Employees;
+using Salztal.Dienstplanung.Infrastructure.Persistence.Scheduling;
 using Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog;
 using Salztal.Dienstplanung.Infrastructure.Persistence.StaffingDemands;
 
@@ -94,14 +94,27 @@ internal static class MainWindowComposition
             currentWeekMonday,
             staffingDemands.LoadAsync,
             errorReporter);
-        AvailabilityOverviewViewModel availabilities = new(
-            new GetAvailabilityPeriodQuery(dependencies.AvailabilityReader),
-            new SaveAvailabilityEntryCommand(
-                dependencies.AvailabilityReader,
-                dependencies.SetAvailabilityEntryStore),
-            new RemoveAvailabilityEntryCommand(
-                dependencies.AvailabilityReader,
-                dependencies.RemoveAvailabilityEntryStore),
+        SchedulingDependencies scheduling = dependencies.Scheduling;
+        ScheduleOverviewViewModel schedule = new(
+            new OpenOrCreateScheduleDraftCommand(
+                scheduling.WorkspaceReader,
+                scheduling.OpenDraftStore),
+            new GetScheduleWorkspaceQuery(scheduling.WorkspaceReader),
+            new SetServiceManagementAssignmentCommand(
+                scheduling.WorkspaceReader,
+                scheduling.ChangeDayStore),
+            new RemoveServiceManagementAssignmentCommand(
+                scheduling.WorkspaceReader,
+                scheduling.ChangeDayStore),
+            new ChangeScheduleDayEntryCommand(
+                scheduling.WorkspaceReader,
+                scheduling.ChangeDayStore),
+            new RemoveScheduleDayEntryCommand(
+                scheduling.WorkspaceReader,
+                scheduling.ChangeDayStore),
+            new PreparePlanningInputCommand(
+                scheduling.PlanningInputReader,
+                scheduling.PrepareSnapshotStore),
             currentWeekMonday,
             errorReporter);
         serviceCatalog.SelectedWorkLocationChanged +=
@@ -113,7 +126,7 @@ internal static class MainWindowComposition
             employeeTypes,
             staffingDemands,
             standardStaffingDemands,
-            availabilities);
+            schedule);
     }
 
     public static async Task<MainWindowDependencies> CreateInitializedAsync(
@@ -124,8 +137,9 @@ internal static class MainWindowComposition
         await serviceCatalogStore.InitializeAsync(cancellationToken);
         SqliteEmployeeStore employeeStore = new(databasePath);
         SqliteStaffingDemandStore staffingDemandStore = new(databasePath);
-        SqliteAvailabilityStore availabilityStore = new(databasePath);
+        SqliteScheduleStore scheduleStore = new(databasePath);
         await staffingDemandStore.InitializeAsync(cancellationToken);
+        await scheduleStore.InitializeAsync(cancellationToken);
 
         return new MainWindowDependencies(
             serviceCatalogStore,
@@ -145,9 +159,12 @@ internal static class MainWindowComposition
             staffingDemandStore,
             staffingDemandStore,
             staffingDemandStore,
-            availabilityStore,
-            availabilityStore,
-            availabilityStore);
+            new SchedulingDependencies(
+                scheduleStore,
+                scheduleStore,
+                scheduleStore,
+                scheduleStore,
+                scheduleStore));
     }
 
     private static DateOnly GetWeekMonday(DateOnly date)

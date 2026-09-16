@@ -4,7 +4,7 @@
 
 Dieses Dokument hält das gemeinsam bestätigte Grundverständnis, bereits getroffene Entscheidungen und noch offene Grundsatzfragen fest. Es ist noch keine technische Spezifikation und enthält bewusst noch nicht die später zu erfassenden Detailregeln für Mitarbeitertypen, Dienste und Einsatzorte.
 
-Status: Grundfassung abgenommen am 2026-09-13; Ergänzungen bis System 06 fachlich bestätigt am 2026-09-15; System-07-Konsolidierung am 2026-09-16 abgenommen
+Status: Grundfassung abgenommen am 2026-09-13; Ergänzungen bis System 06 fachlich bestätigt am 2026-09-15; System-07-Konsolidierung und System-08-Vorentscheidungen am 2026-09-16 bestätigt
 
 ## Ziel der App
 
@@ -30,8 +30,8 @@ Nach manueller Prüfung wird ein Plan abgenommen. Erst danach kann er in eine no
 ### Planungszeitraum
 
 - Eine Planungswoche läuft von Montag bis Sonntag.
-- Der übliche Planungsvorlauf beträgt drei Wochen.
-- Die Service-Leitung kann einstellen, für wie viele Wochen im Voraus ein Plan erzeugt wird.
+- Die erste Fassung plant immer genau drei vollständige Wochen ab einem ausgewählten Montag.
+- Ein bereits gespeicherter Planungszeitraum darf nicht ganz oder teilweise in einen neuen Planungszeitraum aufgenommen werden. Weitere Arbeit an denselben Kalendertagen erfolgt am vorhandenen Plan.
 - Die Anzahl vollständig gespeicherter zurückliegender Wochen soll konfigurierbar sein.
 - Fehlende historische Wochen dürfen die Generierung eines neuen Plans nicht verhindern.
 

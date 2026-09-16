@@ -132,11 +132,11 @@ Abhängigkeiten: 03, 04, 05 und 06; fachliche Regeln sind bestätigt
 
 ### 08 – Planmodell und Planungszeiträume
 
-Status: `[ ]`
+Status: `[x]` – am 2026-09-16 vollständig geprüft, ausdrücklich abgenommen und archiviert
 
-Ziel: Planungswochen von Montag bis Sonntag, mehrwöchige Zeiträume, tatsächliche Dienstzeiten, Zuweisungen, vollständig ungedeckte normale Bedarfsplätze, den bestätigten `Spr`-Teildeckungsfall und einzelne Sperren fachlich und lokal speicherbar machen. Vorgetragene Typ1-Früh- und Spätdienste können strukturiert als bedarfsneutrale Bürozeit gekennzeichnet werden. Manuelle Zusatzbesetzungen werden unabhängig von freien Bedarfsplätzen modelliert und verändern den Bedarf nicht.
+Ziel: Einen Planungszeitraum aus genau drei vollständigen Montag-bis-Sonntag-Wochen, tatsächliche Dienstzeiten, Zuweisungen, vollständig ungedeckte normale Bedarfsplätze, den bestätigten `Spr`-Teildeckungsfall und einzelne Sperren fachlich und lokal speicherbar machen. Ein bereits gespeicherter Planungszeitraum darf sich nicht mit einem neuen Zeitraum überschneiden. Vorgetragene Typ1-Früh- und Spätdienste können strukturiert als bedarfsneutrale Bürozeit gekennzeichnet werden. Manuelle Zusatzbesetzungen werden unabhängig von freien Bedarfsplätzen modelliert und verändern den Bedarf nicht.
 
-Teil-Roadmap: vor Beginn anzulegen und abzunehmen
+Teil-Roadmap: `docs/roadmaps/completed/S08_SCHEDULE_MODEL_ROADMAP.md`
 
 Abhängigkeiten: 05, 06 und 07
 
@@ -264,4 +264,4 @@ System 16 ergänzt Zeitkonten nach gesonderter Priorisierung, ohne den Abschluss
 
 ## Nächster übergeordneter Schritt
 
-System 07 ist fachlich, technisch und dokumentarisch vollständig geprüft, am 2026-09-16 ausdrücklich abgenommen und archiviert. Der nächste mögliche übergeordnete Schritt ist die Vorbereitung einer eigenen Teil-Roadmap für System 08; System 08 wurde noch nicht begonnen.
+System 08 und alle Schritte PM-01 bis PM-10 sind fachlich, technisch, modular, persistent und sichtbar vollständig geprüft, am 2026-09-16 ausdrücklich abgenommen und archiviert. Der nächste mögliche Arbeitsschritt ist die Vorbereitung der Fachfragen und einer eigenen Teil-Roadmap für System 09. System 09 wurde noch nicht begonnen.

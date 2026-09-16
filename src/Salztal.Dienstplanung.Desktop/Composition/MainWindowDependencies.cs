@@ -1,5 +1,5 @@
-using Salztal.Dienstplanung.Application.Availabilities;
 using Salztal.Dienstplanung.Application.Employees;
+using Salztal.Dienstplanung.Application.Scheduling;
 using Salztal.Dienstplanung.Application.ServiceCatalog;
 using Salztal.Dienstplanung.Application.StaffingDemands;
 
@@ -23,6 +23,11 @@ internal sealed record MainWindowDependencies(
     IStandardStaffingDemandRevisionStore StandardStaffingDemandRevisionStore,
     IStaffingDemandDateExceptionStore StaffingDemandDateExceptionStore,
     IRemoveStaffingDemandDateExceptionStore RemoveStaffingDemandDateExceptionStore,
-    IAvailabilityReader AvailabilityReader,
-    ISetAvailabilityEntryStore SetAvailabilityEntryStore,
-    IRemoveAvailabilityEntryStore RemoveAvailabilityEntryStore);
+    SchedulingDependencies Scheduling);
+
+internal sealed record SchedulingDependencies(
+    IScheduleWorkspaceReader WorkspaceReader,
+    IOpenScheduleDraftStore OpenDraftStore,
+    IChangeScheduleDayStore ChangeDayStore,
+    IPlanningInputReader PlanningInputReader,
+    IPreparePlanningSnapshotStore PrepareSnapshotStore);

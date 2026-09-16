@@ -169,7 +169,7 @@ public sealed class SqliteAvailabilityStore :
             : AvailabilityEntryRemoveStoreResult.Conflict;
     }
 
-    private static AvailabilityEntryReadItem MapEntry(AvailabilityEntryEntity entity)
+    internal static AvailabilityEntryReadItem MapEntry(AvailabilityEntryEntity entity)
     {
         AvailabilityEntryValidationResult result = AvailabilityEntry.Create(
             entity.EmployeeId,

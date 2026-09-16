@@ -4,7 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:employees="clr-namespace:Salztal.Dienstplanung.Desktop.Features.Employees"
-        xmlns:availabilities="clr-namespace:Salztal.Dienstplanung.Desktop.Features.Availabilities"
+        xmlns:scheduling="clr-namespace:Salztal.Dienstplanung.Desktop.Features.Scheduling"
         xmlns:employeeTypes="clr-namespace:Salztal.Dienstplanung.Desktop.Features.EmployeeTypes"
         xmlns:staffingDemands="clr-namespace:Salztal.Dienstplanung.Desktop.Features.StaffingDemands"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -538,7 +538,7 @@
       <employeeTypes:EmployeeTypeOverviewView DataContext="{Binding EmployeeTypes}" />
     </TabItem>
     <TabItem Header="Dienstplan SER">
-      <availabilities:AvailabilityOverviewView DataContext="{Binding Availabilities}" />
+      <scheduling:ScheduleOverviewView DataContext="{Binding Schedule}" />
     </TabItem>
     <TabItem Header="Bedarf">
       <staffingDemands:StaffingDemandOverviewView DataContext="{Binding StaffingDemands}" />

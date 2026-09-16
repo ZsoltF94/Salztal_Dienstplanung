@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Salztal.Dienstplanung.Infrastructure.Persistence.Availabilities;
 using Salztal.Dienstplanung.Infrastructure.Persistence.Employees;
+using Salztal.Dienstplanung.Infrastructure.Persistence.Scheduling;
 using Salztal.Dienstplanung.Infrastructure.Persistence.StaffingDemands;
 
 namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog;
@@ -30,6 +31,38 @@ internal sealed class ServiceCatalogDbContext(DbContextOptions<ServiceCatalogDbC
     public DbSet<StaffingDemandDateExceptionEntity> StaffingDemandDateExceptions =>
         Set<StaffingDemandDateExceptionEntity>();
 
+    public DbSet<ScheduleDraftEntity> ScheduleDrafts => Set<ScheduleDraftEntity>();
+
+    public DbSet<SchedulePeriodDayEntity> SchedulePeriodDays =>
+        Set<SchedulePeriodDayEntity>();
+
+    public DbSet<ScheduleDemandSlotEntity> ScheduleDemandSlots =>
+        Set<ScheduleDemandSlotEntity>();
+
+    public DbSet<ScheduleAvailabilityEntryEntity> ScheduleAvailabilityEntries =>
+        Set<ScheduleAvailabilityEntryEntity>();
+
+    public DbSet<ScheduleAssignmentEntity> ScheduleAssignments =>
+        Set<ScheduleAssignmentEntity>();
+
+    public DbSet<ScheduleAssignmentSegmentEntity> ScheduleAssignmentSegments =>
+        Set<ScheduleAssignmentSegmentEntity>();
+
+    public DbSet<ScheduleDemandCoverageEntity> ScheduleDemandCoverages =>
+        Set<ScheduleDemandCoverageEntity>();
+
+    public DbSet<ScheduleGeneratedDayOffEntity> ScheduleGeneratedDaysOff =>
+        Set<ScheduleGeneratedDayOffEntity>();
+
+    public DbSet<ScheduleAssignmentLockEntity> ScheduleAssignmentLocks =>
+        Set<ScheduleAssignmentLockEntity>();
+
+    public DbSet<PlanningSnapshotEntity> PlanningSnapshots =>
+        Set<PlanningSnapshotEntity>();
+
+    public DbSet<PlanningSnapshotComponentEntity> PlanningSnapshotComponents =>
+        Set<PlanningSnapshotComponentEntity>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new WorkLocationEntityConfiguration());
@@ -42,5 +75,6 @@ internal sealed class ServiceCatalogDbContext(DbContextOptions<ServiceCatalogDbC
         modelBuilder.ApplyConfiguration(
             new StandardStaffingDemandRevisionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new StaffingDemandDateExceptionEntityConfiguration());
+        SchedulingEntityConfigurations.Apply(modelBuilder);
     }
 }

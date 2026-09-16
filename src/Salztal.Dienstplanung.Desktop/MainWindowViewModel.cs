@@ -1,6 +1,6 @@
-using Salztal.Dienstplanung.Desktop.Features.Availabilities;
 using Salztal.Dienstplanung.Desktop.Features.Employees;
 using Salztal.Dienstplanung.Desktop.Features.EmployeeTypes;
+using Salztal.Dienstplanung.Desktop.Features.Scheduling;
 using Salztal.Dienstplanung.Desktop.Features.ServiceCatalog;
 using Salztal.Dienstplanung.Desktop.Features.StaffingDemands;
 
@@ -14,21 +14,21 @@ internal sealed class MainWindowViewModel
         EmployeeTypeOverviewViewModel employeeTypes,
         StaffingDemandOverviewViewModel staffingDemands,
         StandardStaffingDemandEditorViewModel standardStaffingDemands,
-        AvailabilityOverviewViewModel availabilities)
+        ScheduleOverviewViewModel schedule)
     {
         ArgumentNullException.ThrowIfNull(serviceCatalog);
         ArgumentNullException.ThrowIfNull(employees);
         ArgumentNullException.ThrowIfNull(employeeTypes);
         ArgumentNullException.ThrowIfNull(staffingDemands);
         ArgumentNullException.ThrowIfNull(standardStaffingDemands);
-        ArgumentNullException.ThrowIfNull(availabilities);
+        ArgumentNullException.ThrowIfNull(schedule);
 
         ServiceCatalog = serviceCatalog;
         Employees = employees;
         EmployeeTypes = employeeTypes;
         StaffingDemands = staffingDemands;
         StandardStaffingDemands = standardStaffingDemands;
-        Availabilities = availabilities;
+        Schedule = schedule;
     }
 
     public ServiceCatalogViewModel ServiceCatalog { get; }
@@ -41,5 +41,5 @@ internal sealed class MainWindowViewModel
 
     public StandardStaffingDemandEditorViewModel StandardStaffingDemands { get; }
 
-    public AvailabilityOverviewViewModel Availabilities { get; }
+    public ScheduleOverviewViewModel Schedule { get; }
 }

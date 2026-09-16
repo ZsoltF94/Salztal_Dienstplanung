@@ -4,7 +4,7 @@
 
 Die App soll die Service-Leitung beim Erstellen von Arbeitsplänen unterstützen. Sie ist für den gastronomischen Servicebereich einer Rehaklinik vorgesehen.
 
-Die Service-Leitung trägt die Mitarbeitenden und ihre Einsatzmöglichkeiten ein. Danach kann die App für eine gewünschte Anzahl von Wochen einen möglichst guten Dienstplan vorschlagen. Normalerweise werden drei Wochen im Voraus geplant.
+Die Service-Leitung trägt die Mitarbeitenden und ihre Einsatzmöglichkeiten ein. Danach kann die App für genau drei vollständige Wochen einen möglichst guten Dienstplan vorschlagen. Ein neuer Planungszeitraum darf sich nicht mit einem bereits gespeicherten Zeitraum überschneiden.
 
 ## Wo läuft die App?
 
@@ -102,8 +102,8 @@ Der konkrete Regelkatalog und seine Prioritätsmatrix wurden am 16. September 20
 
 ## Erstellen und Bearbeiten eines Plans
 
-- Die Service-Leitung wählt aus, welche Mitarbeitenden im Planungszeitraum verfügbar sind.
-- Sie bestimmt, für wie viele Wochen der Plan erstellt wird.
+- Alle aktiven Mitarbeitenden gelten an einem leeren Tag grundsätzlich als verfügbar. `U`, `K` und ein rotes `X` tragen die Abweichungen für konkrete Kalendertage ein; eine zusätzliche Personenauswahl vor jedem Lauf gibt es nicht.
+- Der Plan wird in der ersten Fassung immer für genau drei vollständige Wochen ab einem ausgewählten Montag erstellt.
 - Die App erzeugt einen vollständigen Vorschlag, soweit dies mit den zwingenden Regeln der Automatik möglich ist.
 - Nicht besetzbare Dienste und andere Probleme werden verständlich erklärt.
 - Einzelne bereits passende Einteilungen können gesperrt werden.

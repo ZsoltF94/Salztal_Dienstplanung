@@ -27,7 +27,7 @@ public sealed class SqliteEmployeeStoreTests
             await ExecuteScalarAsync(
                 database.Path,
                 "SELECT COUNT(*) FROM EmployeeTypeShiftEligibilities;"));
-        Assert.Equal(6L, await ExecuteScalarAsync(
+        Assert.Equal(7L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM __EFMigrationsHistory;"));
 

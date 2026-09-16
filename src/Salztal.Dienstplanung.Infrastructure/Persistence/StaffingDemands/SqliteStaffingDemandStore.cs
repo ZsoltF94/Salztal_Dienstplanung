@@ -333,7 +333,7 @@ public sealed class SqliteStaffingDemandStore :
         };
     }
 
-    private static StandardStaffingDemandRevision MapStandardRevision(
+    internal static StandardStaffingDemandRevision MapStandardRevision(
         StandardStaffingDemandRevisionEntity entity)
     {
         StandardStaffingDemandRevisionValidationResult result =
@@ -376,7 +376,7 @@ public sealed class SqliteStaffingDemandStore :
             ?? throw InvalidStoredData("standard staffing-demand revision", entity.Id);
     }
 
-    private static StaffingDemandDateException MapDateException(
+    internal static StaffingDemandDateException MapDateException(
         StaffingDemandDateExceptionEntity entity)
     {
         StaffingDemandDateExceptionValidationResult result =

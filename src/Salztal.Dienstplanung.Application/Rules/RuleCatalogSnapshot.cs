@@ -4,7 +4,7 @@ namespace Salztal.Dienstplanung.Application.Rules;
 
 public sealed class RuleCatalogSnapshot
 {
-    internal RuleCatalogSnapshot(
+    public RuleCatalogSnapshot(
         int version,
         IEnumerable<RuleDefinitionSnapshot> definitions)
     {

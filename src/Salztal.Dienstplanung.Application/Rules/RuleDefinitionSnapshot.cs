@@ -4,7 +4,7 @@ namespace Salztal.Dienstplanung.Application.Rules;
 
 public sealed class RuleDefinitionSnapshot
 {
-    internal RuleDefinitionSnapshot(
+    public RuleDefinitionSnapshot(
         string id,
         RuleFamily family,
         RuleScope scope,

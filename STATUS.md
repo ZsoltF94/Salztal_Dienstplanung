@@ -2,18 +2,18 @@
 
 Stand: 2026-09-16
 
-Status dieses Dokuments: Aktuell – System 07 abgeschlossen und archiviert
+Status dieses Dokuments: Aktuell – System 08 abgeschlossen und archiviert
 
 ## Aktueller Überblick
 
 | Bereich | Aktueller Stand |
 |---|---|
-| Projektphase | Systeme 05, 06 und 07 abgeschlossen; System 08 noch nicht begonnen |
-| Aktives System | Keines; System 07 ist abgeschlossen und archiviert |
-| Aktive Teil-Roadmap | Keine; System 08 benötigt vor Beginn eine eigene Teil-Roadmap |
-| Aktueller Stand | System 07 vollständig geprüft, ausdrücklich abgenommen und archiviert |
-| Zuletzt abgenommener Schritt | RK-07 und damit System 07 am 2026-09-16 |
-| Funktionsfähige App | Einsatzorte, Diensttyp-Standardzeiten, Mitarbeitende, regelmäßige Bedarfe und einzelne Tagesänderungen können im bestätigten Umfang verwaltet werden; noch keine Dienstplanfunktion |
+| Projektphase | Systeme 05, 06, 07 und 08 abgeschlossen; System 09 noch nicht begonnen |
+| Aktives System | Kein aktives System; als Nächstes kann System 09 vorbereitet werden |
+| Aktive Teil-Roadmap | Keine |
+| Aktueller Stand | System 08 und PM-01 bis PM-10 am 2026-09-16 vollständig geprüft, ausdrücklich abgenommen und archiviert |
+| Zuletzt abgenommener Schritt | PM-10 und damit System 08 am 2026-09-16 |
+| Funktionsfähige App | Einsatzorte, Diensttyp-Standardzeiten, Mitarbeitende, regelmäßige Bedarfe, einzelne Tagesänderungen und der dreiwöchige Dienstplanentwurf mit Typ1 und Planungsvorbereitung können im bestätigten Umfang verwaltet werden; noch keine automatische Plangenerierung |
 | Echte Mitarbeiter- oder Plandaten im Repository | Keine Daten übernommen; `dienstplan beispiel blank.jpeg` wurde als reines Beispiel ohne personenbezogene oder reale Planungsdaten bestätigt, bleibt unversioniert und wird nicht als Fachdatenquelle verwendet |
 
 ## Nachweislich fertig und abgenommen
@@ -47,6 +47,27 @@ Status dieses Dokuments: Aktuell – System 07 abgeschlossen und archiviert
 - RK-06 dokumentiert für jede der 28 Regeln je einen erfüllten, verletzten und nicht anwendbaren synthetischen Fall. Die Sieben-Tage-Regel besitzt zusätzlich den Fall einer nicht vollständig prüfbaren Vorgeschichte. Neun Kombinationsszenarien erklären die bestätigten Wechselwirkungen. Der Schritt und das fachliche Dokument-Gate wurden am 2026-09-16 ausdrücklich abgenommen.
 - RK-07 gleicht Domain-Katalog, Application-Lesevertrag, Beispielszenarien und die Übergaben an Systeme 08 bis 12 abschließend ab. Gesperrte Wiederherstellung, Build, fokussierte und vollständige Tests, Formatierung, Pfade, Datenschutz, Artefaktsuche und Diff-Hygiene sind grün. RK-07 und System 07 wurden am 2026-09-16 ausdrücklich abgenommen.
 - WPF-Oberfläche, Datenbankspeicherung und Solver-Übersetzung bleiben unverändert und gehören nicht zu System 07.
+- Die zehn Fachfragen für System 08 sind beantwortet und in `docs/roadmaps/completed/S08_SCHEDULE_MODEL_QUESTIONS.md` archiviert. Die erste Fassung plant genau drei Wochen, erlaubt keine Überschneidung verschiedener Planungszeiträume und verwendet eine bewusst erzeugte unveränderliche Planungsmomentaufnahme.
+- `docs/roadmaps/completed/S08_SCHEDULE_MODEL_ROADMAP.md` dokumentiert die zehn vollständig geprüften und ausdrücklich abgenommenen Schritte von Zeitraum und Bedarfsplätzen über Typ1, Momentaufnahme, SQLite und WPF bis zum Gesamtnachweis. Domain, Application, Infrastructure, Desktop, Composition und das erst später betroffene Planning-Modul bleiben getrennt.
+- PM-01 und damit der Roadmap-Entwurf wurden am 2026-09-16 ausdrücklich abgenommen.
+- PM-02 führt `SchedulePeriod`, stabile einzelne `DemandSlot`-Werte und eine deterministische `DemandSlotSet`-Erzeugung ein. Unbekannte Referenzen, Bedarfe außerhalb der 21 Tage und doppelte Platzidentitäten werden strukturiert abgelehnt.
+- PM-02 ist mit 18 fokussierten Scheduling-Tests, allen 285 Domain-Tests, allen 18 Architekturtests, vollständigem Solution-Build ohne Warnung oder Fehler und erfolgreicher Formatprüfung automatisch nachgewiesen und am 2026-09-16 ausdrücklich abgenommen.
+- PM-03 ergänzt tatsächliche Arbeitssegmente, normale Vollbesetzung, `D`, die ausschließlich zulässige `Spr`-Teildeckung, geschützte Typ1-Herkunft, bedarfsneutrales `B`, schwarze `X`, Zuweisungssperren und bedarfsneutrale manuelle Zusatzbesetzung als getrennte Fachwerte.
+- PM-03 ist mit 35 fokussierten Scheduling-Tests, allen 302 Domain-Tests, allen 18 Architekturtests, vollständigem Solution-Build ohne Warnung oder Fehler und erfolgreicher Formatprüfung automatisch nachgewiesen und am 2026-09-16 ausdrücklich abgenommen.
+- PM-04 ergänzt einen unveränderlichen aktuellen Entwurf mit stabiler Kennung, positiver Änderungsversion, eindeutigen Personen-/Tageszuständen, einmaliger Bedarfsdeckung und strukturierten Sperren. Die Typ1-Bereitschaft unterscheidet je Woche gültige Zuweisung, vollständige Abwesenheit und fehlende Zuweisung.
+- PM-04 ist mit 48 fokussierten Scheduling-Tests, allen 315 Domain-Tests, allen 18 Architekturtests, vollständigem Solution-Build ohne Warnung oder Fehler und erfolgreicher Formatprüfung automatisch nachgewiesen und am 2026-09-16 ausdrücklich abgenommen.
+- PM-05 ergänzt einen kohärenten Application-Vertrag zum Öffnen oder überschneidungsfreien Anlegen eines Drei-Wochen-Entwurfs und zum Lesen von 21 Tagen, aktiven Personen, drei Wochenwerten, Tageskennzeichen, 195 Bedarfsplätzen, Typ1-Zuweisungen, Typ1-Bereitschaft und Vorbereitungsstatus über genau einen Reader-Aufruf.
+- PM-05 ist mit 19 fokussierten Scheduling-Application-Tests, allen 179 Application-Tests, allen 315 Domain-Tests, allen 18 Architekturtests, vollständigem Solution-Build ohne Warnung oder Fehler und erfolgreicher Formatprüfung automatisch nachgewiesen und am 2026-09-16 ausdrücklich abgenommen.
+- PM-06 ergänzt je einen koordinierten Application-Ablauf zum Setzen oder Ersetzen von normalen Typ1-Diensten, `B`, `D` und `Spr`, zum Entfernen einer Typ1-Zuweisung und zum bestätigten atomaren Wechsel zwischen Typ1 und `U`, `K` oder rotem `X`. Alle Schreibübergaben enthalten die erwartete Entwurfsversion und kennzeichnen eine vorhandene Planungsvorbereitung als potenziell veraltet.
+- PM-06 ist mit 23 fokussierten Tests beziehungsweise 42 Scheduling-Application-Tests, allen 202 Application-Tests, allen 315 Domain-Tests, allen 18 Architekturtests, vollständigem Solution-Build ohne Warnung oder Fehler und erfolgreicher Formatprüfung automatisch nachgewiesen und am 2026-09-16 ausdrücklich abgenommen.
+- PM-07 ergänzt eine unveränderliche Planungsmomentaufnahme mit aktiven Personen, verwendeten Typfassungen und Einsatzfreigaben, Dienstkatalog, Tageskennzeichen, tatsächlichen Bedarfsplätzen, Typ1, allen 28 Regeln, Laufoptionen sowie genau sieben strukturierten Vorgeschichtstagen. Fehlende Vorgeschichte bleibt zulässig und wird ehrlich als teilweise oder vollständig fehlend gekennzeichnet.
+- PM-07 ist mit 20 fokussierten Tests beziehungsweise 62 Scheduling-Application-Tests, allen 222 Application-Tests, allen 315 Domain-Tests, allen 18 Architekturtests, vollständigem Solution-Build ohne Warnung oder Fehler und erfolgreicher Formatprüfung automatisch nachgewiesen und am 2026-09-16 ausdrücklich abgenommen.
+- PM-08 speichert den aktuellen Entwurf, seine 21 eindeutigen Zeitraumtage, Bedarfsplätze, Tageskennzeichen, Typ1-Zuweisungen, Segmente, Deckungen und eine bewusst erzeugte Planungsmomentaufnahme in der gemeinsamen lokalen SQLite-Datenbank. Kombinierte Typ1-/Tageswechsel und Snapshot-Aktualisierungen sind transaktional; künstliche Fehler hinterlassen keine Teiländerung.
+- Die generierte Migration `20260916163137_AddScheduling` aktualisiert auch einen System-06-Datenbankstand, ohne bestehende synthetische Katalog-, Mitarbeitenden-, Bedarfs- oder Verfügbarkeitsdaten zu verlieren. Neustarts rekonstruieren `B`, `D`, `Spr`, Regeln, Laufoptionen und Vorgeschichte verlustfrei.
+- PM-08 ist mit acht fokussierten Scheduling-Persistenztests, allen 65 Infrastructure-Tests, allen 222 Application-Tests, allen 315 Domain-Tests, allen 18 Architekturtests, vollständigem Solution-Build ohne Warnung oder Fehler, erfolgreicher Formatprüfung und einem EF-Modellabgleich ohne ausstehende Änderung automatisch nachgewiesen und am 2026-09-16 ausdrücklich abgenommen.
+- PM-09 ersetzt die bisherige Availability-Ansicht vollständig durch das modulare Feature `Features/Scheduling`. Zeitraum, Tageskennzeichen, Typ1 einschließlich `B`, `D` und `Spr`, Typ1-Wochenbereitschaft, Vorbereitung, veraltete Kategorien, Vorgeschichte und Laufoption werden getrennt und verständlich dargestellt.
+- Alle sichtbaren Tageswechsel verwenden koordinierte Scheduling-Abläufe. Die Application liefert zulässige Typ1-Auswahloptionen strukturiert; Desktop errät keine Fachregel aus Namen oder Farben. `SchedulingDependencies` hält die konkrete SQLite-Verdrahtung ausschließlich in Composition.
+- PM-09 ist mit 65 Scheduling-Application-Tests, 11 Scheduling-Desktop-/Render-Tests, allen 225 Application-Tests, allen 89 Desktop-Tests, allen 315 Domain-Tests, allen 65 Infrastructure-Tests, allen 18 Architekturtests und vollständigem Solution-Build ohne Warnung oder Fehler technisch nachgewiesen. Die Service-Leitung hat die sichtbare Bedienung am 2026-09-16 ausdrücklich bestätigt; PM-09 ist abgenommen.
 
 - Die Fachfragen für System 06 sind beantwortet und in `docs/roadmaps/completed/S06_AVAILABILITY_ABSENCE_QUESTIONS.md` archiviert.
 - Die vollständig abgenommene Teil-Roadmap `docs/roadmaps/completed/S06_AVAILABILITY_ABSENCE_ROADMAP.md` enthält den Mitarbeitertypen-Vorbereitungsteil und die Drei-Wochen-Erfassung.
@@ -215,7 +236,7 @@ Status dieses Dokuments: Aktuell – System 07 abgeschlossen und archiviert
 
 ## Noch nicht implementiert
 
-- Systeme 08 bis 14; System 08 benötigt vor Beginn eine eigene Teil-Roadmap
+- Systeme 09 bis 14; System 09 benötigt vor seiner Implementierung eigene Fachfragen und eine ausdrücklich abgenommene Teil-Roadmap
 - System 15 – Portable Windows-Auslieferung und Endabnahme der Kernversion
 - System 16 – Zeitkonten als spätere Ausbaustufe
 
@@ -292,7 +313,6 @@ Die vollständige Fachentscheidung steht in `docs/decisions/S03_EMPLOYEE_TYPES_A
 
 ## Offene Entscheidungen für spätere Systeme
 
-- ausdrückliche Sammelabnahme der automatisch weitergeführten System-07-Schritte vor dem nächsten manuellen Gate,
 - Inhalt und Aufbau der noch bereitzustellenden Excel-Vorlage,
 - endgültige Bestätigung der Excel-Bibliothek nach dem Vorlagentest,
 - praktische Voraussetzungen der portablen Ausgabe auf dem vorgesehenen Windows-11-Rechner.
@@ -337,4 +357,4 @@ Keines dieser späteren Gates wird vorzeitig als bestanden geführt.
 
 ## Nächster minimaler Schritt
 
-System 07 und alle Schritte RK-01 bis RK-07 sind vollständig geprüft, ausdrücklich abgenommen und archiviert. Als nächstes kann eine eigene Teil-Roadmap für System 08 vorbereitet und vor jeder Implementierung abgenommen werden. System 08 wurde noch nicht begonnen.
+System 08 und PM-01 bis PM-10 sind vollständig geprüft, ausdrücklich abgenommen und archiviert. Der nächste mögliche Arbeitsschritt ist die Vorbereitung der Fachfragen und einer eigenen Teil-Roadmap für System 09. Vor deren ausdrücklicher Abnahme beginnt keine Implementierung von System 09.

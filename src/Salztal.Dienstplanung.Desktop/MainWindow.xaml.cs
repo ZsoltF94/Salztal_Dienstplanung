@@ -1,7 +1,7 @@
 using System.Windows;
-using Salztal.Dienstplanung.Desktop.Features.Availabilities;
 using Salztal.Dienstplanung.Desktop.Features.Employees;
 using Salztal.Dienstplanung.Desktop.Features.EmployeeTypes;
+using Salztal.Dienstplanung.Desktop.Features.Scheduling;
 using Salztal.Dienstplanung.Desktop.Features.ServiceCatalog;
 using Salztal.Dienstplanung.Desktop.Features.StaffingDemands;
 
@@ -14,7 +14,7 @@ internal sealed partial class MainWindow : Window
     private readonly EmployeeTypeOverviewViewModel _employeeTypes;
     private readonly StaffingDemandOverviewViewModel _staffingDemands;
     private readonly StandardStaffingDemandEditorViewModel _standardStaffingDemands;
-    private readonly AvailabilityOverviewViewModel _availabilities;
+    private readonly ScheduleOverviewViewModel _schedule;
 
     public MainWindow(
         ServiceCatalogViewModel serviceCatalog,
@@ -22,21 +22,21 @@ internal sealed partial class MainWindow : Window
         EmployeeTypeOverviewViewModel employeeTypes,
         StaffingDemandOverviewViewModel staffingDemands,
         StandardStaffingDemandEditorViewModel standardStaffingDemands,
-        AvailabilityOverviewViewModel availabilities)
+        ScheduleOverviewViewModel schedule)
     {
         ArgumentNullException.ThrowIfNull(serviceCatalog);
         ArgumentNullException.ThrowIfNull(employees);
         ArgumentNullException.ThrowIfNull(employeeTypes);
         ArgumentNullException.ThrowIfNull(staffingDemands);
         ArgumentNullException.ThrowIfNull(standardStaffingDemands);
-        ArgumentNullException.ThrowIfNull(availabilities);
+        ArgumentNullException.ThrowIfNull(schedule);
 
         _serviceCatalog = serviceCatalog;
         _employees = employees;
         _employeeTypes = employeeTypes;
         _staffingDemands = staffingDemands;
         _standardStaffingDemands = standardStaffingDemands;
-        _availabilities = availabilities;
+        _schedule = schedule;
         InitializeComponent();
         DataContext = new MainWindowViewModel(
             serviceCatalog,
@@ -44,7 +44,7 @@ internal sealed partial class MainWindow : Window
             employeeTypes,
             staffingDemands,
             standardStaffingDemands,
-            availabilities);
+            schedule);
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
@@ -56,6 +56,6 @@ internal sealed partial class MainWindow : Window
             _employeeTypes.LoadCommand.ExecuteAsync(null),
             _staffingDemands.LoadCommand.ExecuteAsync(null),
             _standardStaffingDemands.LoadEffectiveWeekCommand.ExecuteAsync(null),
-            _availabilities.LoadCommand.ExecuteAsync(null));
+            _schedule.LoadCommand.ExecuteAsync(null));
     }
 }
