@@ -163,7 +163,7 @@ Ergebnis:
 - Bewertet werden mindestens Windows-11-Unterstützung, Offlinebetrieb, portable Auslieferung, lokale Datenbank, Excel-Erzeugung, automatische Planung, Wartbarkeit und Testbarkeit.
 - Die empfohlene Lösung wird vor einer Festlegung verständlich mit Vor- und Nachteilen vorgestellt.
 - Zeitkonten bleiben als nachrangiges Modul vorgesehen.
-- Der Vorschlag wird in `docs/decisions/ARCHITECTURE_PROPOSAL.md` mit Quellen, Risiken und offenen Bestätigungen festgehalten.
+- Der Vorschlag wird in `docs/decisions/S01_ARCHITECTURE_PROPOSAL.md` mit Quellen, Risiken und offenen Bestätigungen festgehalten.
 
 Prüfung:
 
@@ -178,7 +178,7 @@ Status: `[x]` – abgenommen am 2026-09-13
 
 Geplantes Ergebnis:
 
-- Die Rückmeldungen zu `docs/decisions/ARCHITECTURE_PROPOSAL.md` werden eingearbeitet.
+- Die Rückmeldungen zu `docs/decisions/S01_ARCHITECTURE_PROPOSAL.md` werden eingearbeitet.
 - `ARCHITECTURE.md` dokumentiert die abgenommene Technologieentscheidung, Systemgrenzen, Module, Datenflüsse, Speicherstrategie, Sicherheitsgrenzen und Erweiterungspunkte.
 - Nicht bestätigte Möglichkeiten werden nicht als Architekturentscheidung dargestellt.
 - Es wird weiterhin noch kein App-Code angelegt.

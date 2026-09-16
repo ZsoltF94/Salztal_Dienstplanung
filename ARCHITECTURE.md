@@ -1,14 +1,14 @@
 # Architektur der Salztal-Dienstplanung
 
-Status: Grundarchitektur abgenommen am 2026-09-13; System-06-Grenzen fachlich ergänzt am 2026-09-15
+Status: Grundarchitektur abgenommen am 2026-09-13; System-07-Regelgrenzen am 2026-09-16 abgenommen
 
-Stand: 2026-09-15
+Stand: 2026-09-16
 
 ## Zweck
 
 Nach seiner Abnahme legt dieses Dokument die technische Grundarchitektur der Anwendung verbindlich fest. Es beschreibt Grenzen und Verantwortlichkeiten, aber noch keine konkrete Implementierung einzelner Fachsysteme.
 
-Fachliche Grundlage ist `GRUNDLAGEN_FRAGEN_UND_ENTSCHEIDUNGEN.md`. Die begründete Technologieauswahl und ihre Primärquellen stehen in `docs/decisions/ARCHITECTURE_PROPOSAL.md`. Die bestätigte Trennung zwischen Diensttyp-Standardzeit und tatsächlicher Bedarfszeit sowie der Springer-Sonderfall stehen in `docs/decisions/SHIFT_TYPES_AND_STAFFING_DEMAND_MODEL.md`. Das bindende Mitarbeitertyp- und Einsatzfreigabemodell steht in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`.
+Fachliche Grundlage ist `GRUNDLAGEN_FRAGEN_UND_ENTSCHEIDUNGEN.md`. Die begründete Technologieauswahl und ihre Primärquellen stehen in `docs/decisions/S01_ARCHITECTURE_PROPOSAL.md`. Die bestätigte Trennung zwischen Diensttyp-Standardzeit und tatsächlicher Bedarfszeit sowie der Springer-Sonderfall stehen in `docs/decisions/S04_SHIFT_TYPES_AND_STAFFING_DEMAND_MODEL.md`. Das bindende Mitarbeitertyp- und Einsatzfreigabemodell steht in `docs/decisions/S03_EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`. Regelkatalog und manuelle Abweichungen stehen in `docs/decisions/S07_RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md`.
 
 ## Architekturziele
 
@@ -178,7 +178,7 @@ Für Domain, Application, Planning, Infrastructure und Excel werden getrennte Te
 
 ## Eine einzige fachliche Regelquelle
 
-Jede Planungsregel wird genau einmal als unveränderliche fachliche Regeldefinition in `Domain` beschrieben. Die Ausführungskontexte und Durchsetzungsstufen folgen der zur Abnahme vorbereiteten Entscheidung `docs/decisions/RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md`. Eine Regeldefinition enthält mindestens:
+Jede Planungsregel wird genau einmal als unveränderliche fachliche Regeldefinition in `Domain` beschrieben. Die Ausführungskontexte und Durchsetzungsstufen folgen der abgenommenen Entscheidung `docs/decisions/S07_RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md`. Eine Regeldefinition enthält mindestens:
 
 - eine stabile Regelkennung,
 - Regelart und Geltungsbereich,

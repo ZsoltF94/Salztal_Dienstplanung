@@ -1,6 +1,6 @@
 # Fragen und Verständnisabgleich: Regelkatalog und Prioritäten
 
-Status: Alle Fragen beantwortet; konsolidierter Verständnisstand zur fachlichen Abnahme vorbereitet
+Status: Alle Fragen beantwortet; konsolidierter Verständnisstand am 2026-09-16 ausdrücklich abgenommen
 
 Stand: 2026-09-16
 
@@ -8,7 +8,7 @@ Stand: 2026-09-16
 
 Dieses Dokument sammelt die fachlichen und übergeordneten technischen Fragen für System 07 „Regelkatalog und Prioritäten“.
 
-Alle Fragen und Folgefragen sind beantwortet. Die ursprünglichen Antworten bleiben als Entscheidungsverlauf erhalten. Der Abschnitt „Konsolidiertes Verständnis“ fasst ihre gemeinsame Bedeutung widerspruchsfrei für die fachliche Abnahme zusammen. Bis zu dieser Abnahme ist die Zusammenfassung ein Entwurf und noch keine verbindliche Fachregel.
+Alle Fragen und Folgefragen sind beantwortet. Die ursprünglichen Antworten bleiben als Entscheidungsverlauf erhalten. Der Abschnitt „Konsolidiertes Verständnis“ fasst ihre gemeinsame Bedeutung widerspruchsfrei zusammen und wurde am 2026-09-16 ausdrücklich abgenommen.
 
 Dieses Dokument ist noch keine Teil-Roadmap und gibt weder Implementierung noch Datenbank-, Bedien- oder Planungscode frei. System 06 ist abgeschlossen und bleibt davon unberührt.
 
@@ -25,9 +25,9 @@ Alle Beispiele und späteren Tests verwenden ausschließlich erfundene Personen 
 - `Service-Leitung/README.md`
 - `Service-Leitung/AKTUELLER_STAND.md`
 - `Service-Leitung/GRUNDLAGEN_UND_ENTSCHEIDUNGEN.md`
-- `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`
-- `docs/roadmaps/completed/AVAILABILITY_ABSENCE_QUESTIONS.md`
-- `docs/roadmaps/completed/AVAILABILITY_ABSENCE_ROADMAP.md`
+- `docs/decisions/S03_EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`
+- `docs/roadmaps/completed/S06_AVAILABILITY_ABSENCE_QUESTIONS.md`
+- `docs/roadmaps/completed/S06_AVAILABILITY_ABSENCE_ROADMAP.md`
 - die abgeschlossenen Fragen-, Entscheidungs- und Roadmap-Dateien der Systeme 03 bis 05
 
 ## Rechtliche Orientierung für die Fragen
@@ -1064,11 +1064,11 @@ Regeln derselben Priorität werden zunächst nach Zahl beziehungsweise Ausmaß i
 - System 11 prüft manuelle Änderungen, blockiert Strukturverletzungen und verlangt für übersteuerbare Planungsregeln eine sichtbare Bestätigung.
 - System 12 bewahrt Regelkatalogversion, verwendete Regelparameter, Laufoptionen und bestätigte manuelle Abweichungen in der unveränderlichen Planversion.
 
-Die dazugehörige Architekturentscheidung ist in `docs/decisions/RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md` als Entwurf zur Abnahme dokumentiert.
+Die dazugehörige Architekturentscheidung ist in `docs/decisions/S07_RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md` dokumentiert und ebenfalls abgenommen.
 
 ## Ergebnis des Verständnisabgleichs
 
 - Alle 85 Ausgangsfragen und alle 14 Folgefragen sind beantwortet.
 - Es bestehen keine offenen fachlichen Rückfragen, die den Roadmap-Entwurf verhindern.
-- Die Konsolidierung und die neue Architekturentscheidung benötigen noch die ausdrückliche fachliche Abnahme.
-- Erst nach dieser Abnahme wird eine kleinschrittige Teil-Roadmap für System 07 entworfen und wiederum vor der Implementierung abgenommen.
+- Die Konsolidierung und die neue Architekturentscheidung wurden am 2026-09-16 ausdrücklich fachlich und architektonisch abgenommen.
+- `docs/roadmaps/active/S07_RULE_CATALOG_ROADMAP.md` ist der daraus entstandene kleinschrittige Roadmap-Entwurf. Er benötigt vor der Implementierung eine eigene ausdrückliche Abnahme.

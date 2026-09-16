@@ -23,7 +23,7 @@ Alle Beispiele und späteren Tests verwenden ausschließlich erfundene Personen 
 - `Service-Leitung/README.md`
 - `Service-Leitung/AKTUELLER_STAND.md`
 - `Service-Leitung/GRUNDLAGEN_UND_ENTSCHEIDUNGEN.md`
-- `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`
+- `docs/decisions/S03_EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`
 - die abgeschlossenen Fragen- und Roadmap-Dateien der Systeme 03 bis 05
 - die am 2026-09-15 beschriebene abstrahierte Struktur der bisherigen Drei-Wochen-Tabelle; das lokale Referenzbild wird nicht als Projektdokumentation übernommen
 

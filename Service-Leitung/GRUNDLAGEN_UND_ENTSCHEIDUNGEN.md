@@ -98,7 +98,7 @@ Kann ein Bedarf wegen einer zwingenden automatischen Regel nicht gedeckt werden,
 
 Wünsche erhalten die Priorität hoch, mittel oder niedrig und dürfen nur dann unerfüllt bleiben, wenn keine bessere erlaubte Lösung gefunden wird. Eine bewusst bestätigte manuelle Abweichung bleibt sichtbar und ändert die Regel für zukünftige Pläne nicht.
 
-Der konkrete Regelkatalog und seine Prioritätsmatrix sind vollständig beantwortet und zur gemeinsamen Abnahme vorbereitet. Die erste Fassung prüft nur die internen Regeln der Service-Leitung und behauptet keine vollständige gesetzliche oder tarifliche Prüfung.
+Der konkrete Regelkatalog und seine Prioritätsmatrix wurden am 16. September 2026 vollständig bestätigt. Die erste Fassung prüft nur die internen Regeln der Service-Leitung und behauptet keine vollständige gesetzliche oder tarifliche Prüfung.
 
 ## Erstellen und Bearbeiten eines Plans
 

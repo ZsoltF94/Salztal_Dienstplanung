@@ -4,7 +4,7 @@
 
 Dieses Dokument hält das gemeinsam bestätigte Grundverständnis, bereits getroffene Entscheidungen und noch offene Grundsatzfragen fest. Es ist noch keine technische Spezifikation und enthält bewusst noch nicht die später zu erfassenden Detailregeln für Mitarbeitertypen, Dienste und Einsatzorte.
 
-Status: Grundfassung abgenommen am 2026-09-13; Ergänzungen bis System 06 fachlich bestätigt am 2026-09-15; System-07-Konsolidierung vom 2026-09-16 wartet auf Abnahme
+Status: Grundfassung abgenommen am 2026-09-13; Ergänzungen bis System 06 fachlich bestätigt am 2026-09-15; System-07-Konsolidierung am 2026-09-16 abgenommen
 
 ## Ziel der App
 
@@ -92,7 +92,7 @@ Nach manueller Prüfung wird ein Plan abgenommen. Erst danach kann er in eine no
 - Die erste Fassung bildet ausschließlich die bestätigten internen Regeln der Service-Leitung ab.
 - Sie prüft keine vollständige gesetzliche, tarifliche oder sonstige externe Regelkonformität und darf diese nicht behaupten.
 - Pausen, allgemeine tägliche Höchstarbeitszeit, Ruhezeiten, Ersatzruhetage, Zuschläge, mehrere Arbeitgeber und besondere Personengruppen werden in der ersten Fassung nicht geprüft.
-- Der feste Regelkatalog, seine Prioritätsmatrix und die Abgrenzung manueller Abweichungen sind in `docs/roadmaps/active/RULE_CATALOG_QUESTIONS.md` und `docs/decisions/RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md` zur Abnahme vorbereitet. Sie geben noch keine Implementierung frei.
+- Der feste Regelkatalog, seine Prioritätsmatrix und die Abgrenzung manueller Abweichungen sind in `docs/roadmaps/active/S07_RULE_CATALOG_QUESTIONS.md` und `docs/decisions/S07_RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md` abgenommen. Die Umsetzung benötigt weiterhin eine eigene abgenommene Teil-Roadmap.
 
 ### Historie, Änderungen und Zeitkonten
 
@@ -252,11 +252,11 @@ Diese Versionsverwaltung ist bestätigt.
 ## Zum Zeitpunkt der Grundlagenklärung noch nicht festgelegt
 
 - konkrete Mitarbeitertypen und Vertragsmodelle; diese wurden am 2026-09-14 für System 03 fachlich bestätigt,
-- der vollständige interne Regelkatalog und seine Prioritäten; diese wurden am 2026-09-16 für die fachliche Abnahme konsolidiert,
+- der vollständige interne Regelkatalog und seine Prioritäten; diese wurden am 2026-09-16 fachlich konsolidiert und abgenommen,
 - mögliche spätere gesetzliche, tarifliche oder sonstige externe Regeln außerhalb der ersten Fassung,
 - genaue Personal- und Stundenbedarfe; die Startbedarfe und Änderungsgrundsätze wurden am 2026-09-14 für System 05 fachlich bestätigt,
 - verwendete Planungs- beziehungsweise Optimierungsmethode,
 - endgültige technische Architektur,
 - Aufbau der Excel-Vorlage.
 
-Die Planungs- beziehungsweise Optimierungsmethode und die technische Architektur wurden anschließend in `ARCHITECTURE.md` festgelegt und abgenommen. Konkrete Einsatzorte, Diensttypen, Doppeldienst und Springer-Einsatz wurden am 2026-09-13 für System 04 bestätigt. Bindende Mitarbeitertypen, ihre Wochen-Sollwerte und Einsatzfreigaben wurden am 2026-09-14 für System 03 bestätigt und stehen in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`. Die vollständigen Startbedarfe, ihre Änderungswirkung und die Datumsausnahmen wurden für das am 2026-09-15 abgeschlossene System 05 bestätigt und stehen in `docs/roadmaps/completed/STAFFING_DEMAND_ROADMAP.md`. Der interne Regelkatalog und seine manuellen Ausnahmen sind am 2026-09-16 vollständig beantwortet und konsolidiert worden, warten aber noch auf ausdrückliche Abnahme. Die übrigen fachlichen Detailpunkte werden weiterhin erst vor den jeweils betroffenen Systemen gemeinsam geklärt.
+Die Planungs- beziehungsweise Optimierungsmethode und die technische Architektur wurden anschließend in `ARCHITECTURE.md` festgelegt und abgenommen. Konkrete Einsatzorte, Diensttypen, Doppeldienst und Springer-Einsatz wurden am 2026-09-13 für System 04 bestätigt. Bindende Mitarbeitertypen, ihre Wochen-Sollwerte und Einsatzfreigaben wurden am 2026-09-14 für System 03 bestätigt und stehen in `docs/decisions/S03_EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`. Die vollständigen Startbedarfe, ihre Änderungswirkung und die Datumsausnahmen wurden für das am 2026-09-15 abgeschlossene System 05 bestätigt und stehen in `docs/roadmaps/completed/S05_STAFFING_DEMAND_ROADMAP.md`. Der interne Regelkatalog und seine manuellen Ausnahmen wurden am 2026-09-16 vollständig beantwortet, konsolidiert und ausdrücklich abgenommen. Die übrigen fachlichen Detailpunkte werden weiterhin erst vor den jeweils betroffenen Systemen gemeinsam geklärt.

@@ -19,10 +19,10 @@ System 03 legt die Mitarbeiter- und Typstammdaten sicher an. Die automatische Ve
 - `CLEANCODE.md`
 - `AGENTS.md` mit dem verbindlichen kleinschrittigen Abnahmeprozess
 - `MASTER_ROADMAP.md`, System 03 – Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben
-- `docs/decisions/SHIFT_TYPES_AND_STAFFING_DEMAND_MODEL.md`
-- `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`
-- `docs/decisions/SHARED_SQLITE_MIGRATION_BOUNDARY.md`
-- die vollständig beantwortete Fragen-Datei `EMPLOYEES_EMPLOYEE_TYPES_SHIFT_ELIGIBILITY_QUESTIONS.md`
+- `docs/decisions/S04_SHIFT_TYPES_AND_STAFFING_DEMAND_MODEL.md`
+- `docs/decisions/S03_EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`
+- `docs/decisions/S03_SHARED_SQLITE_MIGRATION_BOUNDARY.md`
+- die vollständig beantwortete Fragen-Datei `S03_EMPLOYEES_EMPLOYEE_TYPES_SHIFT_ELIGIBILITY_QUESTIONS.md`
 - System 02 – Technisches App-Grundgerüst, abgeschlossen und archiviert am 2026-09-13
 - System 04 – Einsatzorte, Diensttypen und Doppeldienste, abgeschlossen und archiviert am 2026-09-13
 - ausschließlich synthetische Mitarbeiterdaten in Quellcode, Tests, Dokumentation und Screenshots
@@ -612,7 +612,7 @@ Status: `[x]` – umgesetzt, automatisch geprüft und am 2026-09-14 gemeinsam mi
 Voraussetzungen:
 
 - Die MA-10-Implementierung und ihre automatischen Prüfungen sind abgeschlossen. Ihr noch offener sichtbarer Ablauf wird mit dem manuellen MA-10A-Gesamtablauf gemeinsam geprüft.
-- Die Antworten in `docs/roadmaps/completed/EMPLOYEES_REACTIVATION_DELETION_QUESTIONS.md` sind bestätigt und in die Roadmap eingearbeitet.
+- Die Antworten in `docs/roadmaps/completed/S03_EMPLOYEES_REACTIVATION_DELETION_QUESTIONS.md` sind bestätigt und in die Roadmap eingearbeitet.
 
 Vorgesehenes Ergebnis:
 

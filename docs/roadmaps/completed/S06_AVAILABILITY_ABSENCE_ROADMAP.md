@@ -25,9 +25,9 @@ System 06 erzeugt noch keinen Dienstplan. Typ1-Dienste, schwarze `X`, automatisc
 - `Service-Leitung/README.md`
 - `Service-Leitung/AKTUELLER_STAND.md`
 - `Service-Leitung/GRUNDLAGEN_UND_ENTSCHEIDUNGEN.md`
-- `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`
-- `docs/decisions/SHARED_SQLITE_MIGRATION_BOUNDARY.md`
-- `docs/roadmaps/completed/AVAILABILITY_ABSENCE_QUESTIONS.md`
+- `docs/decisions/S03_EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`
+- `docs/decisions/S03_SHARED_SQLITE_MIGRATION_BOUNDARY.md`
+- `docs/roadmaps/completed/S06_AVAILABILITY_ABSENCE_QUESTIONS.md`
 - abgeschlossene Systeme 03, 04 und 05 mit ihren Roadmaps und Entscheidungen
 - ausschließlich synthetische Mitarbeiter-, Abwesenheits- und Plandaten in Tests und Dokumentation
 

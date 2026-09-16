@@ -18,10 +18,10 @@ Jeder wirksame Bedarf enthält die tatsächlich zu besetzende Zeit und eine kons
 - `AGENTS.md`
 - `MASTER_ROADMAP.md`
 - `STATUS.md`
-- `docs/decisions/SHIFT_TYPES_AND_STAFFING_DEMAND_MODEL.md`
-- `docs/decisions/SHARED_SQLITE_MIGRATION_BOUNDARY.md`
-- `docs/roadmaps/completed/WORK_LOCATIONS_SHIFT_TYPES_SPLIT_SHIFTS_ROADMAP.md`
-- `docs/roadmaps/completed/EMPLOYEES_EMPLOYEE_TYPES_SHIFT_ELIGIBILITY_ROADMAP.md`
+- `docs/decisions/S04_SHIFT_TYPES_AND_STAFFING_DEMAND_MODEL.md`
+- `docs/decisions/S03_SHARED_SQLITE_MIGRATION_BOUNDARY.md`
+- `docs/roadmaps/completed/S04_WORK_LOCATIONS_SHIFT_TYPES_SPLIT_SHIFTS_ROADMAP.md`
+- `docs/roadmaps/completed/S03_EMPLOYEES_EMPLOYEE_TYPES_SHIFT_ELIGIBILITY_ROADMAP.md`
 
 ## Bestätigte fachliche Grundlagen
 

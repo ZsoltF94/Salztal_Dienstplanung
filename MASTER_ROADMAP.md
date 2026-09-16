@@ -1,6 +1,6 @@
 # Master-Roadmap der Salztal-Dienstplanung
 
-Status: Grundfassung abgenommen am 2026-09-13; Systeme 05 und 06 abgeschlossen; System-07-Verständnis zur Abnahme konsolidiert
+Status: Grundfassung abgenommen am 2026-09-13; Systeme 05 und 06 abgeschlossen; System-07-Roadmap im Entwurf
 
 Stand: 2026-09-16
 
@@ -16,7 +16,7 @@ Vor jedem System wird eine eigene kleinschrittige Teil-Roadmap unter `docs/roadm
 - Die technischen Grenzen stehen in `ARCHITECTURE.md`.
 - Die Qualitätsregeln stehen in `CLEANCODE.md`.
 - Die Arbeits- und Abnahmeregeln stehen in `AGENTS.md`.
-- Die abgeschlossene Projektgrundlage ist in `docs/roadmaps/completed/PROJECT_FOUNDATION_ROADMAP.md` dokumentiert.
+- Die abgeschlossene Projektgrundlage ist in `docs/roadmaps/completed/S01_PROJECT_FOUNDATION_ROADMAP.md` dokumentiert.
 - Konkrete Mitarbeiter-, Dienst-, Bedarfs- und Planungsregeln werden erst in den dafür vorgesehenen Teil-Roadmaps gemeinsam festgelegt.
 
 ## Statuszeichen
@@ -64,7 +64,7 @@ Status: `[x]` – abgeschlossen und archiviert am 2026-09-13
 
 Ziel: Fachliche Grundlagen, Architektur, Qualitäts- und Arbeitsregeln sowie wahrheitsgemäße Projektsteuerung fertigstellen.
 
-Teil-Roadmap: `docs/roadmaps/completed/PROJECT_FOUNDATION_ROADMAP.md`
+Teil-Roadmap: `docs/roadmaps/completed/S01_PROJECT_FOUNDATION_ROADMAP.md`
 
 Abhängigkeiten: keine
 
@@ -74,7 +74,7 @@ Status: `[x]` – abgeschlossen und archiviert am 2026-09-13
 
 Ziel: Die leere Windows-11-Anwendung, Projektmodule, Abhängigkeitsgrenzen, zentrale Paketverwaltung und erste Architekturtests als belastbares Gerüst anlegen.
 
-Teil-Roadmap: `docs/roadmaps/completed/TECHNICAL_APP_SCAFFOLD_ROADMAP.md`
+Teil-Roadmap: `docs/roadmaps/completed/S02_TECHNICAL_APP_SCAFFOLD_ROADMAP.md`
 
 Abhängigkeiten: 01
 
@@ -84,7 +84,7 @@ Status: `[x]` – abgeschlossen und archiviert am 2026-09-14
 
 Ziel: Mitarbeitende mit getrennten Namen, Aktivstatus und genau einem gemeinsam referenzierten Mitarbeitertyp erfassen und lokal speichern. Jeder Typ stellt sein Wochen-Soll sowie reguläre, kontextabhängige und nur vorschlagsfähige Einsatzfreigaben als strukturierte Fachwerte bereit.
 
-Teil-Roadmap: `docs/roadmaps/completed/EMPLOYEES_EMPLOYEE_TYPES_SHIFT_ELIGIBILITY_ROADMAP.md`
+Teil-Roadmap: `docs/roadmaps/completed/S03_EMPLOYEES_EMPLOYEE_TYPES_SHIFT_ELIGIBILITY_ROADMAP.md`
 
 Nachtrag: Vor System 06 erweitert dessen abgenommener Vorbereitungsteil die bereits technisch vorbereitete Mitarbeitertypenpflege um drei weitere Starttypen, den `U`-/`K`-Tageswert sowie Anlegen, Bearbeiten und referenzgeschütztes Löschen in einem eigenen Tab. Der historische Abschluss von System 03 bleibt unverändert.
 
@@ -96,7 +96,7 @@ Status: `[x]` – abgeschlossen und archiviert am 2026-09-13
 
 Ziel: Erweiterbare Einsatzorte, normale Diensttypen mit bearbeitbaren Standardzeiten sowie die zusammengesetzten Einsatzmuster für den festen Restaurant-Doppeldienst `D` und den samstäglichen Springer `Spr` als fachliche Grundlage verwalten können.
 
-Teil-Roadmap: `docs/roadmaps/completed/WORK_LOCATIONS_SHIFT_TYPES_SPLIT_SHIFTS_ROADMAP.md`
+Teil-Roadmap: `docs/roadmaps/completed/S04_WORK_LOCATIONS_SHIFT_TYPES_SPLIT_SHIFTS_ROADMAP.md`
 
 Abhängigkeiten: 02
 
@@ -106,7 +106,7 @@ Status: `[x]` – abgeschlossen und archiviert am 2026-09-15
 
 Ziel: Standardbedarfe und datumsbezogene Ausnahmen je Einsatzort und genau einem verlangten Diensttyp mit tatsächlicher Zeit und Personenzahl erfassen; daraus Personen- und Stundenbedarf nachvollziehbar berechnen.
 
-Teil-Roadmap: `docs/roadmaps/completed/STAFFING_DEMAND_ROADMAP.md`
+Teil-Roadmap: `docs/roadmaps/completed/S05_STAFFING_DEMAND_ROADMAP.md`
 
 Abhängigkeiten: 04
 
@@ -116,19 +116,19 @@ Status: `[x]` – vollständig geprüft, ausdrücklich abgenommen und archiviert
 
 Ziel: Vorbereitend Mitarbeitertypen einschließlich Abwesenheits-Tageswert und Einsatzberechtigungen pflegen; anschließend Urlaub `U`, Krankheit `K` und verbindliche rote `X` für konkrete Kalendertage in einer Drei-Wochen-Ansicht erfassen, korrigieren und lokal speichern. Fortbildung, Wunschfrei und zeitliche Einschränkungen gehören nicht zur ersten Fassung.
 
-Teil-Roadmap: `docs/roadmaps/completed/AVAILABILITY_ABSENCE_ROADMAP.md`
+Teil-Roadmap: `docs/roadmaps/completed/S06_AVAILABILITY_ABSENCE_ROADMAP.md`
 
 Abhängigkeiten: 03
 
 ### 07 – Regelkatalog und Prioritäten
 
-Status: `[~]` – Fachfragen beantwortet und konsolidiert; fachliche Abnahme und Teil-Roadmap noch offen
+Status: `[~]` – Fachliche Grundlage abgenommen; Teil-Roadmap entworfen und noch nicht abgenommen
 
 Ziel: Gemeinsam bestätigte Regeln mit ihrer Wirkung für automatische Generierung und manuelle Bearbeitung als eine zentrale fachliche Quelle abbilden. Dazu gehören nicht übersteuerbare Strukturregeln, automatische Hard Rules, weiche Regeln mit den Prioritäten hoch, mittel und niedrig, der normale Wochenkorridor, die nachgelagerte AH-Planung sowie stabile Bewertungs- und Ursachecodes. Der feste Katalog wird nicht in WPF oder SQLite gepflegt.
 
-Teil-Roadmap: vor Beginn anzulegen und abzunehmen
+Teil-Roadmap: `docs/roadmaps/active/S07_RULE_CATALOG_ROADMAP.md` – Entwurf, noch nicht abgenommen
 
-Abhängigkeiten: 03 und 04; konkrete Regeln müssen fachlich bestätigt sein
+Abhängigkeiten: 03, 04, 05 und 06; fachliche Regeln sind bestätigt
 
 ### 08 – Planmodell und Planungszeiträume
 
@@ -264,4 +264,4 @@ System 16 ergänzt Zeitkonten nach gesonderter Priorisierung, ohne den Abschluss
 
 ## Nächster übergeordneter Schritt
 
-System 06 ist fachlich, technisch und sichtbar vollständig geprüft, ausdrücklich abgenommen und archiviert. Für System 07 sind alle Fragen und Folgefragen beantwortet. Der konsolidierte Verständnisstand und die dazugehörige Architekturentscheidung warten auf ausdrückliche Abnahme. Erst danach wird eine eigene Teil-Roadmap entworfen und abgenommen; Implementierung ist weiterhin nicht freigegeben.
+System 06 ist fachlich, technisch und sichtbar vollständig geprüft, ausdrücklich abgenommen und archiviert. Der konsolidierte Verständnisstand und die Architekturentscheidung für System 07 wurden am 2026-09-16 ausdrücklich abgenommen. `docs/roadmaps/active/S07_RULE_CATALOG_ROADMAP.md` liegt als kleinschrittiger Entwurf vor und wartet auf eigene Abnahme; Implementierung ist weiterhin nicht freigegeben.

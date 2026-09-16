@@ -1,6 +1,6 @@
 # Entscheidung: Diensttypen, tatsächliche Bedarfszeiten und Springer-Einsatz
 
-Status: Fachlich bestätigt am 2026-09-13; System 04 abgeschlossen; Mitarbeiterfreigaben am 2026-09-14 präzisiert; manuelle Zusatzbesetzung aus System 07 wartet auf Abnahme
+Status: Fachlich bestätigt am 2026-09-13; System 04 abgeschlossen; Mitarbeiterfreigaben am 2026-09-14 und manuelle Zusatzbesetzung am 2026-09-16 präzisiert
 
 ## Anlass
 
@@ -111,4 +111,4 @@ Diese Punkte blockieren noch keine Dokumentation des fachlichen Modells. Sie wer
 
 `D` und `Spr` bleiben unverändert zusammengesetzte Muster aus System 04 und niemals Diensttypen eines einzelnen Bedarfs. System 03 darf jedoch eine kontextabhängige Freigabe auf ihre stabilen `ShiftPatternId`-Werte referenzieren, ohne die Musterdefinition zu kopieren.
 
-Diese Präzisierung ist für `TypAH2` erforderlich: Frühdienst ist innerhalb von `D` regulär zulässig, als einzelner Dienst aber nur eine manuell zu bestätigende Lösungsmöglichkeit. Die optionale Verwendung von `TypAH2` für `Spr` bleibt zusätzlich von einer ausdrücklichen, standardmäßig ausgeschalteten Planungslaufoption und der allgemeinen Springer-Notfallbedingung abhängig. Die vollständige Entscheidung steht in `EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`.
+Diese Präzisierung ist für `TypAH2` erforderlich: Frühdienst ist innerhalb von `D` regulär zulässig, als einzelner Dienst aber nur eine manuell zu bestätigende Lösungsmöglichkeit. Die optionale Verwendung von `TypAH2` für `Spr` bleibt zusätzlich von einer ausdrücklichen, standardmäßig ausgeschalteten Planungslaufoption und der allgemeinen Springer-Notfallbedingung abhängig. Die vollständige Entscheidung steht in `S03_EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`.

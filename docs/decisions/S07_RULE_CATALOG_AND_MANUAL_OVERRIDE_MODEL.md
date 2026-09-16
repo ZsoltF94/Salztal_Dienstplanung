@@ -1,6 +1,6 @@
 # Entscheidung: Regelkatalog und manuelle Abweichungen
 
-Status: Entwurf zur fachlichen und architektonischen Abnahme; noch nicht implementiert
+Status: Fachlich und architektonisch am 2026-09-16 ausdrücklich abgenommen; noch nicht implementiert
 
 Stand: 2026-09-16
 
@@ -8,7 +8,7 @@ Stand: 2026-09-16
 
 Die bisherigen Grundlagen unterschieden nur zwischen zwingenden und weichen Regeln. Die vollständige Befragung für System 07 hat zusätzlich ergeben, dass die Service-Leitung bestimmte für die Automatik zwingende Planungsregeln später bewusst manuell übergehen darf, während widersprüchliche Plandaten weiterhin unmöglich bleiben müssen.
 
-Diese Entscheidung konsolidiert die beantworteten Fragen aus `docs/roadmaps/active/RULE_CATALOG_QUESTIONS.md`. Sie wird erst nach ausdrücklicher Abnahme verbindlich und gibt weder die System-07-Roadmap noch Implementierung frei.
+Diese Entscheidung konsolidiert die beantworteten Fragen aus `docs/roadmaps/active/S07_RULE_CATALOG_QUESTIONS.md`. Sie wurde am 2026-09-16 ausdrücklich abgenommen. Die Abnahme gibt weder die System-07-Roadmap noch Implementierung frei.
 
 ## Entscheidung
 
@@ -103,6 +103,6 @@ Regelarten, Grenzwerte, Prioritäten und Aktivierung sind nicht frei bearbeitbar
 - keine Erweiterung um externe gesetzliche oder tarifliche Regeln,
 - keine System-07-Implementierung vor einer eigenen abgenommenen Teil-Roadmap.
 
-## Abnahmebedingung
+## Abnahme
 
-Vor dem Roadmap-Entwurf bestätigt der Auftraggeber, dass diese Entscheidung und der konsolidierte Abschnitt des Fragenkatalogs das fachliche Verständnis vollständig und widerspruchsfrei wiedergeben. Erst danach werden beide Dokumente als abgenommen gekennzeichnet und die Teil-Roadmap für System 07 entworfen.
+Der Auftraggeber hat am 2026-09-16 bestätigt, dass diese Entscheidung und der konsolidierte Abschnitt des Fragenkatalogs das fachliche Verständnis vollständig und widerspruchsfrei wiedergeben. Auf dieser Grundlage wurde `docs/roadmaps/active/S07_RULE_CATALOG_ROADMAP.md` als eigener, noch abzunehmender Roadmap-Entwurf erstellt.

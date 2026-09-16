@@ -269,7 +269,7 @@ Abnahmebedingung:
 
 Tatsächlich umgesetzt:
 
-- Die Prüfung und Auswahl ist in `docs/decisions/TECHNICAL_PACKAGE_BASELINE.md` mit offiziellen Quellen, Zweck, Lizenz, Wartungsstand, Kompatibilität und offenen Laufzeitgates dokumentiert.
+- Die Prüfung und Auswahl ist in `docs/decisions/S02_TECHNICAL_PACKAGE_BASELINE.md` mit offiziellen Quellen, Zweck, Lizenz, Wartungsstand, Kompatibilität und offenen Laufzeitgates dokumentiert.
 - `CommunityToolkit.Mvvm` `8.4.2` zentral festgelegt und ausschließlich in Desktop direkt referenziert.
 - `Microsoft.EntityFrameworkCore.Sqlite` `10.0.12` zentral festgelegt und ausschließlich in Infrastructure direkt referenziert.
 - `Google.OrTools` `9.15.6755` zentral festgelegt und ausschließlich in Planning direkt referenziert.

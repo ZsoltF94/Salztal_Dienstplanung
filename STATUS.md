@@ -2,17 +2,17 @@
 
 Stand: 2026-09-16
 
-Status dieses Dokuments: Aktuell – System 07 fachlich konsolidiert, Abnahme noch offen
+Status dieses Dokuments: Aktuell – System-07-Roadmap entworfen, Abnahme noch offen
 
 ## Aktueller Überblick
 
 | Bereich | Aktueller Stand |
 |---|---|
-| Projektphase | Systeme 05 und 06 abgeschlossen; System-07-Verständnis zur Abnahme konsolidiert |
-| Aktives System | Keine Implementierung freigegeben; System-07-Fragen und Folgefragen sind beantwortet |
-| Aktive Teil-Roadmap | Keine; System 06 liegt unter `docs/roadmaps/completed/AVAILABILITY_ABSENCE_ROADMAP.md` |
-| Aktueller Stand | System-07-Prioritätsmatrix und Architekturentscheidung erstellt; fachliche Abnahme steht aus |
-| Zuletzt abgenommener Schritt | VA-06 – Gesamtnachweis und ausdrückliche Abnahme von System 06 |
+| Projektphase | Systeme 05 und 06 abgeschlossen; System-07-Roadmap im Abnahmeverfahren |
+| Aktives System | Keine Implementierung freigegeben; Roadmap-Entwurf für System 07 liegt vor |
+| Aktive Teil-Roadmap | `docs/roadmaps/active/S07_RULE_CATALOG_ROADMAP.md` – Entwurf, noch nicht abgenommen |
+| Aktueller Stand | Fachliche Konsolidierung und Architekturentscheidung abgenommen; Roadmap wartet auf Abnahme |
+| Zuletzt abgenommener Schritt | Fachliche und architektonische System-07-Konsolidierung am 2026-09-16 |
 | Funktionsfähige App | Einsatzorte, Diensttyp-Standardzeiten, Mitarbeitende, regelmäßige Bedarfe und einzelne Tagesänderungen können im bestätigten Umfang verwaltet werden; noch keine Dienstplanfunktion |
 | Echte Mitarbeiter- oder Plandaten im Repository | Keine Daten übernommen; `dienstplan beispiel blank.jpeg` wurde als reines Beispiel ohne personenbezogene oder reale Planungsdaten bestätigt, bleibt unversioniert und wird nicht als Fachdatenquelle verwendet |
 
@@ -34,14 +34,15 @@ Status dieses Dokuments: Aktuell – System 07 fachlich konsolidiert, Abnahme no
 
 ## Aktuell
 
-- Alle 85 Ausgangsfragen und 14 Folgefragen für System 07 sind beantwortet und in `docs/roadmaps/active/RULE_CATALOG_QUESTIONS.md` konsolidiert.
+- Alle 85 Ausgangsfragen und 14 Folgefragen für System 07 sind beantwortet und in `docs/roadmaps/active/S07_RULE_CATALOG_QUESTIONS.md` konsolidiert.
 - Die Konsolidierung unterscheidet automatische Hard Rules, manuell übersteuerbare Planungsregeln und nicht übersteuerbare Strukturregeln. Sie enthält außerdem die fachliche Prioritätsmatrix und die Übergaben an Systeme 08 bis 12.
-- `docs/decisions/RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md` dokumentiert die daraus folgende Architekturänderung als Entwurf zur Abnahme.
+- Die Konsolidierung und `docs/decisions/S07_RULE_CATALOG_AND_MANUAL_OVERRIDE_MODEL.md` wurden am 2026-09-16 ausdrücklich fachlich und architektonisch abgenommen.
+- `docs/roadmaps/active/S07_RULE_CATALOG_ROADMAP.md` gliedert System 07 in sieben kleine Schritte von der Regelsprache bis zum Gesamtnachweis. Der Entwurf wartet auf ausdrückliche Abnahme.
 - Die erste Fassung bildet nur die bestätigten internen Regeln der Service-Leitung ab und behauptet keine vollständige gesetzliche oder tarifliche Regelprüfung.
-- Noch nicht freigegeben sind die System-07-Teil-Roadmap, Implementierung, WPF-Oberfläche, Datenbankspeicherung oder Solver-Übersetzung.
+- Noch nicht freigegeben sind RK-01 und jede weitere Implementierung. WPF-Oberfläche, Datenbankspeicherung und Solver-Übersetzung gehören nicht zu System 07.
 
-- Die Fachfragen für System 06 sind beantwortet und in `docs/roadmaps/completed/AVAILABILITY_ABSENCE_QUESTIONS.md` archiviert.
-- Die vollständig abgenommene Teil-Roadmap `docs/roadmaps/completed/AVAILABILITY_ABSENCE_ROADMAP.md` enthält den Mitarbeitertypen-Vorbereitungsteil und die Drei-Wochen-Erfassung.
+- Die Fachfragen für System 06 sind beantwortet und in `docs/roadmaps/completed/S06_AVAILABILITY_ABSENCE_QUESTIONS.md` archiviert.
+- Die vollständig abgenommene Teil-Roadmap `docs/roadmaps/completed/S06_AVAILABILITY_ABSENCE_ROADMAP.md` enthält den Mitarbeitertypen-Vorbereitungsteil und die Drei-Wochen-Erfassung.
 - MT-01 führt eine strukturierte Planungsrolle für normale Typen, Typ1 und AH sowie eine unveränderliche `U`-/`K`-Regel mit einem geprüften Tageswert von höchstens 24 Stunden ein. Kennung, Code und Sonderrolle bleiben bei der fachlichen Bearbeitung erhalten.
 - Der Domain-Startkatalog enthält jetzt elf Typen einschließlich `Typ20`, `Typ20a` und `Typ25a`. Normale Typen verwenden die normale automatische Planungsrolle; Typ1 und AH behalten ihre geschützten Rollen. Die neuen Domain-Werte und Einsatzfreigaben sind automatisch geprüft.
 - MT-03 führt die vorhandene gemeinsame SQLite-Migrationsfolge fort. Alle elf Starttypen, Abwesenheitswerte und geschützten Planungsrollen werden nun strukturiert gespeichert; die frühere kennungsbasierte Übergangsabbildung für AH ist nicht mehr erforderlich.
@@ -50,7 +51,7 @@ Status dieses Dokuments: Aktuell – System 07 fachlich konsolidiert, Abnahme no
 - Ein neuer Typ erhält immer die normale Planungsrolle. Beim Bearbeiten bleiben Kennung, Typcode und besondere Typ1- oder AH-Rolle unverändert; doppelte Codes und unbekannte Katalogbezüge werden mit stabilen Codes und verständlichen Meldungen abgelehnt.
 - Endgültiges Löschen benötigt eine ausdrückliche Bestätigung. Typ1- und AH-Rollen sowie Typen mit zugeordneten aktiven oder deaktivierten Personen oder anderen Fachdaten werden geschützt; zwischenzeitliche Änderungen führen ohne Teiländerung zu einem Konfliktergebnis.
 - Die drei schmalen Speicherverträge für Anlegen, Bearbeiten und Löschen sind vorbereitet. Eine konkrete SQLite-Implementierung, Migration oder sichtbare Bedienoberfläche gehört noch nicht zu MT-02.
-- System 05 – Personal-, Schicht- und Stundenbedarf – wurde am 2026-09-15 nach dem vollständigen BE-10-Nachweis ausdrücklich abgenommen und nach `docs/roadmaps/completed/STAFFING_DEMAND_ROADMAP.md` archiviert.
+- System 05 – Personal-, Schicht- und Stundenbedarf – wurde am 2026-09-15 nach dem vollständigen BE-10-Nachweis ausdrücklich abgenommen und nach `docs/roadmaps/completed/S05_STAFFING_DEMAND_ROADMAP.md` archiviert.
 - BE-09A und BE-09B bilden gemeinsam den abgenommenen korrigierten Bedienstand: regelmäßige Bedarfe werden unter „Einsatzorte und Dienste“ verwaltet, einzelne Tagesänderungen im Reiter „Bedarf“, und derselbe Wirksamkeitsmontag bleibt wiederholt korrigierbar.
 - Die vollständigen Startbedarfe, ab Montag wirksame Standardrevisionen, vollständige Datumsausnahmen, manuelle Feiertagsbehandlung und höchstens ein zusammenhängender Bedarfsblock je Einsatzort, Datum und Diensttyp sind fachlich bestätigt.
 - Die geplanten Code-Anker halten Bedarfs-Domain, Application-Verträge, `Persistence/StaffingDemands` und `Features/StaffingDemands` getrennt. Die bestehende gemeinsame SQLite-Migrationsfolge bleibt verbindlich.
@@ -104,7 +105,7 @@ Status dieses Dokuments: Aktuell – System 07 fachlich konsolidiert, Abnahme no
 - BE-09B erlaubt nun eine zweite und weitere Änderung desselben regelmäßigen Bedarfs am selben Wirksamkeitsmontag. Fortlaufende unveränderliche Korrekturfassungen bleiben erhalten; für den jeweiligen Montag gilt die zuletzt gespeicherte Fassung.
 - Der regelmäßige Bedarfsbereich zeigt den links gewählten Einsatzort vollständig von Montag bis Sonntag. Die zusätzliche Einsatzortauswahl im rechten Editor ist entfallen; vorhandene und fehlende Bedarfe können aus der Woche zur Bearbeitung gewählt werden.
 - Die neue verlustfreie Migration `20260914185047_AddStandardDemandCorrectionSequence` übernimmt bestehende Revisionen mit Folge `1` und sichert positive, je Bedarfsschlüssel und Montag eindeutige Korrekturfolgen.
-- Die Mitarbeiterfragen und Folgefragen sind vollständig beantwortet. Die fachlichen Entscheidungen stehen in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`.
+- Die Mitarbeiterfragen und Folgefragen sind vollständig beantwortet. Die fachlichen Entscheidungen stehen in `docs/decisions/S03_EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`.
 - Jeder Mitarbeiter erhält genau einen gemeinsam referenzierten bindenden Mitarbeitertyp. Wochen-Soll und Einsatzfreigaben gehören zum Typ und werden nicht als unabhängige Mitarbeiterkopien gespeichert.
 - Die acht Starttypen, ihre Wochen-Sollwerte, regulären Einsatzmöglichkeiten sowie die Typ1- und AH-Sonderfälle sind festgehalten.
 - Für die erste Fassung wird kein zusätzlicher Qualifikationskatalog benötigt. System 03 heißt deshalb künftig „Mitarbeitende, Mitarbeitertypen und Einsatzfreigaben“.
@@ -141,7 +142,7 @@ Status dieses Dokuments: Aktuell – System 07 fachlich konsolidiert, Abnahme no
 - System 04 – Einsatzorte, Diensttypen und Doppeldienste – ist als erstes Fachsystem ausgewählt, damit System 03 später vorhandene stabile Kennungen zuordnen kann.
 - Die beantwortete Fragen-Datei bestätigt Einsatzorte, Diensttypen, Standardzeiten, tatsächliche Bedarfszeiten, Doppeldienst, Springer und den minimalen Bedienumfang.
 - Die frühere Annahme einer stets festen Diensttypzeit ist ersetzt: Jeder Bedarf verlangt genau einen Diensttyp, besitzt aber seine tatsächliche, ausdrücklich bearbeitbare Zeit.
-- Die Entscheidung und ihre Auswirkungen auf die Systeme 03 bis 12 sind in `docs/decisions/SHIFT_TYPES_AND_STAFFING_DEMAND_MODEL.md` festgehalten.
+- Die Entscheidung und ihre Auswirkungen auf die Systeme 03 bis 12 sind in `docs/decisions/S04_SHIFT_TYPES_AND_STAFFING_DEMAND_MODEL.md` festgehalten.
 - ED-01 und damit der Roadmap-Entwurf sind ausdrücklich abgenommen.
 - ED-02 trennt normale Diensttypen von den zusammengesetzten Einsatzmustern `D` und `Spr` und ist ausdrücklich abgenommen.
 - ED-03 führt `WorkLocation`, die stark typisierte `WorkLocationId`, geprüfte Namen und erweiterbare semantische Farbkennungen ausschließlich in Domain ein.
@@ -247,7 +248,7 @@ Die Antworten sind in der Fragen-Datei und im Entscheidungsdokument festgehalten
 - Stunden werden aus tatsächlicher Dauer mal Personenzahl in ganzen Minuten berechnet und nicht unabhängig eingegeben.
 - Die erste Übersicht soll Bedarf, Tagessummen je Einsatzort, Wochensummen je Einsatzort und die Gesamtsumme der Woche darstellen; die atomaren Daten bleiben für spätere abgestimmte Summen verfügbar.
 
-Diese Entscheidungen und die umgesetzten Code-Anker stehen in `docs/roadmaps/completed/STAFFING_DEMAND_ROADMAP.md`. BE-01 bis BE-08 sowie die korrigierten Zielabläufe aus BE-09A und BE-09B sind ausdrücklich abgenommen; BE-10 und System 05 sind abgeschlossen.
+Diese Entscheidungen und die umgesetzten Code-Anker stehen in `docs/roadmaps/completed/S05_STAFFING_DEMAND_ROADMAP.md`. BE-01 bis BE-08 sowie die korrigierten Zielabläufe aus BE-09A und BE-09B sind ausdrücklich abgenommen; BE-10 und System 05 sind abgeschlossen.
 
 ## Bestätigte Entscheidungen für System 03
 
@@ -266,7 +267,7 @@ Diese Entscheidungen und die umgesetzten Code-Anker stehen in `docs/roadmaps/com
 - kein zusätzlicher Qualifikationskatalog in der ersten Fassung,
 - erste Mitarbeiteroberfläche mit Übersicht, Anlegen, Bearbeiten, Typwechsel und Deaktivieren; noch ohne Suche, Filter und Typenkatalogpflege.
 
-Die vollständige Fachentscheidung steht in `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`; die gemeinsame technische Migrationsgrenze in `docs/decisions/SHARED_SQLITE_MIGRATION_BOUNDARY.md`. MA-01 bis MA-11 einschließlich MA-02A sind abgenommen; System 03 ist abgeschlossen und archiviert.
+Die vollständige Fachentscheidung steht in `docs/decisions/S03_EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`; die gemeinsame technische Migrationsgrenze in `docs/decisions/S03_SHARED_SQLITE_MIGRATION_BOUNDARY.md`. MA-01 bis MA-11 einschließlich MA-02A sind abgenommen; System 03 ist abgeschlossen und archiviert.
 
 ## Bestätigte Entscheidungen für System 06 und seinen Vorbereitungsteil
 
@@ -284,7 +285,7 @@ Die vollständige Fachentscheidung steht in `docs/decisions/EMPLOYEE_TYPES_AND_S
 
 ## Offene Entscheidungen für spätere Systeme
 
-- ausdrückliche Abnahme des konsolidierten System-07-Regelkatalogs und seiner Architekturentscheidung,
+- ausdrückliche Abnahme der entworfenen System-07-Teil-Roadmap,
 - Inhalt und Aufbau der noch bereitzustellenden Excel-Vorlage,
 - endgültige Bestätigung der Excel-Bibliothek nach dem Vorlagentest,
 - praktische Voraussetzungen der portablen Ausgabe auf dem vorgesehenen Windows-11-Rechner.
@@ -327,4 +328,4 @@ Keines dieser späteren Gates wird vorzeitig als bestanden geführt.
 
 ## Nächster minimaler Schritt
 
-Der konsolidierte Verständnisstand für System 07 wartet auf ausdrückliche fachliche und architektonische Abnahme. Danach ist der nächste minimale Schritt der Entwurf einer eigenen kleinschrittigen Teil-Roadmap. Vor jeglicher Implementierung muss auch diese Roadmap ausdrücklich abgenommen werden.
+Der konsolidierte Verständnisstand und die Architekturentscheidung für System 07 sind ausdrücklich abgenommen. Der nächste minimale Schritt ist die Prüfung und ausdrückliche Abnahme von `docs/roadmaps/active/S07_RULE_CATALOG_ROADMAP.md`. Erst danach darf RK-01 beginnen.

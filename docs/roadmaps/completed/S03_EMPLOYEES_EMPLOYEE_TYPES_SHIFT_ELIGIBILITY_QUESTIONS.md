@@ -23,10 +23,10 @@ Alle Beispiele verwenden ausschließlich Typbezeichnungen und keine echten Mitar
 - `Service-Leitung/README.md`
 - `Service-Leitung/AKTUELLER_STAND.md`
 - `Service-Leitung/GRUNDLAGEN_UND_ENTSCHEIDUNGEN.md`
-- `docs/decisions/ARCHITECTURE_PROPOSAL.md`
-- `docs/decisions/SHIFT_TYPES_AND_STAFFING_DEMAND_MODEL.md`
-- `docs/decisions/TECHNICAL_PACKAGE_BASELINE.md`
-- die inzwischen abgeschlossene Teil-Roadmap `EMPLOYEES_EMPLOYEE_TYPES_SHIFT_ELIGIBILITY_ROADMAP.md`
+- `docs/decisions/S01_ARCHITECTURE_PROPOSAL.md`
+- `docs/decisions/S04_SHIFT_TYPES_AND_STAFFING_DEMAND_MODEL.md`
+- `docs/decisions/S02_TECHNICAL_PACKAGE_BASELINE.md`
+- die inzwischen abgeschlossene Teil-Roadmap `S03_EMPLOYEES_EMPLOYEE_TYPES_SHIFT_ELIGIBILITY_ROADMAP.md`
 - die abgeschlossene Roadmap und Fragen-Datei von System 04
 - die vorhandenen Domain-, Application-, Infrastructure- und Composition-Verträge aus System 04
 
@@ -551,6 +551,6 @@ Die Antworten sind vollständig in die abgenommene Roadmap eingearbeitet. MA-02 
 
 - MA-09 wurde am 2026-09-14 sichtbar abgenommen.
 - MA-10 mit Anlegen, Bearbeiten, Typwechsel und Deaktivieren ist umgesetzt, automatisch geprüft und sichtbar abgenommen.
-- Die neue Anforderung zum Reaktivieren und endgültigen Löschen deaktivierter Mitarbeitender ist als MA-10A ergänzt. Beide Empfehlungen aus `docs/roadmaps/completed/EMPLOYEES_REACTIVATION_DELETION_QUESTIONS.md` sind bestätigt; MA-10A ist umgesetzt, automatisch geprüft und gemeinsam mit MA-10 sichtbar abgenommen.
+- Die neue Anforderung zum Reaktivieren und endgültigen Löschen deaktivierter Mitarbeitender ist als MA-10A ergänzt. Beide Empfehlungen aus `docs/roadmaps/completed/S03_EMPLOYEES_REACTIVATION_DELETION_QUESTIONS.md` sind bestätigt; MA-10A ist umgesetzt, automatisch geprüft und gemeinsam mit MA-10 sichtbar abgenommen.
 - MA-11 hat den vollständigen System-03-Umfang und die Übergaben an spätere Systeme abgeglichen. System 03 wurde anschließend ausdrücklich abgenommen und archiviert.
 - Planning bleibt weiterhin unverändert.

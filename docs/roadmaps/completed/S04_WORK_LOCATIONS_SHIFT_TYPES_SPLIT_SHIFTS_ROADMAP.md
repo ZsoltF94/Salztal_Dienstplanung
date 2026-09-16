@@ -4,7 +4,7 @@ Status: Abgeschlossen und archiviert am 2026-09-13
 
 Stand: 2026-09-13
 
-Nachtrag vom 2026-09-14: Die spätere System-03-Entscheidung führt bindende Mitarbeitertypen und eine kontextabhängige Musterfreigabe für `TypAH2` ein. System 04 bleibt weiterhin alleinige Quelle für Definition, Kennung und Bestandteile von `D` und `Spr`; der historische Abschluss dieses Systems wird dadurch nicht verändert. Siehe `docs/decisions/EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`.
+Nachtrag vom 2026-09-14: Die spätere System-03-Entscheidung führt bindende Mitarbeitertypen und eine kontextabhängige Musterfreigabe für `TypAH2` ein. System 04 bleibt weiterhin alleinige Quelle für Definition, Kennung und Bestandteile von `D` und `Spr`; der historische Abschluss dieses Systems wird dadurch nicht verändert. Siehe `docs/decisions/S03_EMPLOYEE_TYPES_AND_SHIFT_ELIGIBILITY_MODEL.md`.
 
 ## Ziel und Nutzen
 
@@ -128,7 +128,7 @@ System 04 schafft damit die eindeutige Quelle für Einsatzorte und Diensttypen. 
 
 ## Bestätigte Entscheidungen für diesen Entwurf
 
-Die begleitende Datei [Fragen zu Einsatzorten, Diensttypen, Doppeldiensten und Belegung](WORK_LOCATIONS_SHIFT_TYPES_SPLIT_SHIFTS_QUESTIONS.md) wurde am 2026-09-13 fachlich beantwortet. Die begründete Änderung des bisherigen Zeitmodells steht in `docs/decisions/SHIFT_TYPES_AND_STAFFING_DEMAND_MODEL.md`.
+Die begleitende Datei [Fragen zu Einsatzorten, Diensttypen, Doppeldiensten und Belegung](S04_WORK_LOCATIONS_SHIFT_TYPES_SPLIT_SHIFTS_QUESTIONS.md) wurde am 2026-09-13 fachlich beantwortet. Die begründete Änderung des bisherigen Zeitmodells steht in `docs/decisions/S04_SHIFT_TYPES_AND_STAFFING_DEMAND_MODEL.md`.
 
 - Cafeteria und Restaurant werden als Startwerte angelegt; weitere Einträge bleiben durch ein erweiterbares Datenmodell möglich.
 - Einsatzorte besitzen keine eigenen Arbeits-, Öffnungs- oder Betriebszeiten.

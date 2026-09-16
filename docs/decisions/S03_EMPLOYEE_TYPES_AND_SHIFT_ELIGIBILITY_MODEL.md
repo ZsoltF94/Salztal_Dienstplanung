@@ -1,6 +1,6 @@
 # Entscheidung: Bindende Mitarbeitertypen und Einsatzfreigaben
 
-Status: Fachlich bestätigt und mit MA-01 am 2026-09-14 ausdrücklich abgenommen; Erweiterung für System 06 am 2026-09-15 bestätigt; Korridorpräzisierung aus System 07 wartet auf Abnahme
+Status: Fachlich bestätigt und mit MA-01 am 2026-09-14 ausdrücklich abgenommen; Erweiterung für System 06 am 2026-09-15 und Korridorpräzisierung am 2026-09-16 bestätigt
 
 Stand: 2026-09-16
 
