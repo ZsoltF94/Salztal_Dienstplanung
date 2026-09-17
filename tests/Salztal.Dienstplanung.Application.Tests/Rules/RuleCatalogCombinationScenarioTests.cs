@@ -24,6 +24,7 @@ public sealed class RuleCatalogCombinationScenarioTests
     public async Task ApplicationCatalogAndExamplesShareCompleteStableScenarioReferences()
     {
         RuleCatalogSnapshot snapshot = await GetRuleCatalogQuery.ExecuteAsync(
+            1,
             TestContext.Current.CancellationToken);
         string document = ReadExamplesDocument();
 

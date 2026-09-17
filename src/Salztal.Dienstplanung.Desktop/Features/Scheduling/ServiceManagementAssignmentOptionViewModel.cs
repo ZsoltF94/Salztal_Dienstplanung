@@ -1,4 +1,5 @@
 using System.Globalization;
+using CommunityToolkit.Mvvm.Input;
 using Salztal.Dienstplanung.Application.Scheduling;
 
 namespace Salztal.Dienstplanung.Desktop.Features.Scheduling;
@@ -6,13 +7,23 @@ namespace Salztal.Dienstplanung.Desktop.Features.Scheduling;
 internal sealed class ServiceManagementAssignmentOptionViewModel
 {
     public ServiceManagementAssignmentOptionViewModel(
-        ServiceManagementAssignmentOptionSnapshot snapshot)
+        ServiceManagementAssignmentOptionSnapshot snapshot,
+        bool isCurrent,
+        IAsyncRelayCommand<ServiceManagementAssignmentOptionViewModel> selectCommand)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
+        ArgumentNullException.ThrowIfNull(selectCommand);
         Snapshot = snapshot;
+        IsCurrent = isCurrent;
+        SelectCommand = selectCommand;
     }
 
     public ServiceManagementAssignmentOptionSnapshot Snapshot { get; }
+
+    public bool IsCurrent { get; }
+
+    public IAsyncRelayCommand<ServiceManagementAssignmentOptionViewModel> SelectCommand
+    { get; }
 
     public string Display => Snapshot.Kind switch
     {

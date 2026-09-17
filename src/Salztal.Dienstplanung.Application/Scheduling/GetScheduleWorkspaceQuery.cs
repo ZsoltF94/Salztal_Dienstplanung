@@ -135,13 +135,33 @@ public sealed class GetScheduleWorkspaceQuery
             availability,
             slots,
             assignments,
+            draft.GeneratedDayOffMarkers.Select(marker =>
+                new ScheduleGeneratedDayOffSnapshot(
+                    marker.EmployeeId.Value,
+                    marker.Date)),
             assignmentOptions,
             readiness,
             preparation.Status,
             data.PreparedSnapshot?.Id,
             data.PreparedSnapshot?.RunOptions,
             data.PreparedSnapshot?.History.Completeness,
-            preparation.ChangedCategories);
+            preparation.ChangedCategories,
+            CreateAcceptedAutomaticSchedule(draft, data.AutomaticScheduleRun));
+    }
+
+    private static AcceptedAutomaticScheduleSnapshot? CreateAcceptedAutomaticSchedule(
+        ScheduleDraft draft,
+        AutomaticScheduleRunRecord? run)
+    {
+        if (run is null)
+        {
+            return null;
+        }
+
+        return new AcceptedAutomaticScheduleSnapshot(
+            draft.Assignments.Count(assignment =>
+                assignment.Origin == AssignmentOrigin.AutomaticGeneration),
+            draft.GeneratedDayOffMarkers.Count);
     }
 
     private static ServiceManagementAssignmentOptionSnapshot[] CreateAssignmentOptions(

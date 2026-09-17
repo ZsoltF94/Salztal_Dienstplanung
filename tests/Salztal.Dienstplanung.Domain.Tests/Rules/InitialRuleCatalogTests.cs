@@ -84,7 +84,7 @@ public sealed class InitialRuleCatalogTests
     [Fact]
     public void ReadWhenVersionIsUnknownReturnsStructuredUnsupportedVersionError()
     {
-        Assert.True(RuleCatalogVersion.TryCreate(2, out RuleCatalogVersion? version));
+        Assert.True(RuleCatalogVersion.TryCreate(3, out RuleCatalogVersion? version));
 
         RuleCatalogReadResult result = InitialRuleCatalog.Read(version);
 
@@ -92,6 +92,28 @@ public sealed class InitialRuleCatalogTests
         Assert.Null(result.Value);
         Assert.Equal(RuleCatalogReadCode.UnsupportedVersion, result.Error!.Code);
         Assert.Equal(version, result.Error.RequestedVersion);
+    }
+
+    [Fact]
+    public void ReadCurrentVersionReturnsVersionTwoWithoutReinterpretingVersionOne()
+    {
+        RuleCatalog versionOne = ReadVersionOne();
+        RuleCatalogReadResult currentResult = InitialRuleCatalog.Read(
+            InitialRuleCatalog.Version);
+        RuleCatalog current = Assert.IsType<RuleCatalog>(currentResult.Value);
+
+        Assert.Equal(1, versionOne.Version.Value);
+        Assert.Equal(2, current.Version.Value);
+        Assert.Equal(28, versionOne.Definitions.Count);
+        Assert.Equal(30, current.Definitions.Count);
+        Assert.Contains(versionOne.Definitions, rule =>
+            rule.Id == InitialSoftRuleDefinitions.AuxiliaryWeeklyTarget.Id);
+        Assert.DoesNotContain(current.Definitions, rule =>
+            rule.Id == InitialSoftRuleDefinitions.AuxiliaryWeeklyTarget.Id);
+        Assert.Contains(current.Definitions, rule =>
+            rule.Id == CurrentSoftRuleDefinitions.AuxiliaryWeeklyMinimum.Id);
+        Assert.Contains(current.Definitions, rule =>
+            rule.Id == CurrentSoftRuleDefinitions.RelativeWeeklyTarget.Id);
     }
 
     [Fact]
@@ -138,7 +160,8 @@ public sealed class InitialRuleCatalogTests
 
     private static RuleCatalog ReadVersionOne()
     {
-        RuleCatalogReadResult result = InitialRuleCatalog.Read(InitialRuleCatalog.Version);
+        RuleCatalogReadResult result = InitialRuleCatalog.Read(
+            InitialRuleCatalog.VersionOne);
         Assert.True(result.IsSuccess);
         Assert.Null(result.Error);
         return Assert.IsType<RuleCatalog>(result.Value);

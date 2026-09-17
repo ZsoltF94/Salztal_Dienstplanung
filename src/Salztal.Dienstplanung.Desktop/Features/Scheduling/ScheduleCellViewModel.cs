@@ -9,6 +9,7 @@ namespace Salztal.Dienstplanung.Desktop.Features.Scheduling;
 internal sealed class ScheduleCellViewModel : ObservableObject
 {
     private static readonly CultureInfo GermanCulture = CultureInfo.GetCultureInfo("de-DE");
+    private bool _isAssignmentEditorOpen;
     private bool _isSelected;
 
     public ScheduleCellViewModel(
@@ -19,7 +20,9 @@ internal sealed class ScheduleCellViewModel : ObservableObject
         bool isServiceManagement,
         AvailabilityDayEntryKind? entryKind,
         long? changeVersion,
+        bool isGeneratedDayOff,
         ScheduleAssignmentSnapshot? assignment,
+        ScheduleAssignmentDisplay? assignmentDisplay,
         IEnumerable<ServiceManagementAssignmentOptionViewModel> assignmentOptions)
     {
         ArgumentNullException.ThrowIfNull(assignmentOptions);
@@ -30,7 +33,9 @@ internal sealed class ScheduleCellViewModel : ObservableObject
         IsServiceManagement = isServiceManagement;
         EntryKind = entryKind;
         ChangeVersion = changeVersion;
+        IsGeneratedDayOff = isGeneratedDayOff;
         Assignment = assignment;
+        AssignmentDisplay = assignmentDisplay;
         AssignmentOptions = Array.AsReadOnly(assignmentOptions.ToArray());
     }
 
@@ -50,6 +55,10 @@ internal sealed class ScheduleCellViewModel : ObservableObject
 
     public ScheduleAssignmentSnapshot? Assignment { get; }
 
+    public ScheduleAssignmentDisplay? AssignmentDisplay { get; }
+
+    public bool IsGeneratedDayOff { get; }
+
     public ReadOnlyCollection<ServiceManagementAssignmentOptionViewModel>
         AssignmentOptions
     { get; }
@@ -60,12 +69,19 @@ internal sealed class ScheduleCellViewModel : ObservableObject
         set => SetProperty(ref _isSelected, value);
     }
 
+    public bool IsAssignmentEditorOpen
+    {
+        get => _isAssignmentEditorOpen;
+        set => SetProperty(ref _isAssignmentEditorOpen, value);
+    }
+
     public string EntryDisplay => EntryKind switch
     {
         AvailabilityDayEntryKind.Vacation => "U",
         AvailabilityDayEntryKind.Sickness => "K",
         AvailabilityDayEntryKind.FixedDayOff => "X",
-        null => CreateAssignmentDisplay(Assignment),
+        null when IsGeneratedDayOff => "X",
+        null => AssignmentDisplay?.Text ?? string.Empty,
         _ => "?",
     };
 
@@ -73,7 +89,14 @@ internal sealed class ScheduleCellViewModel : ObservableObject
 
     public bool HasAssignment => Assignment is not null;
 
-    public bool HasEntry => EntryKind is not null;
+    public bool HasEntry => EntryKind is not null || IsGeneratedDayOff;
+
+    public bool CanOpenAssignmentEditor =>
+        IsServiceManagement
+        && AssignmentOptions.Count > 0
+        && !IsGeneratedDayOff
+        && Assignment?.Origin is not ScheduleAssignmentOriginSnapshot.AutomaticGeneration
+            and not ScheduleAssignmentOriginSnapshot.ManualEdit;
 
     public string DateDisplay => Date.ToString("dddd, dd.MM.yyyy", GermanCulture);
 
@@ -86,36 +109,10 @@ internal sealed class ScheduleCellViewModel : ObservableObject
         AvailabilityDayEntryKind.Vacation => "Urlaub",
         AvailabilityDayEntryKind.Sickness => "Krankheit",
         AvailabilityDayEntryKind.FixedDayOff => "fest vorgegebenes Frei",
-        null when Assignment is not null => CreateAssignmentMeaning(Assignment),
+        null when IsGeneratedDayOff => "automatisch erzeugtes schwarzes X",
+        null when Assignment is not null =>
+            AssignmentDisplay?.Meaning ?? "Einteilung ohne Anzeigetext",
         null => "kein Tageseintrag",
         _ => "unbekannter Tageseintrag",
     };
-
-    private static string CreateAssignmentDisplay(ScheduleAssignmentSnapshot? assignment)
-    {
-        return assignment?.Kind switch
-        {
-            ScheduleAssignmentKindSnapshot.NormalDemand => "Typ1",
-            ScheduleAssignmentKindSnapshot.OfficeTime => "B",
-            ScheduleAssignmentKindSnapshot.SplitShiftPattern => "D",
-            ScheduleAssignmentKindSnapshot.ReliefShiftPattern => "Spr",
-            null => string.Empty,
-            _ => "?",
-        };
-    }
-
-    private static string CreateAssignmentMeaning(ScheduleAssignmentSnapshot assignment)
-    {
-        return assignment.Kind switch
-        {
-            ScheduleAssignmentKindSnapshot.NormalDemand => "vorgetragener Typ1-Dienst",
-            ScheduleAssignmentKindSnapshot.OfficeTime =>
-                "vorgetragener Typ1-Dienst mit Bürokennzeichnung B; Bedarf bleibt offen",
-            ScheduleAssignmentKindSnapshot.SplitShiftPattern =>
-                "vorgetragenes Typ1-Dienstmuster D",
-            ScheduleAssignmentKindSnapshot.ReliefShiftPattern =>
-                "vorgetragenes Typ1-Dienstmuster Spr",
-            _ => "vorgetragene Einteilung",
-        };
-    }
 }

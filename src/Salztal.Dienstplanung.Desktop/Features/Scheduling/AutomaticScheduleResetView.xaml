@@ -1,0 +1,61 @@
+<UserControl x:Class="Salztal.Dienstplanung.Desktop.Features.Scheduling.AutomaticScheduleResetView"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Focusable="True">
+  <UserControl.InputBindings>
+    <KeyBinding Key="R"
+                Modifiers="Alt"
+                Command="{Binding RequestCommand}" />
+  </UserControl.InputBindings>
+
+  <UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+  </UserControl.Resources>
+
+  <StackPanel Visibility="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <StackPanel>
+        <TextBlock FontSize="16"
+                   FontWeight="SemiBold"
+                   Text="Automatischen Plan neu beginnen" />
+        <TextBlock Margin="0,4,0,0"
+                   Foreground="#526174"
+                   Text="Ein bereits übernommener automatischer Plan kann vollständig verworfen werden."
+                   TextWrapping="Wrap" />
+      </StackPanel>
+      <Button Grid.Column="1"
+              MinWidth="230"
+              Margin="20,0,0,0"
+              AutomationProperties.HelpText="Tastenkürzel Alt+R"
+              AutomationProperties.Name="Übernommenen automatischen Plan vollständig verwerfen"
+              Command="{Binding RequestCommand}"
+              Content="Automatischen Plan _verwerfen"
+              Visibility="{Binding IsAvailable, Converter={StaticResource BooleanToVisibilityConverter}}" />
+    </Grid>
+
+    <Border Margin="0,12,0,0"
+            Padding="12"
+            Background="#EAF7EE"
+            BorderBrush="#8CC99E"
+            BorderThickness="1"
+            CornerRadius="6"
+            Visibility="{Binding HasStatusMessage, Converter={StaticResource BooleanToVisibilityConverter}}">
+      <StackPanel>
+        <TextBlock FontWeight="SemiBold"
+                   Text="{Binding StatusMessage}"
+                   TextWrapping="Wrap" />
+        <TextBlock Margin="0,4,0,0"
+                   Foreground="#8B1E1E"
+                   FontWeight="SemiBold"
+                   Text="{Binding ErrorCodeDisplay}"
+                   TextWrapping="Wrap"
+                   Visibility="{Binding HasErrorCode, Converter={StaticResource BooleanToVisibilityConverter}}" />
+      </StackPanel>
+    </Border>
+  </StackPanel>
+</UserControl>

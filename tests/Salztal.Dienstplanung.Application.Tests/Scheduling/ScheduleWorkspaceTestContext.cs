@@ -65,7 +65,8 @@ internal static class ScheduleWorkspaceTestContext
         IEnumerable<ScheduleDraftHeader>? draftHeaders = null,
         ScheduleDraft? exactDraft = null,
         IEnumerable<PlanningHistoryDayReadItem>? historyDays = null,
-        PlanningInputSnapshot? preparedSnapshot = null)
+        PlanningInputSnapshot? preparedSnapshot = null,
+        AutomaticScheduleRunRecord? automaticScheduleRun = null)
     {
         return new ScheduleWorkspaceReadData(
             new AvailabilityReadData(
@@ -79,14 +80,17 @@ internal static class ScheduleWorkspaceTestContext
             draftHeaders ?? [],
             exactDraft,
             historyDays,
-            preparedSnapshot);
+            preparedSnapshot,
+            automaticScheduleRun);
     }
 
     public static ScheduleDraft CreateDraft(
         SchedulePeriod? period = null,
         IEnumerable<AvailabilityEntry>? availabilityEntries = null,
         IEnumerable<ScheduleAssignment>? assignments = null,
-        int version = 1)
+        int version = 1,
+        IEnumerable<GeneratedDayOffMarker>? generatedDayOffMarkers = null,
+        IEnumerable<AssignmentLock>? assignmentLocks = null)
     {
         SchedulePeriod selectedPeriod = period ?? Period;
         AvailabilityEntrySet availabilitySet = Assert.IsType<AvailabilityEntrySet>(
@@ -101,8 +105,8 @@ internal static class ScheduleWorkspaceTestContext
                 demandSlots,
                 availabilitySet,
                 assignments ?? [],
-                [],
-                []).Value);
+                generatedDayOffMarkers ?? [],
+                assignmentLocks ?? []).Value);
     }
 
     public static ScheduleDraftHeader CreateHeader(ScheduleDraft draft)
@@ -116,7 +120,8 @@ internal static class ScheduleWorkspaceTestContext
         IEnumerable<EmployeeType>? employeeTypes = null,
         IEnumerable<AvailabilityEntryReadItem>? entries = null,
         IEnumerable<PlanningHistoryDayReadItem>? historyDays = null,
-        PlanningInputSnapshot? preparedSnapshot = null)
+        PlanningInputSnapshot? preparedSnapshot = null,
+        AutomaticScheduleRunRecord? automaticScheduleRun = null)
     {
         return CreateReadData(
             employees: employees,
@@ -125,7 +130,8 @@ internal static class ScheduleWorkspaceTestContext
             draftHeaders: [CreateHeader(draft)],
             exactDraft: draft,
             historyDays: historyDays,
-            preparedSnapshot: preparedSnapshot);
+            preparedSnapshot: preparedSnapshot,
+            automaticScheduleRun: automaticScheduleRun);
     }
 
     public static ScheduleDemandSlotSelection CreateSelection(DemandSlot slot)

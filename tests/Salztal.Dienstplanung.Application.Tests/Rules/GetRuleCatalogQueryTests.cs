@@ -22,7 +22,8 @@ public sealed class GetRuleCatalogQueryTests
         typeof(SplitShiftWeeklyMaximumParameters),
         typeof(PlanningPeriodFreeWeekendParameters),
         typeof(ShiftPatternMinimizationParameters),
-        typeof(WeeklyMinutesTargetParameters),
+        typeof(WeeklyMinutesMinimumParameters),
+        typeof(RelativeWeeklyTargetParameters),
         typeof(WeeklyMinutesBelowNoticeParameters),
         typeof(WeeklyMinutesRangeNoticeParameters),
         typeof(CurrentPeriodFairDistributionParameters),
@@ -34,8 +35,8 @@ public sealed class GetRuleCatalogQueryTests
         RuleCatalogSnapshot snapshot = await GetRuleCatalogQuery.ExecuteAsync(
             TestContext.Current.CancellationToken);
 
-        Assert.Equal(1, snapshot.Version);
-        Assert.Equal(28, snapshot.Definitions.Count);
+        Assert.Equal(2, snapshot.Version);
+        Assert.Equal(30, snapshot.Definitions.Count);
         Assert.True(((ICollection<RuleDefinitionSnapshot>)snapshot.Definitions).IsReadOnly);
         Assert.Throws<NotSupportedException>(() =>
             ((IList<RuleDefinitionSnapshot>)snapshot.Definitions).Add(
@@ -44,6 +45,22 @@ public sealed class GetRuleCatalogQueryTests
             typeof(RuleCatalogSnapshot).GetProperties()
                 .Concat(typeof(RuleDefinitionSnapshot).GetProperties()),
             property => Assert.Null(property.SetMethod));
+    }
+
+    [Fact]
+    public async Task ExecuteAsyncForVersionOneReturnsHistoricalCatalogUnchanged()
+    {
+        RuleCatalogSnapshot snapshot = await GetRuleCatalogQuery.ExecuteAsync(
+            1,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(1, snapshot.Version);
+        Assert.Equal(28, snapshot.Definitions.Count);
+        Assert.Contains(snapshot.Definitions, definition =>
+            definition.Id == "AH_WEEKLY_TARGET"
+            && definition.Parameters is WeeklyMinutesTargetParameters);
+        Assert.DoesNotContain(snapshot.Definitions, definition =>
+            definition.Id == "AH_WEEKLY_MINIMUM");
     }
 
     [Fact]

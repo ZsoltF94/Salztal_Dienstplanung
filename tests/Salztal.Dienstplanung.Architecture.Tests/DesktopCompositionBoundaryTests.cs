@@ -135,6 +135,23 @@ public sealed class DesktopCompositionBoundaryTests
         Assert.Contains("SelectWorkLocation", composition, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void AutomaticGenerationViewModelWhenScannedUsesNoBlockingOrTaskRun()
+    {
+        string source = File.ReadAllText(Path.Combine(
+            RepositoryLayout.Root.FullName,
+            "src",
+            "Salztal.Dienstplanung.Desktop",
+            "Features",
+            "Scheduling",
+            "AutomaticScheduleGenerationViewModel.cs"));
+
+        Assert.DoesNotContain(".Wait(", source, StringComparison.Ordinal);
+        Assert.DoesNotContain(".Result", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("Task.Run", source, StringComparison.Ordinal);
+        Assert.Contains("await Task.WhenAny", source, StringComparison.Ordinal);
+    }
+
     private static void AssertFeatureDoesNotReference(
         string featureDirectory,
         string forbiddenNamespace)

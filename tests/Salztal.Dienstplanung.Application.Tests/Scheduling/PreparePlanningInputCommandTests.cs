@@ -34,8 +34,8 @@ public sealed class PreparePlanningInputCommandTests
         Assert.Empty(snapshot.AvailabilityEntries);
         Assert.Equal(195, snapshot.DemandSlots.Count);
         Assert.Equal(3, snapshot.ServiceManagementAssignments.Count);
-        Assert.Equal(1, snapshot.RuleCatalog.Version);
-        Assert.Equal(28, snapshot.RuleCatalog.Definitions.Count);
+        Assert.Equal(2, snapshot.RuleCatalog.Version);
+        Assert.Equal(30, snapshot.RuleCatalog.Definitions.Count);
         Assert.False(snapshot.RunOptions.EnableAuxiliaryReliefShift);
         Assert.Equal(PlanningHistoryCompleteness.Complete, snapshot.History.Completeness);
         Assert.Equal(7, snapshot.History.AvailableDayCount);

@@ -18,6 +18,7 @@ internal static class SchedulingEntityConfigurations
         ConfigureLock(modelBuilder.Entity<ScheduleAssignmentLockEntity>());
         ConfigureSnapshot(modelBuilder.Entity<PlanningSnapshotEntity>());
         ConfigureSnapshotComponent(modelBuilder.Entity<PlanningSnapshotComponentEntity>());
+        ConfigureAutomaticRun(modelBuilder.Entity<AutomaticScheduleRunEntity>());
     }
 
     private static void ConfigureDraft(EntityTypeBuilder<ScheduleDraftEntity> builder)
@@ -236,6 +237,36 @@ internal static class SchedulingEntityConfigurations
         builder.HasOne<PlanningSnapshotEntity>()
             .WithMany()
             .HasForeignKey(entity => entity.SnapshotId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+
+    private static void ConfigureAutomaticRun(
+        EntityTypeBuilder<AutomaticScheduleRunEntity> builder)
+    {
+        builder.ToTable("AutomaticScheduleRuns", table =>
+        {
+            table.HasCheckConstraint(
+                "CK_AutomaticScheduleRuns_ResultStatus",
+                "ResultStatus >= 0 AND ResultStatus <= 1");
+            table.HasCheckConstraint(
+                "CK_AutomaticScheduleRuns_TimeLimit",
+                "TimeLimitTicks > 0");
+            table.HasCheckConstraint(
+                "CK_AutomaticScheduleRuns_Durations",
+                "ModelBuildDurationTicks >= 0 "
+                + "AND OptimizationDurationTicks >= 0 "
+                + "AND LegacyPhaseDurationTicks >= 0 "
+                + "AND ResultMappingDurationTicks >= 0 "
+                + "AND TotalDurationTicks >= 0");
+        });
+        builder.HasKey(entity => entity.DraftId);
+        builder.Property(entity => entity.SolverName).HasMaxLength(200);
+        builder.Property(entity => entity.SolverVersion).HasMaxLength(100);
+        builder.Property(entity => entity.SettingsPayload).IsRequired();
+        builder.Property(entity => entity.ObjectivePayload).IsRequired();
+        builder.HasOne<ScheduleDraftEntity>()
+            .WithOne()
+            .HasForeignKey<AutomaticScheduleRunEntity>(entity => entity.DraftId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

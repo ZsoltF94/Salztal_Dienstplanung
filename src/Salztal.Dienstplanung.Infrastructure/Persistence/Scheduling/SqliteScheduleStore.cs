@@ -24,7 +24,8 @@ public sealed class SqliteScheduleStore :
     IOpenScheduleDraftStore,
     IChangeScheduleDayStore,
     IPlanningInputReader,
-    IPreparePlanningSnapshotStore
+    IPreparePlanningSnapshotStore,
+    IAcceptAutomaticScheduleProposalStore
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -200,6 +201,84 @@ public sealed class SqliteScheduleStore :
         }
     }
 
+    public async Task<AcceptAutomaticScheduleProposalStoreResult> AcceptAsync(
+        AcceptAutomaticScheduleProposalChange change,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(change);
+        await using ServiceCatalogDbContext context = _contextFactory.Create();
+        await using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction =
+            await context.Database.BeginTransactionAsync(cancellationToken);
+
+        ScheduleDraftEntity? current = await context.ScheduleDrafts.SingleOrDefaultAsync(
+            entity => entity.Id == change.UpdatedDraft.Id.Value,
+            cancellationToken);
+        if (current is null
+            || current.Version != change.ExpectedDraftVersion
+            || current.PreparedSnapshotId != change.ExpectedSnapshotId
+            || current.StartMonday != change.UpdatedDraft.Period.StartMonday
+            || current.EndSunday != change.UpdatedDraft.Period.EndSunday
+            || change.UpdatedDraft.Version.Value != change.ExpectedDraftVersion + 1)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            return AcceptAutomaticScheduleProposalStoreResult.Conflict();
+        }
+
+        Guid[] lockedIds = await context.ScheduleAssignmentLocks
+            .Where(entity => entity.DraftId == current.Id)
+            .Select(entity => entity.AssignmentId)
+            .ToArrayAsync(cancellationToken);
+        Guid[] replaceableIds = await context.ScheduleAssignments
+            .Where(entity => entity.DraftId == current.Id)
+            .Where(entity => entity.Origin == (int)AssignmentOrigin.AutomaticGeneration)
+            .Where(entity => !lockedIds.Contains(entity.Id))
+            .Select(entity => entity.Id)
+            .ToArrayAsync(cancellationToken);
+        await context.ScheduleDemandCoverages
+            .Where(entity => replaceableIds.Contains(entity.AssignmentId))
+            .ExecuteDeleteAsync(cancellationToken);
+        await context.ScheduleAssignmentSegments
+            .Where(entity => replaceableIds.Contains(entity.AssignmentId))
+            .ExecuteDeleteAsync(cancellationToken);
+        await context.ScheduleAssignments
+            .Where(entity => replaceableIds.Contains(entity.Id))
+            .ExecuteDeleteAsync(cancellationToken);
+        await context.ScheduleGeneratedDaysOff
+            .Where(entity => entity.DraftId == current.Id)
+            .ExecuteDeleteAsync(cancellationToken);
+        await context.AutomaticScheduleRuns
+            .Where(entity => entity.DraftId == current.Id)
+            .ExecuteDeleteAsync(cancellationToken);
+
+        HashSet<ScheduleAssignmentId> updatedLockedIds = change.UpdatedDraft.AssignmentLocks
+            .Select(assignmentLock => assignmentLock.AssignmentId)
+            .ToHashSet();
+        AddAssignments(
+            context,
+            change.UpdatedDraft.Id.Value,
+            change.UpdatedDraft.Assignments.Where(assignment =>
+                assignment.Origin == AssignmentOrigin.AutomaticGeneration
+                && !updatedLockedIds.Contains(assignment.Id)));
+        AddGeneratedDaysOff(context, change.UpdatedDraft);
+        context.AutomaticScheduleRuns.Add(CreateAutomaticRunEntity(
+            change.UpdatedDraft.Id.Value,
+            change.Run));
+        current.Version = change.UpdatedDraft.Version.Value;
+
+        try
+        {
+            await context.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            return AcceptAutomaticScheduleProposalStoreResult.Success(
+                change.UpdatedDraft);
+        }
+        catch (DbUpdateException exception) when (IsConstraintViolation(exception))
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            return AcceptAutomaticScheduleProposalStoreResult.Conflict();
+        }
+    }
+
     private async Task<PlanningInputReadData> LoadCoreAsync(
         SchedulePeriod period,
         CancellationToken cancellationToken)
@@ -283,6 +362,12 @@ public sealed class SqliteScheduleStore :
                 context,
                 exactEntity.PreparedSnapshotId.Value,
                 cancellationToken);
+        AutomaticScheduleRunRecord? automaticRun = exactEntity is null
+            ? null
+            : await LoadAutomaticRunAsync(
+                context,
+                exactEntity.Id,
+                cancellationToken);
 
         await transaction.CommitAsync(cancellationToken);
 
@@ -292,7 +377,8 @@ public sealed class SqliteScheduleStore :
             headers,
             exactDraft,
             history,
-            prepared);
+            prepared,
+            automaticRun);
         return new PlanningInputReadData(workspace, history, prepared);
     }
 
@@ -610,23 +696,107 @@ public sealed class SqliteScheduleStore :
                     .Select(CreateHistoryDaySnapshot)));
     }
 
+    private static async Task<AutomaticScheduleRunRecord?> LoadAutomaticRunAsync(
+        ServiceCatalogDbContext context,
+        Guid draftId,
+        CancellationToken cancellationToken)
+    {
+        AutomaticScheduleRunEntity? entity = await context.AutomaticScheduleRuns
+            .AsNoTracking()
+            .SingleOrDefaultAsync(item => item.DraftId == draftId, cancellationToken);
+        if (entity is null)
+        {
+            return null;
+        }
+
+        try
+        {
+            StoredAutomaticScheduleSetting[] settings = JsonSerializer.Deserialize<
+                    StoredAutomaticScheduleSetting[]>(
+                    entity.SettingsPayload,
+                    JsonOptions)
+                ?? throw InvalidStored("automatic schedule settings", draftId);
+            StoredAutomaticScheduleObjective storedObjective =
+                JsonSerializer.Deserialize<StoredAutomaticScheduleObjective>(
+                    entity.ObjectivePayload,
+                    JsonOptions)
+                ?? throw InvalidStored("automatic schedule objective", draftId);
+            AutomaticScheduleRunMetadata metadata = new(
+                entity.SolverName,
+                entity.SolverVersion,
+                (AutomaticSchedulePlanningStatus)entity.ResultStatus,
+                TimeSpan.FromTicks(entity.TimeLimitTicks),
+                TimeSpan.FromTicks(entity.ModelBuildDurationTicks),
+                TimeSpan.FromTicks(checked(
+                    entity.OptimizationDurationTicks
+                    + entity.LegacyPhaseDurationTicks)),
+                TimeSpan.FromTicks(entity.ResultMappingDurationTicks),
+                TimeSpan.FromTicks(entity.TotalDurationTicks),
+                settings.Select(setting =>
+                    new AutomaticScheduleSetting(setting.Key, setting.Value)));
+            AutomaticScheduleObjectiveSnapshot objective = new(
+                storedObjective.UncoveredEmployeeMinutes,
+                storedObjective.FullyUncoveredDemandSlotCount,
+                storedObjective.HighPriorityViolations.Select(CreateViolation),
+                storedObjective.ReliefShiftAssignmentCount,
+                storedObjective.SplitShiftAssignmentCount,
+                (storedObjective.AuxiliaryMinimumCases ?? []).Select(value =>
+                    new AutomaticScheduleAuxiliaryMinimumCase(
+                        value.EmployeeId,
+                        value.WeekMonday,
+                        value.AssignedMinutes,
+                        value.HasEligibleDemand)),
+                (storedObjective.RelativeWeeklyTargetCases ?? []).Select(value =>
+                    new AutomaticScheduleRelativeWeeklyTargetCase(
+                        value.EmployeeId,
+                        value.WeekMonday,
+                        value.AssignedMinutes,
+                        value.TargetMinutes)),
+                storedObjective.MediumPriorityViolations.Select(CreateViolation),
+                storedObjective.LowPriorityViolations.Select(CreateViolation),
+                storedObjective.StabilityViolations.Select(CreateViolation),
+                storedObjective.TechnicalTieBreakerKeys);
+            return new AutomaticScheduleRunRecord(
+                entity.SnapshotId,
+                metadata,
+                objective);
+        }
+        catch (Exception exception) when (
+            exception is JsonException
+                or ArgumentException
+                or InvalidOperationException
+                or OverflowException)
+        {
+            throw InvalidStored("automatic schedule run", draftId);
+        }
+    }
+
+    private static AutomaticScheduleRuleViolation CreateViolation(
+        StoredAutomaticScheduleRuleViolation value) => new(
+            value.RuleId,
+            value.RuleFamily,
+            value.Priority,
+            value.CaseKey,
+            value.Magnitude);
+
     private static async Task<RuleCatalogSnapshot> LoadRulesAsync(
         int version,
         IReadOnlyList<StoredRuleDefinition> stored,
         Guid snapshotId,
         CancellationToken cancellationToken)
     {
-        RuleCatalogSnapshot current = await GetRuleCatalogQuery.ExecuteAsync(
+        RuleCatalogSnapshot catalog = await GetRuleCatalogQuery.ExecuteAsync(
+            version,
             cancellationToken);
-        StoredRuleDefinition[] expected = current.Definitions
+        StoredRuleDefinition[] expected = catalog.Definitions
             .Select(CreateStoredRule)
             .ToArray();
-        if (current.Version != version || !stored.SequenceEqual(expected))
+        if (!stored.SequenceEqual(expected))
         {
             throw InvalidStored("planning rule catalog", snapshotId);
         }
 
-        return current;
+        return catalog;
     }
 
     private static T AssertSingle<T>(IReadOnlyList<T> values, Guid snapshotId)
@@ -675,12 +845,27 @@ public sealed class SqliteScheduleStore :
                     Kind = (int)entry.Kind,
                 }));
 
-        foreach (ScheduleAssignment assignment in draft.Assignments)
+        AddAssignments(context, draft.Id.Value, draft.Assignments);
+        AddGeneratedDaysOff(context, draft);
+        context.ScheduleAssignmentLocks.AddRange(draft.AssignmentLocks.Select(item =>
+            new ScheduleAssignmentLockEntity
+            {
+                DraftId = draft.Id.Value,
+                AssignmentId = item.AssignmentId.Value,
+            }));
+    }
+
+    private static void AddAssignments(
+        ServiceCatalogDbContext context,
+        Guid draftId,
+        IEnumerable<ScheduleAssignment> assignments)
+    {
+        foreach (ScheduleAssignment assignment in assignments)
         {
             context.ScheduleAssignments.Add(new ScheduleAssignmentEntity
             {
                 Id = assignment.Id.Value,
-                DraftId = draft.Id.Value,
+                DraftId = draftId,
                 EmployeeId = assignment.EmployeeId.Value,
                 Date = assignment.Date,
                 Kind = (int)assignment.Kind,
@@ -696,7 +881,7 @@ public sealed class SqliteScheduleStore :
                     {
                         AssignmentId = assignment.Id.Value,
                         Sequence = index,
-                        DraftId = draft.Id.Value,
+                        DraftId = draftId,
                         AnchorSlotKey = CreateSlotKey(segment.AnchorSlotId),
                         Date = segment.Date,
                         WorkLocationId = segment.WorkLocationId.Value,
@@ -711,7 +896,7 @@ public sealed class SqliteScheduleStore :
                     {
                         AssignmentId = assignment.Id.Value,
                         Sequence = index,
-                        DraftId = draft.Id.Value,
+                        DraftId = draftId,
                         SlotKey = CreateSlotKey(coverage.SlotId),
                         CoveredStart = coverage.CoveredTime.Start,
                         CoveredEnd = coverage.CoveredTime.End,
@@ -719,7 +904,12 @@ public sealed class SqliteScheduleStore :
                         Kind = (int)coverage.Kind,
                     }));
         }
+    }
 
+    private static void AddGeneratedDaysOff(
+        ServiceCatalogDbContext context,
+        ScheduleDraft draft)
+    {
         context.ScheduleGeneratedDaysOff.AddRange(
             draft.GeneratedDayOffMarkers.Select(marker =>
                 new ScheduleGeneratedDayOffEntity
@@ -728,12 +918,6 @@ public sealed class SqliteScheduleStore :
                     EmployeeId = marker.EmployeeId.Value,
                     Date = marker.Date,
                 }));
-        context.ScheduleAssignmentLocks.AddRange(draft.AssignmentLocks.Select(item =>
-            new ScheduleAssignmentLockEntity
-            {
-                DraftId = draft.Id.Value,
-                AssignmentId = item.AssignmentId.Value,
-            }));
     }
 
     private static async Task DeleteDraftChildrenAsync(
@@ -844,6 +1028,68 @@ public sealed class SqliteScheduleStore :
             HistoryCompleteness = (int)snapshot.History.Completeness,
         };
     }
+
+    private static AutomaticScheduleRunEntity CreateAutomaticRunEntity(
+        Guid draftId,
+        AutomaticScheduleRunRecord run)
+    {
+        AutomaticScheduleRunMetadata metadata = run.Metadata;
+        return new AutomaticScheduleRunEntity
+        {
+            DraftId = draftId,
+            SnapshotId = run.SnapshotId,
+            SolverName = metadata.SolverName,
+            SolverVersion = metadata.SolverVersion,
+            ResultStatus = (int)metadata.ResultStatus,
+            TimeLimitTicks = metadata.TimeLimit.Ticks,
+            ModelBuildDurationTicks = metadata.ModelBuildDuration.Ticks,
+            OptimizationDurationTicks = metadata.OptimizationDuration.Ticks,
+            LegacyPhaseDurationTicks = 0,
+            ResultMappingDurationTicks = metadata.ResultMappingDuration.Ticks,
+            TotalDurationTicks = metadata.TotalDuration.Ticks,
+            SettingsPayload = JsonSerializer.Serialize(
+                metadata.Settings.Select(setting =>
+                    new StoredAutomaticScheduleSetting(
+                        setting.Key,
+                        setting.Value)),
+                JsonOptions),
+            ObjectivePayload = JsonSerializer.Serialize(
+                CreateStoredObjective(run.Objective),
+                JsonOptions),
+        };
+    }
+
+    private static StoredAutomaticScheduleObjective CreateStoredObjective(
+        AutomaticScheduleObjectiveSnapshot objective) => new(
+            objective.UncoveredEmployeeMinutes,
+            objective.FullyUncoveredDemandSlotCount,
+            objective.HighPriorityViolations.Select(CreateStoredViolation).ToArray(),
+            objective.MediumPriorityViolations.Select(CreateStoredViolation).ToArray(),
+            objective.LowPriorityViolations.Select(CreateStoredViolation).ToArray(),
+            objective.StabilityViolations.Select(CreateStoredViolation).ToArray(),
+            objective.TechnicalTieBreakerKeys.ToArray(),
+            objective.ReliefShiftAssignmentCount,
+            objective.SplitShiftAssignmentCount,
+            objective.AuxiliaryMinimumCases.Select(value =>
+                new StoredAutomaticScheduleAuxiliaryMinimumCase(
+                    value.EmployeeId,
+                    value.WeekMonday,
+                    value.AssignedMinutes,
+                    value.HasEligibleDemand)).ToArray(),
+            objective.RelativeWeeklyTargetCases.Select(value =>
+                new StoredAutomaticScheduleRelativeWeeklyTargetCase(
+                    value.EmployeeId,
+                    value.WeekMonday,
+                    value.AssignedMinutes,
+                    value.TargetMinutes)).ToArray());
+
+    private static StoredAutomaticScheduleRuleViolation CreateStoredViolation(
+        AutomaticScheduleRuleViolation value) => new(
+            value.RuleId,
+            value.RuleFamily,
+            value.Priority,
+            value.CaseKey,
+            value.Magnitude);
 
     private static List<PlanningSnapshotComponentEntity>
         CreateSnapshotComponents(PlanningInputSnapshot snapshot)

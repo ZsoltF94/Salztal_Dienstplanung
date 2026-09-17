@@ -824,6 +824,65 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
                         });
                 });
 
+            modelBuilder.Entity("Salztal.Dienstplanung.Infrastructure.Persistence.Scheduling.AutomaticScheduleRunEntity", b =>
+                {
+                    b.Property<Guid>("DraftId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("LegacyPhaseDurationTicks")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("ModelBuildDurationTicks")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ObjectivePayload")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("OptimizationDurationTicks")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("ResultMappingDurationTicks")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ResultStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SettingsPayload")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("SnapshotId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SolverName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SolverVersion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("TimeLimitTicks")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("TotalDurationTicks")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("DraftId");
+
+                    b.ToTable("AutomaticScheduleRuns", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_AutomaticScheduleRuns_Durations", "ModelBuildDurationTicks >= 0 AND OptimizationDurationTicks >= 0 AND LegacyPhaseDurationTicks >= 0 AND ResultMappingDurationTicks >= 0 AND TotalDurationTicks >= 0");
+
+                            t.HasCheckConstraint("CK_AutomaticScheduleRuns_ResultStatus", "ResultStatus >= 0 AND ResultStatus <= 1");
+
+                            t.HasCheckConstraint("CK_AutomaticScheduleRuns_TimeLimit", "TimeLimitTicks > 0");
+                        });
+                });
+
             modelBuilder.Entity("Salztal.Dienstplanung.Infrastructure.Persistence.Scheduling.PlanningSnapshotComponentEntity", b =>
                 {
                     b.Property<Guid>("SnapshotId")
@@ -1502,6 +1561,15 @@ namespace Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog.Migrat
                     b.Navigation("ShiftPattern");
 
                     b.Navigation("ShiftType");
+                });
+
+            modelBuilder.Entity("Salztal.Dienstplanung.Infrastructure.Persistence.Scheduling.AutomaticScheduleRunEntity", b =>
+                {
+                    b.HasOne("Salztal.Dienstplanung.Infrastructure.Persistence.Scheduling.ScheduleDraftEntity", null)
+                        .WithOne()
+                        .HasForeignKey("Salztal.Dienstplanung.Infrastructure.Persistence.Scheduling.AutomaticScheduleRunEntity", "DraftId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Salztal.Dienstplanung.Infrastructure.Persistence.Scheduling.PlanningSnapshotComponentEntity", b =>

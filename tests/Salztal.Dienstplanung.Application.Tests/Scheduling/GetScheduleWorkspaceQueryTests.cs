@@ -4,6 +4,7 @@ using Salztal.Dienstplanung.Application.ServiceCatalog;
 using Salztal.Dienstplanung.Domain.Availabilities;
 using Salztal.Dienstplanung.Domain.Employees;
 using Salztal.Dienstplanung.Domain.Scheduling;
+using Salztal.Dienstplanung.Domain.Scheduling.Optimization;
 using Salztal.Dienstplanung.Domain.ShiftTypes;
 
 namespace Salztal.Dienstplanung.Application.Tests.Scheduling;
@@ -68,6 +69,10 @@ public sealed class GetScheduleWorkspaceQueryTests
         Assert.Equal(ScheduleDemandSourceKindSnapshot.Standard, early.SourceKind);
         Assert.Equal("Restaurant", early.WorkLocationName);
         Assert.Equal("Frühdienst", early.ShiftTypeName);
+        Assert.Equal(
+            ScheduleShiftDisplayKindSnapshot.Abbreviation,
+            early.ShiftTypeDisplayKind);
+        Assert.Equal("F", early.ShiftTypeAbbreviation);
         Assert.Equal(InitialShiftTypeCatalog.EarlyShift.StandardTime.Start, early.ActualStart);
         Assert.Equal(InitialShiftTypeCatalog.EarlyShift.StandardTime.End, early.ActualEnd);
         Assert.Equal(
@@ -80,6 +85,60 @@ public sealed class GetScheduleWorkspaceQueryTests
                     slot.Date == ScheduleWorkspaceTestContext.PeriodMonday
                     && slot.ShiftTypeId == InitialShiftTypeCatalog.EarlyShift.Id.Value)
                 .Select(slot => slot.Ordinal));
+    }
+
+    [Fact]
+    public async Task ExecuteProjectsGeneratedDayOffMarkersWithoutUiInference()
+    {
+        GeneratedDayOffMarker marker = new(
+            ScheduleWorkspaceTestContext.StandardEmployee.Id,
+            ScheduleWorkspaceTestContext.PeriodMonday.AddDays(2));
+        ScheduleDraft draft = ScheduleWorkspaceTestContext.CreateDraft(
+            generatedDayOffMarkers: [marker]);
+
+        ScheduleWorkspaceSnapshot snapshot = await ExecuteSuccessfully(
+            new FakeScheduleWorkspaceReader(CreateReadDataForDraft(draft)));
+
+        ScheduleGeneratedDayOffSnapshot projected = Assert.Single(
+            snapshot.GeneratedDayOffs);
+        Assert.Equal(marker.EmployeeId.Value, projected.EmployeeId);
+        Assert.Equal(marker.Date, projected.Date);
+    }
+
+    [Fact]
+    public async Task ExecuteProjectsAcceptedAutomaticScheduleCountsFromStoredRun()
+    {
+        ScheduleDraft empty = ScheduleWorkspaceTestContext.CreateDraft();
+        DemandSlot slot = Assert.Single(empty.DemandSlots.Slots, candidate =>
+            candidate.Id.Date == ScheduleWorkspaceTestContext.PeriodMonday
+            && candidate.Id.ShiftTypeId == InitialShiftTypeCatalog.EarlyShift.Id
+            && candidate.Id.Ordinal == 1);
+        ScheduleAssignment automatic = Assert.IsType<ScheduleAssignment>(
+            ScheduleAssignment.CreateNormal(
+                Guid.NewGuid(),
+                ScheduleWorkspaceTestContext.StandardEmployee.Id,
+                slot,
+                AssignmentOrigin.AutomaticGeneration).Value);
+        ScheduleDraft draft = ScheduleWorkspaceTestContext.CreateDraft(
+            assignments: [automatic],
+            generatedDayOffMarkers:
+            [
+                new GeneratedDayOffMarker(
+                    ScheduleWorkspaceTestContext.StandardEmployee.Id,
+                    ScheduleWorkspaceTestContext.PeriodMonday.AddDays(1)),
+            ]);
+        ScheduleWorkspaceReadData data = ScheduleWorkspaceTestContext.CreateReadData(
+            draftHeaders: [ScheduleWorkspaceTestContext.CreateHeader(draft)],
+            exactDraft: draft,
+            automaticScheduleRun: CreateAutomaticRun());
+
+        ScheduleWorkspaceSnapshot snapshot = await ExecuteSuccessfully(
+            new FakeScheduleWorkspaceReader(data));
+
+        AcceptedAutomaticScheduleSnapshot accepted = Assert.IsType<
+            AcceptedAutomaticScheduleSnapshot>(snapshot.AcceptedAutomaticSchedule);
+        Assert.Equal(1, accepted.AssignmentCount);
+        Assert.Equal(1, accepted.GeneratedDayOffCount);
     }
 
     [Fact]
@@ -295,5 +354,28 @@ public sealed class GetScheduleWorkspaceQueryTests
         return new GetScheduleWorkspaceQuery(reader).ExecuteAsync(
             selectedDate ?? ScheduleWorkspaceTestContext.PeriodMonday,
             TestContext.Current.CancellationToken);
+    }
+
+    private static AutomaticScheduleRunRecord CreateAutomaticRun()
+    {
+        AutomaticScheduleRunMetadata metadata = new(
+            "Synthetischer Testsolver",
+            "1.0",
+            AutomaticSchedulePlanningStatus.Optimal,
+            TimeSpan.FromMinutes(2),
+            TimeSpan.Zero,
+            TimeSpan.Zero,
+            TimeSpan.Zero,
+            TimeSpan.Zero,
+            []);
+        AutomaticScheduleObjectiveSnapshot objective = new(
+            0,
+            0,
+            [],
+            [],
+            [],
+            [],
+            []);
+        return new AutomaticScheduleRunRecord(Guid.NewGuid(), metadata, objective);
     }
 }

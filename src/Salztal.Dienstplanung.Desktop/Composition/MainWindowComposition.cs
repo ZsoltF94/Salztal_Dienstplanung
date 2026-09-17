@@ -9,10 +9,12 @@ using Salztal.Dienstplanung.Desktop.Features.Scheduling;
 using Salztal.Dienstplanung.Desktop.Features.ServiceCatalog;
 using Salztal.Dienstplanung.Desktop.Features.StaffingDemands;
 using Salztal.Dienstplanung.Desktop.Shared;
+using Salztal.Dienstplanung.Infrastructure.Logging;
 using Salztal.Dienstplanung.Infrastructure.Persistence.Employees;
 using Salztal.Dienstplanung.Infrastructure.Persistence.Scheduling;
 using Salztal.Dienstplanung.Infrastructure.Persistence.ServiceCatalog;
 using Salztal.Dienstplanung.Infrastructure.Persistence.StaffingDemands;
+using Salztal.Dienstplanung.Planning;
 
 namespace Salztal.Dienstplanung.Desktop.Composition;
 
@@ -20,6 +22,7 @@ internal static class MainWindowComposition
 {
     private const string ApplicationDataDirectoryName = "Salztal Dienstplanung";
     private const string DatabaseFileName = "dienstplanung.db";
+    private const string TechnicalLogDirectoryName = "Logs";
 
     public static async Task<MainWindow> CreateMainWindowAsync(
         CancellationToken cancellationToken)
@@ -30,6 +33,11 @@ internal static class MainWindowComposition
             localApplicationData,
             ApplicationDataDirectoryName,
             DatabaseFileName);
+        IAutomaticScheduleTechnicalErrorStore technicalErrorStore =
+            new JsonLinesAutomaticScheduleTechnicalErrorStore(Path.Combine(
+                localApplicationData,
+                ApplicationDataDirectoryName,
+                TechnicalLogDirectoryName));
         MainWindowDependencies dependencies = await CreateInitializedAsync(
             databasePath,
             cancellationToken);
@@ -115,8 +123,21 @@ internal static class MainWindowComposition
             new PreparePlanningInputCommand(
                 scheduling.PlanningInputReader,
                 scheduling.PrepareSnapshotStore),
+            new AutomaticScheduleGenerationActions(
+                new GenerateAutomaticScheduleCommand(
+                    scheduling.PlanningInputReader,
+                    AutomaticSchedulePlannerFactory.Create(),
+                    technicalErrorStore),
+                new AcceptAutomaticScheduleProposalCommand(
+                    scheduling.WorkspaceReader,
+                    scheduling.AcceptAutomaticScheduleProposalStore)),
+            new AutomaticScheduleResetActions(
+                new DiscardAutomaticScheduleCommand(
+                    scheduling.WorkspaceReader,
+                    scheduling.DiscardAutomaticScheduleStore)),
             currentWeekMonday,
-            errorReporter);
+            errorReporter,
+            new ScheduleFeedbackDelay());
         serviceCatalog.SelectedWorkLocationChanged +=
             standardStaffingDemands.SelectWorkLocation;
 
@@ -138,6 +159,8 @@ internal static class MainWindowComposition
         SqliteEmployeeStore employeeStore = new(databasePath);
         SqliteStaffingDemandStore staffingDemandStore = new(databasePath);
         SqliteScheduleStore scheduleStore = new(databasePath);
+        SqliteAutomaticScheduleDiscardStore automaticScheduleDiscardStore = new(
+            databasePath);
         await staffingDemandStore.InitializeAsync(cancellationToken);
         await scheduleStore.InitializeAsync(cancellationToken);
 
@@ -164,7 +187,9 @@ internal static class MainWindowComposition
                 scheduleStore,
                 scheduleStore,
                 scheduleStore,
-                scheduleStore));
+                scheduleStore,
+                scheduleStore,
+                automaticScheduleDiscardStore));
     }
 
     private static DateOnly GetWeekMonday(DateOnly date)

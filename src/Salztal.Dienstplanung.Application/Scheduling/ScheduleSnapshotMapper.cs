@@ -16,24 +16,30 @@ internal static class ScheduleSnapshotMapper
             serviceCatalog.WorkLocations.ToDictionary(
                 location => location.Id,
                 location => location.Name.Value);
-        Dictionary<ShiftTypeId, string> shiftTypeNames =
+        Dictionary<ShiftTypeId, ShiftType> shiftTypes =
             serviceCatalog.ShiftTypes.ToDictionary(
                 shiftType => shiftType.Id,
-                shiftType => shiftType.Name.Value);
+                shiftType => shiftType);
 
         return demandSlots.Slots
-            .Select(slot => new ScheduleDemandSlotSnapshot(
-                slot.Id.SourceId.Value,
-                MapSourceKind(slot.Id.SourceKind),
-                slot.Id.Date,
-                slot.Id.WorkLocationId.Value,
-                workLocationNames[slot.Id.WorkLocationId],
-                slot.Id.ShiftTypeId.Value,
-                shiftTypeNames[slot.Id.ShiftTypeId],
-                slot.Id.Ordinal,
-                slot.ActualTime.Start,
-                slot.ActualTime.End,
-                slot.DurationMinutes))
+            .Select(slot =>
+            {
+                ShiftType shiftType = shiftTypes[slot.Id.ShiftTypeId];
+                return new ScheduleDemandSlotSnapshot(
+                    slot.Id.SourceId.Value,
+                    MapSourceKind(slot.Id.SourceKind),
+                    slot.Id.Date,
+                    slot.Id.WorkLocationId.Value,
+                    workLocationNames[slot.Id.WorkLocationId],
+                    slot.Id.ShiftTypeId.Value,
+                    shiftType.Name.Value,
+                    slot.Id.Ordinal,
+                    slot.ActualTime.Start,
+                    slot.ActualTime.End,
+                    slot.DurationMinutes,
+                    MapDisplayKind(shiftType.Display.Kind),
+                    shiftType.Display.Abbreviation);
+            })
             .ToArray();
     }
 
@@ -62,10 +68,12 @@ internal static class ScheduleSnapshotMapper
             slot.Id.Ordinal,
             slot.ActualTime.Start,
             slot.ActualTime.End,
-            slot.DurationMinutes);
+            slot.DurationMinutes,
+            MapDisplayKind(shiftType.Display.Kind),
+            shiftType.Display.Abbreviation);
     }
 
-    private static ScheduleAssignmentSnapshot CreateAssignment(
+    internal static ScheduleAssignmentSnapshot CreateAssignment(
         ScheduleAssignment assignment)
     {
         return new ScheduleAssignmentSnapshot(
@@ -128,6 +136,20 @@ internal static class ScheduleSnapshotMapper
                 ScheduleAssignmentKindSnapshot.ManualAdditional,
             _ => throw new InvalidOperationException(
                 $"Unsupported schedule assignment kind: {kind}"),
+        };
+    }
+
+    private static ScheduleShiftDisplayKindSnapshot MapDisplayKind(
+        ShiftTypeDisplayKind displayKind)
+    {
+        return displayKind switch
+        {
+            ShiftTypeDisplayKind.Abbreviation =>
+                ScheduleShiftDisplayKindSnapshot.Abbreviation,
+            ShiftTypeDisplayKind.ActualTime =>
+                ScheduleShiftDisplayKindSnapshot.ActualTime,
+            _ => throw new InvalidOperationException(
+                $"Unsupported shift-type display kind: {displayKind}"),
         };
     }
 

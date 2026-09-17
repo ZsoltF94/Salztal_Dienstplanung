@@ -59,7 +59,7 @@ public sealed class EmployeeTypePersistenceTests
         Assert.Equal(1L, await ExecuteScalarAsync(
             database.Path,
             $"SELECT COUNT(*) FROM StandardStaffingDemandRevisions WHERE Id = '{DatabaseId(demandId)}';"));
-        Assert.Equal(7L, await ExecuteScalarAsync(
+        Assert.Equal(9L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM __EFMigrationsHistory;"));
 

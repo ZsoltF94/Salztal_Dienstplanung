@@ -13,7 +13,8 @@ public sealed class ScheduleWorkspaceReadData
         IEnumerable<ScheduleDraftHeader> draftHeaders,
         ScheduleDraft? exactDraft,
         IEnumerable<PlanningHistoryDayReadItem>? historyDays = null,
-        PlanningInputSnapshot? preparedSnapshot = null)
+        PlanningInputSnapshot? preparedSnapshot = null,
+        AutomaticScheduleRunRecord? automaticScheduleRun = null)
     {
         ArgumentNullException.ThrowIfNull(availability);
         ArgumentNullException.ThrowIfNull(staffingDemands);
@@ -25,6 +26,7 @@ public sealed class ScheduleWorkspaceReadData
         ExactDraft = exactDraft;
         HistoryDays = Array.AsReadOnly((historyDays ?? []).ToArray());
         PreparedSnapshot = preparedSnapshot;
+        AutomaticScheduleRun = automaticScheduleRun;
     }
 
     public AvailabilityReadData Availability { get; }
@@ -38,4 +40,6 @@ public sealed class ScheduleWorkspaceReadData
     public ReadOnlyCollection<PlanningHistoryDayReadItem> HistoryDays { get; }
 
     public PlanningInputSnapshot? PreparedSnapshot { get; }
+
+    public AutomaticScheduleRunRecord? AutomaticScheduleRun { get; }
 }

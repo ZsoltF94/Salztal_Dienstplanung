@@ -30,4 +30,6 @@ internal sealed record SchedulingDependencies(
     IOpenScheduleDraftStore OpenDraftStore,
     IChangeScheduleDayStore ChangeDayStore,
     IPlanningInputReader PlanningInputReader,
-    IPreparePlanningSnapshotStore PrepareSnapshotStore);
+    IPreparePlanningSnapshotStore PrepareSnapshotStore,
+    IAcceptAutomaticScheduleProposalStore AcceptAutomaticScheduleProposalStore,
+    IDiscardAutomaticScheduleStore DiscardAutomaticScheduleStore);

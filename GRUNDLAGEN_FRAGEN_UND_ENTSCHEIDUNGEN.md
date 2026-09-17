@@ -4,7 +4,7 @@
 
 Dieses Dokument hält das gemeinsam bestätigte Grundverständnis, bereits getroffene Entscheidungen und noch offene Grundsatzfragen fest. Es ist noch keine technische Spezifikation und enthält bewusst noch nicht die später zu erfassenden Detailregeln für Mitarbeitertypen, Dienste und Einsatzorte.
 
-Status: Grundfassung abgenommen am 2026-09-13; Ergänzungen bis System 06 fachlich bestätigt am 2026-09-15; System-07-Konsolidierung und System-08-Vorentscheidungen am 2026-09-16 bestätigt
+Status: Grundfassung abgenommen am 2026-09-13; Ergänzungen bis System 06 fachlich bestätigt am 2026-09-15; System-07-Konsolidierung und System-08-Vorentscheidungen am 2026-09-16 bestätigt; System-09-Zieländerung und Reihenfolge S09A/S09B vor AG-15 am 2026-09-17 fachlich bestätigt
 
 ## Ziel der App
 
@@ -83,8 +83,10 @@ Nach manueller Prüfung wird ein Plan abgenommen. Erst danach kann er in eine no
 - Die Service-Leitung kann den erzeugten Vorschlag manuell bearbeiten.
 - Manuell übersteuerbare Planungsregeln dürfen dabei nur nach sichtbarer Warnung und ausdrücklicher Bestätigung verletzt werden. Nicht übersteuerbare Strukturregeln verhindern widersprüchliche Plandaten.
 - Einzelne Dienste oder Zuweisungen können gesperrt werden, damit eine erneute Generierung sie unverändert lässt.
-- Bei der automatischen Generierung werden zuerst alle Nicht-AH-Typen geplant. AH wird danach ausschließlich für verbleibende zulässige Lücken verwendet; bereits gedeckte Plätze werden nicht zugunsten von AH freigeräumt.
-- Für AH bleiben zehn Wochenstunden das Ziel und zwölf Stunden die zwingende Obergrenze der Automatik. Weniger als sechs sowie mehr als zehn geplante Stunden werden im Generierungsbericht gemeldet; weniger als sechs Stunden blockieren den Plan nicht. Mehr als zwölf Stunden ist nur als bestätigte manuelle Abweichung zulässig.
+- Für den vor AG-15 bestätigten Zielstand werden automatisch planbare Nicht-AH- und AH-Personen gemeinsam optimiert. Normale Dienste dürfen zwischen beiden Rollen umverteilt werden; eine frühere Nicht-AH-Zwischenlösung wird nicht mehr unveränderlich eingefroren.
+- Bedarfsdeckung und die bestehenden hohen Schutzregeln bleiben vorrangig. Bei danach gleichwertigen Plänen werden zuerst `Spr` und anschließend `D` minimiert. `D` und `Spr` bleiben zusammengesetzte Muster aus vorhandenen Bedarfen und werden nicht nur zur Stundenauffüllung erzeugt.
+- Jede AH-Person soll bei vorhandenem zulässigem Bedarf möglichst mindestens drei Stunden je Woche erhalten, ohne eine Nicht-AH-Person unter `wirksames Wochensoll minus drei Stunden` zu drängen. Zehn AH-Wochenstunden bleiben das Ziel und zwölf Stunden die zwingende Obergrenze der Automatik. Weniger als sechs sowie mehr als zehn geplante Stunden werden weiterhin gemeldet.
+- Nach Mindestschutz und Mustervermeidung sollen alle automatisch planbaren Personen relativ zu ihrem individuellen Wochenziel möglichst fair angenähert werden. Früh- und Spätdienste werden weiterhin nur unter vergleichbar geeigneten Personen ausgeglichen.
 - Ein manuell vorgetragener Typ1-Früh- oder Spätdienst kann als Bürozeit `B` gekennzeichnet werden. Seine tatsächliche Dauer zählt zu den Typ1-Wochenstunden, deckt aber keinen Personalbedarf. Nach der Abnahme bleibt der zugrunde liegende Dienst sichtbar; nur `B` wird im Plan und späteren Excel-Export ausgeblendet. Die Büroinformation bleibt intern in der unveränderlichen Planversion erhalten.
 
 ### Aussagegrenze des Regelkatalogs
@@ -165,6 +167,8 @@ Die folgenden Bereiche sollen getrennt bleiben, damit spätere Änderungen ohne 
 
 - Eine für die automatische Planung zwingende Regel ist für die Generierung unverletzbar.
 - Falls dadurch ein Bedarf nicht gedeckt werden kann, wird der übrige Plan trotzdem erzeugt. Normale Bedarfsplätze werden vollständig besetzt oder vollständig ungedeckt ausgewiesen; nur der bestätigte `Spr`-Sonderfall darf eine sichtbare Teildeckung erzeugen.
+- Nach jeder erfolgreichen Plangenerierung erhält die Service-Leitung eine vollständige Bedarfsdeckungsübersicht für alle wirksamen Bedarfe des Drei-Wochen-Zeitraums. Sie enthält ausdrücklich auch vollständig gedeckte Bedarfe und unterscheidet vollständig gedeckt, im bestätigten `Spr`-Sonderfall teilweise gedeckt und ungedeckt.
+- Jeder Eintrag nennt mindestens Datum, Einsatzort, Diensttyp, tatsächliche Bedarfszeit, benötigte Personenzahl beziehungsweise Minuten sowie gedeckte und offene Personenzahl beziehungsweise Minuten. Zusätzlich werden verständliche Gesamtsummen je Deckungsstatus angezeigt.
 - Jeder vollständig oder im `Spr`-Sonderfall teilweise ungedeckte Bedarfszeitraum wird konkret gemeldet.
 - Eine Konfliktmeldung beschreibt das Problem, dessen Ursache und hilfreiche Lösungsmöglichkeiten.
 - Weiche Regeln werden mit den drei Stufen hoch, mittel und niedrig priorisiert.
@@ -181,6 +185,9 @@ Die folgenden Bereiche sollen getrennt bleiben, damit spätere Änderungen ohne 
 - Bei einer ausdrücklich gestarteten Neugenerierung dürfen alle nicht gesperrten Zuweisungen neu verteilt werden.
 - Die Service-Leitung darf Mitarbeitende manuell auch außerhalb ihrer normalen Einsatzfreigaben eintragen. Die App soll die Regelabweichung sichtbar kennzeichnen.
 - Die Service-Leitung darf einen vorhandenen vollständig gedeckten Dienst manuell mit einer zusätzlichen Person besetzen. Der Bedarf bleibt unverändert, die Stunden zählen vollständig und die Überbesetzung muss vor der Abnahme sichtbar bestätigt werden.
+- Nach dem technisch erfolgreichen ersten Generierungsstand wird der Generator zunächst nicht weiter verändert. Zuerst ordnet S09A ausschließlich die Dienstplanoberfläche neu.
+- Danach wird in einem eigenen Fragenkatalog festgelegt, welche neutralen Qualitätswerte der S09B-Planungsqualitätsbericht zeigen soll. Dieser Bericht misst den unveränderten Ausgangsstand und bleibt von den vollständigen Konflikterklärungen und Lösungsvorschlägen aus System 10 getrennt.
+- Erst anhand des Berichts wird in einem eigenen abgenommenen Folgeplan entschieden, welche Optimierungen oder welcher Rückfall umgesetzt werden. Der unabhängige Korrektheits-, Mutations- und Leistungsnachweis aus AG-15 prüft erst den danach endgültig vorgesehenen Algorithmus.
 
 ### E. Planstunden und Zeitkonten
 

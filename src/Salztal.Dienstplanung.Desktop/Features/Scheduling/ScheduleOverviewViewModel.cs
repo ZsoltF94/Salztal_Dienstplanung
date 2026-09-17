@@ -11,6 +11,8 @@ namespace Salztal.Dienstplanung.Desktop.Features.Scheduling;
 
 internal sealed class ScheduleOverviewViewModel : ObservableObject
 {
+    private static readonly TimeSpan SuccessMessageReadingTime = TimeSpan.FromSeconds(4);
+    private static readonly TimeSpan SuccessMessageFadeTime = TimeSpan.FromMilliseconds(350);
     private readonly OpenOrCreateScheduleDraftCommand _openCommand;
     private readonly GetScheduleWorkspaceQuery _query;
     private readonly SetServiceManagementAssignmentCommand _setAssignmentCommand;
@@ -19,12 +21,16 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
     private readonly RemoveScheduleDayEntryCommand _removeDayEntryCommand;
     private readonly PreparePlanningInputCommand _prepareCommand;
     private readonly IUnexpectedErrorReporter _errorReporter;
+    private readonly IScheduleFeedbackDelay _feedbackDelay;
+    private CancellationTokenSource? _feedbackCancellation;
+    private long _feedbackSequence;
     private DateTime _selectedPeriodDate;
     private ScheduleCellViewModel? _selectedCell;
     private PendingScheduleAction? _pendingAction;
     private ScheduleWorkspaceSnapshot? _snapshot;
     private bool _canPrepare;
     private bool _isBusy;
+    private bool _isSuccessMessageFading;
     private string? _errorMessage;
     private string? _successMessage;
     private string _readinessDisplay = string.Empty;
@@ -37,8 +43,11 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         ChangeScheduleDayEntryCommand changeDayEntryCommand,
         RemoveScheduleDayEntryCommand removeDayEntryCommand,
         PreparePlanningInputCommand prepareCommand,
+        IAutomaticScheduleGenerationActions generationActions,
+        IAutomaticScheduleResetActions resetActions,
         DateOnly initialPeriodMonday,
-        IUnexpectedErrorReporter errorReporter)
+        IUnexpectedErrorReporter errorReporter,
+        IScheduleFeedbackDelay feedbackDelay)
     {
         ArgumentNullException.ThrowIfNull(openCommand);
         ArgumentNullException.ThrowIfNull(query);
@@ -47,7 +56,10 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(changeDayEntryCommand);
         ArgumentNullException.ThrowIfNull(removeDayEntryCommand);
         ArgumentNullException.ThrowIfNull(prepareCommand);
+        ArgumentNullException.ThrowIfNull(generationActions);
+        ArgumentNullException.ThrowIfNull(resetActions);
         ArgumentNullException.ThrowIfNull(errorReporter);
+        ArgumentNullException.ThrowIfNull(feedbackDelay);
         if (initialPeriodMonday.DayOfWeek != DayOfWeek.Monday)
         {
             throw new ArgumentException(
@@ -63,13 +75,62 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         _removeDayEntryCommand = removeDayEntryCommand;
         _prepareCommand = prepareCommand;
         _errorReporter = errorReporter;
+        _feedbackDelay = feedbackDelay;
         _selectedPeriodDate = initialPeriodMonday.ToDateTime(TimeOnly.MinValue);
         Days = [];
         Employees = [];
-        Typ1Editor = new ServiceManagementAssignmentEditorViewModel();
         Preparation = new PlanningPreparationViewModel();
-        Typ1Editor.SelectionChanged += NotifyCommandsChanged;
-        Preparation.PropertyChanged += (_, _) => NotifyCommandsChanged();
+        Generation = new AutomaticScheduleGenerationViewModel(
+            generationActions,
+            ReloadAfterAutomaticAcceptanceAsync,
+            errorReporter);
+        AutomaticReset = new AutomaticScheduleResetViewModel(
+            resetActions,
+            ReloadAfterAutomaticDiscardAsync,
+            errorReporter);
+        Preparation.PropertyChanged += (_, _) =>
+        {
+            Generation.UpdateParentState(Preparation.HasLocalRunOptionChange, IsBusy);
+            NotifyCommandsChanged();
+        };
+        Generation.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName is nameof(Generation.IsOperationActive)
+                or nameof(Generation.HasPreview))
+            {
+                if (Generation.IsOperationActive || Generation.HasPreview)
+                {
+                    CloseAssignmentEditor();
+                }
+
+                OnPropertyChanged(nameof(CanEditSchedule));
+                AutomaticReset.UpdateParentState(
+                    IsBusy || Generation.IsOperationActive || Generation.HasPreview);
+                NotifyCommandsChanged();
+            }
+        };
+        AutomaticReset.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName is nameof(AutomaticReset.IsInteractionActive))
+            {
+                if (AutomaticReset.IsInteractionActive)
+                {
+                    CloseAssignmentEditor();
+                }
+
+                OnPropertyChanged(nameof(CanEditSchedule));
+                Generation.UpdateParentState(
+                    Preparation.HasLocalRunOptionChange,
+                    IsBusy || AutomaticReset.IsInteractionActive);
+                NotifyCommandsChanged();
+            }
+
+            if (args.PropertyName is nameof(AutomaticReset.IsConfirmationOpen)
+                or nameof(AutomaticReset.ConfirmationMessage))
+            {
+                NotifyConfirmationStateChanged();
+            }
+        };
         LoadCommand = new AsyncRelayCommand(LoadAsync, CanLoad);
         PreviousPeriodCommand = new AsyncRelayCommand(
             cancellationToken => ChangePeriodAsync(-21, cancellationToken),
@@ -81,7 +142,7 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         SetVacationCommand = CreateDayEntryCommand(AvailabilityDayEntryKind.Vacation);
         SetSicknessCommand = CreateDayEntryCommand(AvailabilityDayEntryKind.Sickness);
         SetFixedDayOffCommand = CreateDayEntryCommand(AvailabilityDayEntryKind.FixedDayOff);
-        SetTyp1AssignmentCommand = new AsyncRelayCommand(
+        SetTyp1AssignmentCommand = new AsyncRelayCommand<ServiceManagementAssignmentOptionViewModel>(
             RequestOrSetAssignmentAsync,
             CanSetAssignment);
         RequestRemovalCommand = new RelayCommand(RequestRemoval, CanRemove);
@@ -90,19 +151,27 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
             CanPreparePlanning);
         ConfirmPendingActionCommand = new AsyncRelayCommand(
             ConfirmPendingActionAsync,
-            () => IsConfirmationOpen && !IsBusy);
+            CanDecidePendingAction);
         CancelPendingActionCommand = new RelayCommand(
             CancelPendingAction,
-            () => IsConfirmationOpen && !IsBusy);
+            CanDecidePendingAction);
+        ConfirmActiveConfirmationCommand = new AsyncRelayCommand(
+            ConfirmActiveConfirmationAsync,
+            CanConfirmActiveConfirmation);
+        CancelActiveConfirmationCommand = new RelayCommand(
+            CancelActiveConfirmation,
+            CanCancelActiveConfirmation);
     }
 
     public ObservableCollection<ScheduleDayHeaderViewModel> Days { get; }
 
     public ObservableCollection<ScheduleEmployeeRowViewModel> Employees { get; }
 
-    public ServiceManagementAssignmentEditorViewModel Typ1Editor { get; }
-
     public PlanningPreparationViewModel Preparation { get; }
+
+    public AutomaticScheduleGenerationViewModel Generation { get; }
+
+    public AutomaticScheduleResetViewModel AutomaticReset { get; }
 
     public IAsyncRelayCommand LoadCommand { get; }
 
@@ -118,7 +187,9 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
 
     public IAsyncRelayCommand SetFixedDayOffCommand { get; }
 
-    public IAsyncRelayCommand SetTyp1AssignmentCommand { get; }
+    public IAsyncRelayCommand<ServiceManagementAssignmentOptionViewModel>
+        SetTyp1AssignmentCommand
+    { get; }
 
     public IRelayCommand RequestRemovalCommand { get; }
 
@@ -127,6 +198,10 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
     public IAsyncRelayCommand ConfirmPendingActionCommand { get; }
 
     public IRelayCommand CancelPendingActionCommand { get; }
+
+    public IAsyncRelayCommand ConfirmActiveConfirmationCommand { get; }
+
+    public IRelayCommand CancelActiveConfirmationCommand { get; }
 
     public DateTime SelectedPeriodDate
     {
@@ -153,6 +228,7 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
 
             if (_selectedCell is not null)
             {
+                _selectedCell.IsAssignmentEditorOpen = false;
                 _selectedCell.IsSelected = false;
             }
 
@@ -162,7 +238,6 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
                 _selectedCell.IsSelected = true;
             }
 
-            Typ1Editor.ApplyCell(value);
             OnPropertyChanged();
             OnPropertyChanged(nameof(SelectedCellDisplay));
             OnPropertyChanged(nameof(SelectedCellEntryDisplay));
@@ -177,7 +252,18 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         {
             if (SetProperty(ref _isBusy, value))
             {
+                if (value && SelectedCell is not null)
+                {
+                    SelectedCell.IsAssignmentEditorOpen = false;
+                }
+
                 OnPropertyChanged(nameof(IsLoading));
+                OnPropertyChanged(nameof(CanEditSchedule));
+                Generation.UpdateParentState(
+                    Preparation.HasLocalRunOptionChange,
+                    value || AutomaticReset.IsInteractionActive);
+                AutomaticReset.UpdateParentState(
+                    value || Generation.IsOperationActive || Generation.HasPreview);
                 NotifyViewStateChanged();
                 NotifyCommandsChanged();
             }
@@ -193,7 +279,7 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         {
             if (SetProperty(ref _errorMessage, value))
             {
-                OnPropertyChanged(nameof(HasError));
+                NotifyFeedbackStateChanged();
             }
         }
     }
@@ -205,9 +291,15 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         {
             if (SetProperty(ref _successMessage, value))
             {
-                OnPropertyChanged(nameof(HasSuccessMessage));
+                NotifyFeedbackStateChanged();
             }
         }
+    }
+
+    public bool IsSuccessMessageFading
+    {
+        get => _isSuccessMessageFading;
+        private set => SetProperty(ref _isSuccessMessageFading, value);
     }
 
     public string SelectedPeriodRangeDisplay
@@ -235,17 +327,60 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         private set => SetProperty(ref _readinessDisplay, value);
     }
 
-    public bool IsConfirmationOpen => _pendingAction is not null;
+    public bool IsConfirmationOpen =>
+        _pendingAction is not null || AutomaticReset.IsConfirmationOpen;
 
-    public string? ConfirmationMessage => _pendingAction?.Message;
+    public string? ConfirmationMessage => _pendingAction?.Message
+        ?? (AutomaticReset.IsConfirmationOpen
+            ? AutomaticReset.ConfirmationMessage
+            : null);
+
+    public string ConfirmationTitle => AutomaticReset.IsConfirmationOpen
+        ? "Automatischen Plan wirklich vollständig verwerfen?"
+        : "Änderung am Tagesfeld bestätigen?";
+
+    public string ConfirmationConfirmText => AutomaticReset.IsConfirmationOpen
+        ? "Vollständig verwerfen"
+        : "Bestätigen";
+
+    public string ConfirmationConfirmAutomationName => AutomaticReset.IsConfirmationOpen
+        ? "Vollständiges Verwerfen bestätigen"
+        : "Änderung am Tagesfeld bestätigen";
+
+    public string ConfirmationAutomationName => AutomaticReset.IsConfirmationOpen
+        ? "Modale Bestätigung zum vollständigen Verwerfen des automatischen Plans"
+        : "Modale Bestätigung für eine Änderung am Tagesfeld";
 
     public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
 
     public bool HasSuccessMessage => !string.IsNullOrWhiteSpace(SuccessMessage);
 
+    public bool HasFeedback => HasError || HasSuccessMessage;
+
+    public string? FeedbackMessage => ErrorMessage ?? SuccessMessage;
+
+    public string FeedbackStatusDisplay => HasError ? "Fehler" : "Hinweis";
+
+    public string FeedbackAutomationName => $"Dienstplanmeldung {FeedbackStatusDisplay}";
+
     public bool HasEmployees => Employees.Count > 0;
 
     public bool IsEmpty => !IsBusy && !HasError && !HasEmployees;
+
+    public bool CanEditSchedule => !IsInteractionLocked;
+
+    private bool IsInteractionLocked =>
+        _pendingAction is not null
+        || IsBusy
+        || Generation.IsOperationActive
+        || Generation.HasPreview
+        || AutomaticReset.IsInteractionActive;
+
+    private bool IsBackgroundOperationActive =>
+        IsBusy
+        || Generation.IsOperationActive
+        || Generation.HasPreview
+        || AutomaticReset.IsInteractionActive;
 
     internal async Task LoadAsync(CancellationToken cancellationToken)
     {
@@ -261,32 +396,41 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
 
     private bool CanLoad()
     {
-        return !IsBusy && !IsConfirmationOpen;
+        return !IsInteractionLocked && !IsConfirmationOpen;
     }
 
     private bool CanSetDayEntry(AvailabilityDayEntryKind kind)
     {
         return SelectedCell is not null
             && _snapshot is not null
-            && !IsBusy
+            && !IsInteractionLocked
             && !IsConfirmationOpen
+            && !SelectedCell.IsGeneratedDayOff
+            && SelectedCell.Assignment?.Origin
+                != ScheduleAssignmentOriginSnapshot.AutomaticGeneration
             && (kind == AvailabilityDayEntryKind.FixedDayOff
                 || SelectedCell.AllowsVacationAndSickness);
     }
 
-    private bool CanSetAssignment()
+    private bool CanSetAssignment(ServiceManagementAssignmentOptionViewModel? option)
     {
-        return SelectedCell?.IsServiceManagement == true
-            && Typ1Editor.SelectedOption is not null
+        return option is not null
+            && SelectedCell?.CanOpenAssignmentEditor == true
+            && SelectedCell.AssignmentOptions.Contains(option)
             && _snapshot is not null
-            && !IsBusy
+            && !IsInteractionLocked
             && !IsConfirmationOpen;
     }
 
     private bool CanRemove()
     {
-        return (SelectedCell is { HasEntry: true } or { HasAssignment: true })
-            && !IsBusy
+        return (SelectedCell is { EntryKind: not null }
+                || SelectedCell is
+                {
+                    HasAssignment: true,
+                    Assignment.Origin: not ScheduleAssignmentOriginSnapshot.AutomaticGeneration,
+                })
+            && !IsInteractionLocked
             && !IsConfirmationOpen;
     }
 
@@ -294,7 +438,7 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
     {
         return _snapshot is not null
             && _canPrepare
-            && !IsBusy
+            && !IsInteractionLocked
             && !IsConfirmationOpen
             && (_snapshot.PreparationStatus != SchedulePreparationStatus.Prepared
                 || Preparation.HasLocalRunOptionChange);
@@ -308,13 +452,17 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
 
     private void SelectCell(ScheduleCellViewModel? cell)
     {
-        if (cell is null || IsBusy || IsConfirmationOpen)
+        if (cell is null || IsInteractionLocked || IsConfirmationOpen)
         {
             return;
         }
 
         ClearFeedback();
         SelectedCell = cell;
+        if (cell.CanOpenAssignmentEditor)
+        {
+            cell.IsAssignmentEditorOpen = true;
+        }
     }
 
     private async Task RequestOrSetDayEntryAsync(
@@ -326,7 +474,7 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         ClearFeedback();
         if (cell.EntryKind == kind)
         {
-            SuccessMessage = "Der ausgewählte Tageswert ist bereits eingetragen.";
+            ShowSuccessMessage("Der ausgewählte Tageswert ist bereits eingetragen.");
             return;
         }
 
@@ -348,12 +496,19 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
             cancellationToken);
     }
 
-    private async Task RequestOrSetAssignmentAsync(CancellationToken cancellationToken)
+    private async Task RequestOrSetAssignmentAsync(
+        ServiceManagementAssignmentOptionViewModel? option,
+        CancellationToken cancellationToken)
     {
         ScheduleCellViewModel cell = SelectedCell
             ?? throw new InvalidOperationException("No schedule cell is selected.");
-        ServiceManagementAssignmentOptionViewModel option = Typ1Editor.SelectedOption
-            ?? throw new InvalidOperationException("No service-management option is selected.");
+        if (option is null)
+        {
+            throw new InvalidOperationException(
+                "No service-management option is selected.");
+        }
+
+        cell.IsAssignmentEditorOpen = false;
         ClearFeedback();
         if (cell.HasEntry)
         {
@@ -427,6 +582,65 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
     private void CancelPendingAction()
     {
         SetPendingAction(null);
+    }
+
+    private bool CanDecidePendingAction() =>
+        _pendingAction is not null && !IsBackgroundOperationActive;
+
+    private bool CanConfirmActiveConfirmation()
+    {
+        if (_pendingAction is not null)
+        {
+            return ConfirmPendingActionCommand.CanExecute(null);
+        }
+
+        return AutomaticReset.IsConfirmationOpen
+            && AutomaticReset.ConfirmCommand.CanExecute(null);
+    }
+
+    private async Task ConfirmActiveConfirmationAsync(CancellationToken cancellationToken)
+    {
+        if (_pendingAction is not null)
+        {
+            await ConfirmPendingActionAsync(cancellationToken);
+            return;
+        }
+
+        if (AutomaticReset.IsConfirmationOpen)
+        {
+            await AutomaticReset.ConfirmCommand.ExecuteAsync(null);
+            return;
+        }
+
+        throw new InvalidOperationException("No schedule confirmation is active.");
+    }
+
+    private bool CanCancelActiveConfirmation()
+    {
+        if (_pendingAction is not null)
+        {
+            return CancelPendingActionCommand.CanExecute(null);
+        }
+
+        return AutomaticReset.IsConfirmationOpen
+            && AutomaticReset.CancelCommand.CanExecute(null);
+    }
+
+    private void CancelActiveConfirmation()
+    {
+        if (_pendingAction is not null)
+        {
+            CancelPendingAction();
+            return;
+        }
+
+        if (AutomaticReset.IsConfirmationOpen)
+        {
+            AutomaticReset.CancelCommand.Execute(null);
+            return;
+        }
+
+        throw new InvalidOperationException("No schedule confirmation is active.");
     }
 
     [SuppressMessage(
@@ -541,7 +755,8 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
             cancellationToken.ThrowIfCancellationRequested();
             if (result.Status != ScheduleDayChangeStatus.Succeeded)
             {
-                ErrorMessage = CreateErrorMessage(result.Errors.Select(error => error.Message));
+                ShowErrorMessage(CreateErrorMessage(
+                    result.Errors.Select(error => error.Message)));
                 return;
             }
 
@@ -557,7 +772,8 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         catch (Exception exception)
         {
             _errorReporter.Report(exception, operation);
-            ErrorMessage = "Die Änderung konnte nicht gespeichert werden. Bitte versuche es erneut.";
+            ShowErrorMessage(
+                "Die Änderung konnte nicht gespeichert werden. Bitte versuche es erneut.");
         }
         finally
         {
@@ -591,7 +807,8 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
             cancellationToken.ThrowIfCancellationRequested();
             if (result.Status != PreparePlanningInputStatus.Succeeded)
             {
-                ErrorMessage = CreateErrorMessage(result.Errors.Select(error => error.Message));
+                ShowErrorMessage(CreateErrorMessage(
+                    result.Errors.Select(error => error.Message)));
                 return;
             }
 
@@ -609,8 +826,8 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         catch (Exception exception)
         {
             _errorReporter.Report(exception, "PreparePlanningInput");
-            ErrorMessage =
-                "Die Planung konnte nicht vorbereitet werden. Bitte versuche es erneut.";
+            ShowErrorMessage(
+                "Die Planung konnte nicht vorbereitet werden. Bitte versuche es erneut.");
         }
         finally
         {
@@ -628,8 +845,7 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         CancellationToken cancellationToken)
     {
         IsBusy = true;
-        ErrorMessage = null;
-        SuccessMessage = null;
+        ClearFeedback();
         SetPendingAction(null);
         ClearSnapshot();
         try
@@ -641,7 +857,8 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
             cancellationToken.ThrowIfCancellationRequested();
             if (openResult.Status != OpenOrCreateScheduleDraftStatus.Succeeded)
             {
-                ErrorMessage = CreateErrorMessage(openResult.Errors.Select(error => error.Message));
+                ShowErrorMessage(CreateErrorMessage(
+                    openResult.Errors.Select(error => error.Message)));
                 return;
             }
 
@@ -657,8 +874,8 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         catch (Exception exception)
         {
             _errorReporter.Report(exception, "LoadScheduleWorkspace");
-            ErrorMessage =
-                "Der Drei-Wochen-Zeitraum konnte nicht geladen werden. Bitte versuche es erneut.";
+            ShowErrorMessage(
+                "Der Drei-Wochen-Zeitraum konnte nicht geladen werden. Bitte versuche es erneut.");
         }
         finally
         {
@@ -678,7 +895,8 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         cancellationToken.ThrowIfCancellationRequested();
         if (result.Status != ScheduleWorkspaceQueryStatus.Succeeded)
         {
-            ErrorMessage = CreateErrorMessage(result.Errors.Select(error => error.Message));
+            ShowErrorMessage(CreateErrorMessage(
+                result.Errors.Select(error => error.Message)));
             return;
         }
 
@@ -688,7 +906,31 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
             ?? throw new InvalidOperationException(
                 "A successful schedule query returned no workspace snapshot."),
             selection);
-        SuccessMessage = successMessage;
+        ShowSuccessMessage(successMessage);
+    }
+
+    private async Task ReloadAfterAutomaticAcceptanceAsync(
+        CancellationToken cancellationToken)
+    {
+        (Guid EmployeeId, DateOnly Date)? selection = SelectedCell is null
+            ? null
+            : (SelectedCell.EmployeeId, SelectedCell.Date);
+        await LoadWorkspaceAsync(
+            selection,
+            "Der automatische Vorschlag wurde vollständig übernommen.",
+            cancellationToken);
+    }
+
+    private async Task ReloadAfterAutomaticDiscardAsync(
+        CancellationToken cancellationToken)
+    {
+        (Guid EmployeeId, DateOnly Date)? selection = SelectedCell is null
+            ? null
+            : (SelectedCell.EmployeeId, SelectedCell.Date);
+        await LoadWorkspaceAsync(
+            selection,
+            "Der automatische Plan wurde vollst\u00e4ndig verworfen.",
+            cancellationToken);
     }
 
     private void ApplySnapshot(
@@ -709,13 +951,16 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         Dictionary<(Guid EmployeeId, DateOnly Date), ScheduleAssignmentSnapshot>
             assignments = snapshot.Assignments.ToDictionary(item =>
                 (item.EmployeeId, item.Date));
+        HashSet<(Guid EmployeeId, DateOnly Date)> generatedDayOffs = snapshot
+            .GeneratedDayOffs
+            .Select(item => (item.EmployeeId, item.Date))
+            .ToHashSet();
         Dictionary<(Guid EmployeeId, DateOnly Date),
-            ServiceManagementAssignmentOptionViewModel[]> options = snapshot.AssignmentOptions
+            ServiceManagementAssignmentOptionSnapshot[]> options = snapshot.AssignmentOptions
                 .GroupBy(item => (item.EmployeeId, item.FirstSlot.Date))
                 .ToDictionary(
                     group => group.Key,
-                    group => group.Select(item =>
-                        new ServiceManagementAssignmentOptionViewModel(item)).ToArray());
+                    group => group.ToArray());
 
         foreach (AvailabilityPeriodDaySnapshot day in snapshot.Availability.Days)
         {
@@ -735,7 +980,16 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
                     out ScheduleAssignmentSnapshot? assignment);
                 options.TryGetValue(
                     (employee.EmployeeId, day.Date),
-                    out ServiceManagementAssignmentOptionViewModel[]? cellOptions);
+                    out ServiceManagementAssignmentOptionSnapshot[]? cellOptions);
+                ScheduleAssignmentDisplay? assignmentDisplay = assignment is null
+                    ? null
+                    : ScheduleAssignmentDisplayFormatter.Create(
+                        assignment,
+                        snapshot.DemandSlots);
+                ServiceManagementAssignmentOptionSnapshot? currentOption = assignment is null
+                    ? null
+                    : cellOptions?.FirstOrDefault(option =>
+                        MatchesAssignment(option, assignment));
                 return new ScheduleCellViewModel(
                     employee.EmployeeId,
                     employee.DisplayName,
@@ -744,8 +998,14 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
                     isServiceManagement,
                     entry?.Kind,
                     entry?.ChangeVersion,
+                    generatedDayOffs.Contains((employee.EmployeeId, day.Date)),
                     assignment,
-                    cellOptions ?? []);
+                    assignmentDisplay,
+                    (cellOptions ?? []).Select(option =>
+                        new ServiceManagementAssignmentOptionViewModel(
+                            option,
+                            ReferenceEquals(option, currentOption),
+                            SetTyp1AssignmentCommand)));
             }).ToArray();
             ScheduleWeekSummaryViewModel[] weeks = employee.Weeks
                 .Select((week, index) => new ScheduleWeekSummaryViewModel(index + 1, week))
@@ -764,6 +1024,21 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         Preparation.Apply(snapshot);
         _canPrepare = snapshot.ServiceManagementReadiness.All(item => item.CanPrepare);
         ReadinessDisplay = CreateReadinessDisplay(snapshot.ServiceManagementReadiness);
+        AutomaticScheduleGenerationContext automaticContext = new(
+                snapshot.DraftId,
+                snapshot.Version,
+                snapshot.PeriodMonday,
+                snapshot.PreparedSnapshotId,
+                snapshot.PreparationStatus,
+                snapshot.ServiceManagementReadiness.All(item => item.CanPrepare),
+                snapshot.AcceptedAutomaticSchedule);
+        Generation.ApplyContext(
+            automaticContext,
+            Preparation.HasLocalRunOptionChange,
+            IsBusy || AutomaticReset.IsInteractionActive);
+        AutomaticReset.ApplyContext(
+            automaticContext,
+            IsBusy || Generation.IsOperationActive || Generation.HasPreview);
         if (selection is not null)
         {
             SelectedCell = Employees
@@ -780,6 +1055,8 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
     {
         _snapshot = null;
         _canPrepare = false;
+        Generation.ClearWorkspace();
+        AutomaticReset.ClearWorkspace();
         SelectedCell = null;
         Days.Clear();
         Employees.Clear();
@@ -789,16 +1066,139 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
 
     private void ClearFeedback()
     {
+        CancelFeedbackDismissal();
         ErrorMessage = null;
         SuccessMessage = null;
     }
 
+    private void ShowErrorMessage(string message)
+    {
+        CancelFeedbackDismissal();
+        SuccessMessage = null;
+        ErrorMessage = message;
+    }
+
+    private void ShowSuccessMessage(string? message)
+    {
+        CancelFeedbackDismissal();
+        ErrorMessage = null;
+        SuccessMessage = message;
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+
+        CancellationTokenSource cancellation = new();
+        _feedbackCancellation = cancellation;
+        long sequence = _feedbackSequence;
+        _ = DismissSuccessMessageAsync(sequence, cancellation);
+    }
+
+    [SuppressMessage(
+        "Design",
+        "CA1031:Do not catch general exception types",
+        Justification = "The UI feedback boundary reports unexpected delay failures without crashing the dispatcher.")]
+    private async Task DismissSuccessMessageAsync(
+        long sequence,
+        CancellationTokenSource cancellation)
+    {
+        try
+        {
+            await _feedbackDelay.DelayAsync(
+                SuccessMessageReadingTime,
+                cancellation.Token);
+            if (sequence != _feedbackSequence || cancellation.IsCancellationRequested)
+            {
+                return;
+            }
+
+            IsSuccessMessageFading = true;
+            await _feedbackDelay.DelayAsync(
+                SuccessMessageFadeTime,
+                cancellation.Token);
+            if (sequence == _feedbackSequence && !cancellation.IsCancellationRequested)
+            {
+                SuccessMessage = null;
+                IsSuccessMessageFading = false;
+            }
+        }
+        catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+        {
+        }
+        catch (Exception exception)
+        {
+            _errorReporter.Report(exception, "DismissScheduleFeedback");
+        }
+        finally
+        {
+            if (ReferenceEquals(_feedbackCancellation, cancellation))
+            {
+                _feedbackCancellation = null;
+                cancellation.Dispose();
+            }
+        }
+    }
+
+    private void CancelFeedbackDismissal()
+    {
+        _feedbackSequence++;
+        CancellationTokenSource? cancellation = _feedbackCancellation;
+        _feedbackCancellation = null;
+        cancellation?.Cancel();
+        cancellation?.Dispose();
+        IsSuccessMessageFading = false;
+    }
+
+    private void NotifyFeedbackStateChanged()
+    {
+        OnPropertyChanged(nameof(HasError));
+        OnPropertyChanged(nameof(HasSuccessMessage));
+        OnPropertyChanged(nameof(HasFeedback));
+        OnPropertyChanged(nameof(FeedbackMessage));
+        OnPropertyChanged(nameof(FeedbackStatusDisplay));
+        OnPropertyChanged(nameof(FeedbackAutomationName));
+        OnPropertyChanged(nameof(IsEmpty));
+    }
+
     private void SetPendingAction(PendingScheduleAction? action)
     {
+        if (action is not null)
+        {
+            CloseAssignmentEditor();
+        }
+
         _pendingAction = action;
+        OnPropertyChanged(nameof(CanEditSchedule));
+        Generation.UpdateParentState(
+            Preparation.HasLocalRunOptionChange,
+            IsBusy || AutomaticReset.IsInteractionActive || action is not null);
+        AutomaticReset.UpdateParentState(
+            IsBusy
+            || Generation.IsOperationActive
+            || Generation.HasPreview
+            || action is not null);
+        NotifyConfirmationStateChanged();
+        NotifyCommandsChanged();
+    }
+
+    private void NotifyConfirmationStateChanged()
+    {
         OnPropertyChanged(nameof(IsConfirmationOpen));
         OnPropertyChanged(nameof(ConfirmationMessage));
-        NotifyCommandsChanged();
+        OnPropertyChanged(nameof(ConfirmationTitle));
+        OnPropertyChanged(nameof(ConfirmationConfirmText));
+        OnPropertyChanged(nameof(ConfirmationConfirmAutomationName));
+        OnPropertyChanged(nameof(ConfirmationAutomationName));
+        ConfirmActiveConfirmationCommand.NotifyCanExecuteChanged();
+        CancelActiveConfirmationCommand.NotifyCanExecuteChanged();
+    }
+
+    private void CloseAssignmentEditor()
+    {
+        if (SelectedCell is not null)
+        {
+            SelectedCell.IsAssignmentEditorOpen = false;
+        }
     }
 
     private void NotifyViewStateChanged()
@@ -821,7 +1221,10 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         PreparePlanningCommand.NotifyCanExecuteChanged();
         ConfirmPendingActionCommand.NotifyCanExecuteChanged();
         CancelPendingActionCommand.NotifyCanExecuteChanged();
+        ConfirmActiveConfirmationCommand.NotifyCanExecuteChanged();
+        CancelActiveConfirmationCommand.NotifyCanExecuteChanged();
     }
+
 
     private static ScheduleDemandSlotSelection CreateSelection(
         ScheduleDemandSlotSnapshot slot)
@@ -835,6 +1238,66 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
             slot.Ordinal,
             slot.ActualStart,
             slot.ActualEnd);
+    }
+
+    private static bool MatchesAssignment(
+        ServiceManagementAssignmentOptionSnapshot option,
+        ScheduleAssignmentSnapshot assignment)
+    {
+        ScheduleAssignmentKindSnapshot expectedKind = option.Kind switch
+        {
+            ServiceManagementAssignmentSelectionKind.NormalDemand =>
+                ScheduleAssignmentKindSnapshot.NormalDemand,
+            ServiceManagementAssignmentSelectionKind.OfficeTime =>
+                ScheduleAssignmentKindSnapshot.OfficeTime,
+            ServiceManagementAssignmentSelectionKind.SplitShiftPattern =>
+                ScheduleAssignmentKindSnapshot.SplitShiftPattern,
+            ServiceManagementAssignmentSelectionKind.ReliefShiftPattern =>
+                ScheduleAssignmentKindSnapshot.ReliefShiftPattern,
+            _ => throw new InvalidOperationException(
+                $"Unsupported service-management option: {option.Kind}"),
+        };
+        if (assignment.Origin != ScheduleAssignmentOriginSnapshot.ServiceManagement
+            || assignment.Kind != expectedKind)
+        {
+            return false;
+        }
+
+        if (option.Kind == ServiceManagementAssignmentSelectionKind.OfficeTime)
+        {
+            return assignment.Segments.Count == 1
+                && MatchesSegment(option.FirstSlot, assignment.Segments[0]);
+        }
+
+        ScheduleDemandSlotSnapshot[] slots = option.SecondSlot is null
+            ? [option.FirstSlot]
+            : [option.FirstSlot, option.SecondSlot];
+        return assignment.Coverages.Count == slots.Length
+            && slots.All(slot => assignment.Coverages.Any(coverage =>
+                MatchesCoverage(slot, coverage)));
+    }
+
+    private static bool MatchesSegment(
+        ScheduleDemandSlotSnapshot slot,
+        ScheduleAssignmentSegmentSnapshot segment)
+    {
+        return segment.DemandSourceId == slot.SourceId
+            && segment.Date == slot.Date
+            && segment.WorkLocationId == slot.WorkLocationId
+            && segment.ShiftTypeId == slot.ShiftTypeId
+            && segment.ActualStart == slot.ActualStart
+            && segment.ActualEnd == slot.ActualEnd;
+    }
+
+    private static bool MatchesCoverage(
+        ScheduleDemandSlotSnapshot slot,
+        ScheduleDemandCoverageSnapshot coverage)
+    {
+        return coverage.DemandSourceId == slot.SourceId
+            && coverage.Date == slot.Date
+            && coverage.WorkLocationId == slot.WorkLocationId
+            && coverage.ShiftTypeId == slot.ShiftTypeId
+            && coverage.Ordinal == slot.Ordinal;
     }
 
     private static string CreateReadinessDisplay(

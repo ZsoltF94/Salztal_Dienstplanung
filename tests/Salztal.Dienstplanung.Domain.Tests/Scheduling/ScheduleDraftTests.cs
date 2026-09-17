@@ -223,6 +223,220 @@ public sealed class ScheduleDraftTests
                 && error.AssignmentId == unknownId);
     }
 
+    [Fact]
+    public void ReplaceAutomaticGenerationExchangesReplaceableValuesAndAdvancesOnce()
+    {
+        SchedulingTestContext context = SchedulingTestContext.Create();
+        ScheduleAssignment protectedAssignment = context.CreateNormalAssignment(
+            FirstEmployeeId,
+            context.Period.StartMonday,
+            InitialShiftTypeCatalog.EarlyShift,
+            AssignmentOrigin.ServiceManagement);
+        ScheduleAssignment oldAutomatic = context.CreateNormalAssignment(
+            SecondEmployeeId,
+            context.Period.StartMonday.AddDays(1),
+            InitialShiftTypeCatalog.EarlyShift,
+            AssignmentOrigin.AutomaticGeneration);
+        GeneratedDayOffMarker oldMarker = new(
+            SecondEmployeeId,
+            context.Period.StartMonday.AddDays(2));
+        ScheduleDraft draft = context.CreateDraft(
+            assignments: [protectedAssignment, oldAutomatic],
+            markers: [oldMarker]);
+        ScheduleAssignment replacement = context.CreateNormalAssignment(
+            SecondEmployeeId,
+            context.Period.StartMonday.AddDays(3),
+            InitialShiftTypeCatalog.EarlyShift,
+            AssignmentOrigin.AutomaticGeneration);
+        GeneratedDayOffMarker replacementMarker = new(
+            SecondEmployeeId,
+            context.Period.StartMonday.AddDays(4));
+
+        ScheduleDraftValidationResult result = draft.ReplaceAutomaticGeneration(
+            [replacement],
+            [replacementMarker]);
+
+        ScheduleDraft updated = Assert.IsType<ScheduleDraft>(result.Value);
+        Assert.Equal(draft.Version.Value + 1, updated.Version.Value);
+        Assert.Equal([protectedAssignment, replacement], updated.Assignments);
+        Assert.Equal(replacementMarker, Assert.Single(updated.GeneratedDayOffMarkers));
+        Assert.DoesNotContain(oldAutomatic, updated.Assignments);
+        Assert.DoesNotContain(oldMarker, updated.GeneratedDayOffMarkers);
+        Assert.Equal(1, draft.Version.Value);
+        Assert.Contains(oldAutomatic, draft.Assignments);
+    }
+
+    [Fact]
+    public void ReplaceAutomaticGenerationPreservesLockedAutomaticAssignment()
+    {
+        SchedulingTestContext context = SchedulingTestContext.Create();
+        ScheduleAssignment lockedAutomatic = context.CreateNormalAssignment(
+            FirstEmployeeId,
+            context.Period.StartMonday,
+            InitialShiftTypeCatalog.EarlyShift,
+            AssignmentOrigin.AutomaticGeneration);
+        AssignmentLock assignmentLock = new(lockedAutomatic.Id);
+        ScheduleDraft draft = context.CreateDraft(
+            assignments: [lockedAutomatic],
+            locks: [assignmentLock]);
+
+        ScheduleDraftValidationResult result = draft.ReplaceAutomaticGeneration([], []);
+
+        ScheduleDraft updated = Assert.IsType<ScheduleDraft>(result.Value);
+        Assert.Equal(lockedAutomatic, Assert.Single(updated.Assignments));
+        Assert.Equal(assignmentLock, Assert.Single(updated.AssignmentLocks));
+    }
+
+    [Fact]
+    public void ReplaceAutomaticGenerationRejectsNonAutomaticReplacement()
+    {
+        SchedulingTestContext context = SchedulingTestContext.Create();
+        ScheduleDraft draft = context.CreateDraft();
+        ScheduleAssignment serviceManagementAssignment =
+            context.CreateNormalAssignment(
+                FirstEmployeeId,
+                context.Period.StartMonday,
+                InitialShiftTypeCatalog.EarlyShift,
+                AssignmentOrigin.ServiceManagement);
+
+        ScheduleDraftValidationResult result = draft.ReplaceAutomaticGeneration(
+            [serviceManagementAssignment],
+            []);
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal(
+            ScheduleDraftValidationCode.ReplacementAssignmentMustBeAutomatic,
+            Assert.Single(result.Errors).Code);
+        Assert.Empty(draft.Assignments);
+        Assert.Equal(1, draft.Version.Value);
+    }
+
+    [Fact]
+    public void ReplaceAutomaticGenerationRejectsConflictWithoutChangingOriginal()
+    {
+        SchedulingTestContext context = SchedulingTestContext.Create();
+        ScheduleAssignment protectedAssignment = context.CreateNormalAssignment(
+            FirstEmployeeId,
+            context.Period.StartMonday,
+            InitialShiftTypeCatalog.EarlyShift,
+            AssignmentOrigin.ServiceManagement);
+        ScheduleDraft draft = context.CreateDraft(assignments: [protectedAssignment]);
+        GeneratedDayOffMarker conflictingMarker = new(
+            FirstEmployeeId,
+            context.Period.StartMonday);
+
+        ScheduleDraftValidationResult result = draft.ReplaceAutomaticGeneration(
+            [],
+            [conflictingMarker]);
+
+        Assert.False(result.IsSuccess);
+        Assert.Contains(
+            result.Errors,
+            error => error.Code
+                == ScheduleDraftValidationCode.GeneratedDayOffConflictsAssignment);
+        Assert.Equal(protectedAssignment, Assert.Single(draft.Assignments));
+        Assert.Empty(draft.GeneratedDayOffMarkers);
+        Assert.Equal(1, draft.Version.Value);
+    }
+
+    [Fact]
+    public void ReplaceAutomaticGenerationRejectsExhaustedVersion()
+    {
+        SchedulingTestContext context = SchedulingTestContext.Create();
+        ScheduleDraft draft = Assert.IsType<ScheduleDraft>(
+            context.CreateDraftResult(version: int.MaxValue).Value);
+
+        ScheduleDraftValidationResult result = draft.ReplaceAutomaticGeneration([], []);
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal(
+            ScheduleDraftValidationCode.VersionCannotAdvance,
+            Assert.Single(result.Errors).Code);
+        Assert.Equal(int.MaxValue, draft.Version.Value);
+    }
+
+    [Fact]
+    public void DiscardAutomaticGenerationRemovesAllAutomaticValuesAndTheirLocks()
+    {
+        SchedulingTestContext context = SchedulingTestContext.Create();
+        ScheduleAssignment serviceManagement = context.CreateNormalAssignment(
+            FirstEmployeeId,
+            context.Period.StartMonday,
+            InitialShiftTypeCatalog.EarlyShift,
+            AssignmentOrigin.ServiceManagement);
+        ScheduleAssignment manual = context.CreateNormalAssignment(
+            FirstEmployeeId,
+            context.Period.StartMonday.AddDays(1),
+            InitialShiftTypeCatalog.LateShift,
+            AssignmentOrigin.ManualEdit);
+        ScheduleAssignment automatic = context.CreateNormalAssignment(
+            SecondEmployeeId,
+            context.Period.StartMonday.AddDays(2),
+            InitialShiftTypeCatalog.EarlyShift,
+            AssignmentOrigin.AutomaticGeneration);
+        AssignmentLock serviceManagementLock = new(serviceManagement.Id);
+        AssignmentLock automaticLock = new(automatic.Id);
+        GeneratedDayOffMarker marker = new(
+            SecondEmployeeId,
+            context.Period.StartMonday.AddDays(3));
+        AvailabilityEntry vacation = CreateAvailabilityEntry(
+            SecondEmployeeId,
+            context.Period.StartMonday.AddDays(4),
+            AvailabilityEntryKind.Vacation);
+        AvailabilityEntry sickness = CreateAvailabilityEntry(
+            SecondEmployeeId,
+            context.Period.StartMonday.AddDays(5),
+            AvailabilityEntryKind.Sickness);
+        AvailabilityEntry fixedDayOff = CreateAvailabilityEntry(
+            SecondEmployeeId,
+            context.Period.StartMonday.AddDays(6),
+            AvailabilityEntryKind.FixedDayOff);
+        ScheduleDraft draft = context.CreateDraft(
+            availabilityEntries: [vacation, sickness, fixedDayOff],
+            assignments: [serviceManagement, manual, automatic],
+            markers: [marker],
+            locks: [serviceManagementLock, automaticLock]);
+
+        ScheduleDraftValidationResult result = draft.DiscardAutomaticGeneration();
+
+        ScheduleDraft updated = Assert.IsType<ScheduleDraft>(result.Value);
+        Assert.Equal(draft.Version.Value + 1, updated.Version.Value);
+        Assert.Equal([serviceManagement, manual], updated.Assignments);
+        Assert.Equal(serviceManagementLock, Assert.Single(updated.AssignmentLocks));
+        Assert.Empty(updated.GeneratedDayOffMarkers);
+        Assert.Equal(
+            [vacation, sickness, fixedDayOff],
+            updated.AvailabilityEntries.Entries);
+        Assert.Same(draft.DemandSlots, updated.DemandSlots);
+        Assert.Same(draft.Period, updated.Period);
+        Assert.Contains(automatic, draft.Assignments);
+        Assert.Equal(marker, Assert.Single(draft.GeneratedDayOffMarkers));
+    }
+
+    [Fact]
+    public void DiscardAutomaticGenerationRejectsExhaustedVersionWithoutMutation()
+    {
+        SchedulingTestContext context = SchedulingTestContext.Create();
+        ScheduleAssignment automatic = context.CreateNormalAssignment(
+            FirstEmployeeId,
+            context.Period.StartMonday,
+            InitialShiftTypeCatalog.EarlyShift,
+            AssignmentOrigin.AutomaticGeneration);
+        ScheduleDraft draft = Assert.IsType<ScheduleDraft>(
+            context.CreateDraftResult(
+                version: int.MaxValue,
+                assignments: [automatic]).Value);
+
+        ScheduleDraftValidationResult result = draft.DiscardAutomaticGeneration();
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal(
+            ScheduleDraftValidationCode.VersionCannotAdvance,
+            Assert.Single(result.Errors).Code);
+        Assert.Equal(automatic, Assert.Single(draft.Assignments));
+        Assert.Equal(int.MaxValue, draft.Version.Value);
+    }
+
     private static AvailabilityEntry CreateAvailabilityEntry(
         EmployeeId employeeId,
         DateOnly date,

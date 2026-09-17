@@ -1,5 +1,11 @@
 namespace Salztal.Dienstplanung.Application.Scheduling;
 
+public enum ScheduleShiftDisplayKindSnapshot
+{
+    Abbreviation,
+    ActualTime,
+}
+
 public enum ScheduleDemandSourceKindSnapshot
 {
     Standard,
@@ -17,4 +23,7 @@ public sealed record ScheduleDemandSlotSnapshot(
     int Ordinal,
     TimeOnly ActualStart,
     TimeOnly ActualEnd,
-    int DurationMinutes);
+    int DurationMinutes,
+    ScheduleShiftDisplayKindSnapshot ShiftTypeDisplayKind =
+        ScheduleShiftDisplayKindSnapshot.ActualTime,
+    string? ShiftTypeAbbreviation = null);

@@ -96,6 +96,12 @@ Für den automatisch erzeugten Plan und die spätere manuelle Bearbeitung werden
 
 Kann ein Bedarf wegen einer zwingenden automatischen Regel nicht gedeckt werden, erstellt die App trotzdem den übrigen Plan. Ein normaler Dienst wird vollständig besetzt oder als ungedeckt angezeigt. Nur beim bestätigten Springer-Einsatz darf ein Teil des Restaurant-Spätdienstes besetzt sein; der frühere offene Zeitraum bleibt sichtbar. Die App erklärt außerdem den Grund und nennt mögliche Lösungen.
 
+Nach jeder erfolgreichen Plangenerierung soll eine vollständige Übersicht alle Bedarfe der drei Wochen aufführen – nicht nur die offenen. Für jeden Bedarf zeigt sie Datum, Einsatzort, Dienst, tatsächliche Bedarfszeit, benötigte Personen beziehungsweise Minuten und den gedeckten sowie offenen Anteil. Die Zustände „vollständig gedeckt“, „teilweise gedeckt“ und „ungedeckt“ werden klar unterschieden und zusätzlich zusammengezählt. Teildeckung bleibt ausschließlich beim bestätigten Springer-Sonderfall möglich. Für teilweise oder vollständig ungedeckte Bedarfe ergänzt die spätere Konflikterklärung Ursachen und mögliche Lösungen.
+
+Nach dem ersten technisch erfolgreichen Generierungsstand bleibt die Berechnung zunächst unverändert. Zuerst wird in S09A nur die Dienstplanoberfläche übersichtlicher angeordnet. Danach wird gemeinsam geklärt, welche Werte ein eigener S09B-Qualitätsbericht zeigen soll. Dieser Bericht macht den unveränderten Ausgangsstand messbar und hilft zu unterscheiden, ob Laufzeit, technische Umsetzung oder die fachliche Zielreihenfolge verbessert werden muss. Erst anschließend wird ein eigener Optimierungsplan erstellt. Die große Abschlussprüfung des Generators erfolgt erst für die danach endgültig vorgesehene Berechnung.
+
+Der S09B-Qualitätsbericht ist noch nicht die spätere vollständige Konflikterklärung aus System 10. Ursachen je ausgeschlossener Person und konkrete Lösungsvorschläge bleiben weiterhin diesem späteren System vorbehalten.
+
 Wünsche erhalten die Priorität hoch, mittel oder niedrig und dürfen nur dann unerfüllt bleiben, wenn keine bessere erlaubte Lösung gefunden wird. Eine bewusst bestätigte manuelle Abweichung bleibt sichtbar und ändert die Regel für zukünftige Pläne nicht.
 
 Der konkrete Regelkatalog und seine Prioritätsmatrix wurden am 16. September 2026 vollständig bestätigt. Die erste Fassung prüft nur die internen Regeln der Service-Leitung und behauptet keine vollständige gesetzliche oder tarifliche Prüfung.
@@ -108,7 +114,10 @@ Der konkrete Regelkatalog und seine Prioritätsmatrix wurden am 16. September 20
 - Nicht besetzbare Dienste und andere Probleme werden verständlich erklärt.
 - Einzelne bereits passende Einteilungen können gesperrt werden.
 - Bei einer neuen automatischen Erstellung dürfen alle nicht gesperrten Einteilungen neu verteilt werden.
-- Die App plant zuerst alle normalen Nicht-AH-Typen. Erst danach setzt sie AH ausschließlich in noch offene, erlaubte Dienste ein. Weniger als sechs AH-Stunden verhindern den Plan nicht, werden aber ebenso wie mehr als zehn Stunden gemeldet. Automatisch sind höchstens zwölf AH-Stunden erlaubt; eine höhere manuelle Einteilung benötigt Warnung und Bestätigung.
+- Für den neuen Zielstand betrachtet die App normale Nicht-AH- und AH-Personen gemeinsam. Bereits vorläufig verteilte normale Dienste dürfen nochmals getauscht werden, damit der Gesamtplan besser wird.
+- Zuerst bleiben Bedarf, zwingende Regeln und die hohen Schutzwünsche maßgeblich. Danach werden Springer und Doppeldienste möglichst vermieden. Sie werden nicht allein zum Auffüllen von Stunden erzeugt.
+- Jede AH-Person soll bei passenden offenen Diensten möglichst mindestens drei Stunden je Woche erhalten. Dafür darf eine normale Person unter ihrem exakten Wochensoll bleiben, aber nicht unter die bisherige Untergrenze von Wochensoll minus drei Stunden gedrängt werden.
+- Anschließend versucht die App, alle Mitarbeitenden relativ fair an ihre eigenen Wochenstunden heranzuführen. Für AH bleiben zehn Stunden das Wochenziel und zwölf Stunden die automatische Obergrenze. Unter sechs und über zehn Stunden werden weiterhin gemeldet.
 - Ein manuell eingetragener Typ1-Früh- oder Spätdienst kann während der Bearbeitung mit `B` als Bürozeit markiert werden. Die Stunden zählen für Typ1, der Dienst deckt aber keinen benötigten Mitarbeiterplatz. Nach der Abnahme bleibt der zugrunde liegende Dienst sichtbar und nur das `B` verschwindet aus Plan und späterer Excel-Ausgabe.
 
 Für Änderungen gibt es einen eigenen Bearbeitungsmodus. Nach dem Speichern berechnet die App Stunden, Bedarfsdeckung und Meldungen neu. Sie erzeugt dabei nicht ungefragt einen komplett neuen Plan.

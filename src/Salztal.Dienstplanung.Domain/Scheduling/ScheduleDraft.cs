@@ -120,6 +120,89 @@ public sealed class ScheduleDraft
                 Array.AsReadOnly(orderedLocks)));
     }
 
+    public ScheduleDraftValidationResult ReplaceAutomaticGeneration(
+        IEnumerable<ScheduleAssignment> replacementAssignments,
+        IEnumerable<GeneratedDayOffMarker> replacementDayOffMarkers)
+    {
+        ArgumentNullException.ThrowIfNull(replacementAssignments);
+        ArgumentNullException.ThrowIfNull(replacementDayOffMarkers);
+
+        ScheduleAssignment[] replacements = replacementAssignments.ToArray();
+        GeneratedDayOffMarker[] markers = replacementDayOffMarkers.ToArray();
+        ScheduleDraftValidationError[] originErrors = replacements
+            .Where(assignment =>
+                assignment.Origin != AssignmentOrigin.AutomaticGeneration)
+            .Select(assignment => new ScheduleDraftValidationError(
+                ScheduleDraftValidationCode.ReplacementAssignmentMustBeAutomatic,
+                assignment.Id,
+                assignment.EmployeeId,
+                assignment.Date))
+            .ToArray();
+        if (originErrors.Length > 0)
+        {
+            return ScheduleDraftValidationResult.Failure(originErrors);
+        }
+
+        if (Version.Value == int.MaxValue)
+        {
+            return ScheduleDraftValidationResult.Failure(
+                [new ScheduleDraftValidationError(
+                    ScheduleDraftValidationCode.VersionCannotAdvance)]);
+        }
+
+        HashSet<ScheduleAssignmentId> lockedAssignmentIds = AssignmentLocks
+            .Select(assignmentLock => assignmentLock.AssignmentId)
+            .ToHashSet();
+        ScheduleAssignment[] preservedAssignments = Assignments
+            .Where(assignment =>
+                assignment.Origin != AssignmentOrigin.AutomaticGeneration
+                || assignment.IsProtectedFromAutomaticGeneration
+                || lockedAssignmentIds.Contains(assignment.Id))
+            .ToArray();
+
+        return Create(
+            Id.Value,
+            Version.Value + 1,
+            Period,
+            DemandSlots,
+            AvailabilityEntries,
+            preservedAssignments.Concat(replacements),
+            markers,
+            AssignmentLocks);
+    }
+
+    public ScheduleDraftValidationResult DiscardAutomaticGeneration()
+    {
+        if (Version.Value == int.MaxValue)
+        {
+            return ScheduleDraftValidationResult.Failure(
+                [new ScheduleDraftValidationError(
+                    ScheduleDraftValidationCode.VersionCannotAdvance)]);
+        }
+
+        ScheduleAssignment[] preservedAssignments = Assignments
+            .Where(assignment =>
+                assignment.Origin != AssignmentOrigin.AutomaticGeneration)
+            .ToArray();
+        HashSet<ScheduleAssignmentId> preservedAssignmentIds = preservedAssignments
+            .Select(assignment => assignment.Id)
+            .ToHashSet();
+        AssignmentLock[] preservedLocks = AssignmentLocks
+            .Where(assignmentLock =>
+                preservedAssignmentIds.Contains(assignmentLock.AssignmentId))
+            .ToArray();
+
+        return Create(
+            Id.Value,
+            Version.Value + 1,
+            Period,
+            DemandSlots,
+            AvailabilityEntries,
+            preservedAssignments,
+            Array.Empty<GeneratedDayOffMarker>(),
+            preservedLocks);
+    }
+
     private static void ValidateAssignments(
         SchedulePeriod period,
         DemandSlotSet demandSlots,

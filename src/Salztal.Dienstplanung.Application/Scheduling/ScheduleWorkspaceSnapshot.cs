@@ -18,19 +18,22 @@ public sealed class ScheduleWorkspaceSnapshot
         AvailabilityPeriodSnapshot availability,
         IEnumerable<ScheduleDemandSlotSnapshot> demandSlots,
         IEnumerable<ScheduleAssignmentSnapshot> assignments,
+        IEnumerable<ScheduleGeneratedDayOffSnapshot> generatedDayOffs,
         IEnumerable<ServiceManagementAssignmentOptionSnapshot> assignmentOptions,
         IEnumerable<ServiceManagementReadinessSnapshot> serviceManagementReadiness,
         SchedulePreparationStatus preparationStatus,
         Guid? preparedSnapshotId,
         PlanningRunOptions? preparedRunOptions,
         PlanningHistoryCompleteness? preparedHistoryCompleteness,
-        IEnumerable<PlanningInputChangeCategory> changedCategories)
+        IEnumerable<PlanningInputChangeCategory> changedCategories,
+        AcceptedAutomaticScheduleSnapshot? acceptedAutomaticSchedule)
     {
         DraftId = draftId;
         Version = version;
         Availability = availability;
         DemandSlots = Array.AsReadOnly(demandSlots.ToArray());
         Assignments = Array.AsReadOnly(assignments.ToArray());
+        GeneratedDayOffs = Array.AsReadOnly(generatedDayOffs.ToArray());
         AssignmentOptions = Array.AsReadOnly(assignmentOptions.ToArray());
         ServiceManagementReadiness = Array.AsReadOnly(
             serviceManagementReadiness.ToArray());
@@ -39,6 +42,7 @@ public sealed class ScheduleWorkspaceSnapshot
         PreparedRunOptions = preparedRunOptions;
         PreparedHistoryCompleteness = preparedHistoryCompleteness;
         ChangedCategories = Array.AsReadOnly(changedCategories.ToArray());
+        AcceptedAutomaticSchedule = acceptedAutomaticSchedule;
     }
 
     public Guid DraftId { get; }
@@ -54,6 +58,8 @@ public sealed class ScheduleWorkspaceSnapshot
     public ReadOnlyCollection<ScheduleDemandSlotSnapshot> DemandSlots { get; }
 
     public ReadOnlyCollection<ScheduleAssignmentSnapshot> Assignments { get; }
+
+    public ReadOnlyCollection<ScheduleGeneratedDayOffSnapshot> GeneratedDayOffs { get; }
 
     public ReadOnlyCollection<ServiceManagementAssignmentOptionSnapshot>
         AssignmentOptions
@@ -73,7 +79,13 @@ public sealed class ScheduleWorkspaceSnapshot
     public PlanningHistoryCompleteness? PreparedHistoryCompleteness { get; }
 
     public ReadOnlyCollection<PlanningInputChangeCategory> ChangedCategories { get; }
+
+    public AcceptedAutomaticScheduleSnapshot? AcceptedAutomaticSchedule { get; }
 }
+
+public sealed record AcceptedAutomaticScheduleSnapshot(
+    int AssignmentCount,
+    int GeneratedDayOffCount);
 
 public enum ServiceManagementWeekReadinessStatusSnapshot
 {

@@ -3,6 +3,7 @@ using Salztal.Dienstplanung.Application.Employees;
 using Salztal.Dienstplanung.Application.Scheduling;
 using Salztal.Dienstplanung.Application.ServiceCatalog;
 using Salztal.Dienstplanung.Application.StaffingDemands;
+using Salztal.Dienstplanung.Desktop.Features.Scheduling;
 using Salztal.Dienstplanung.Desktop.Shared;
 using Salztal.Dienstplanung.Domain.Availabilities;
 using Salztal.Dienstplanung.Domain.Employees;
@@ -32,24 +33,37 @@ internal sealed class FakeScheduleDataAccess :
 
     private readonly Dictionary<(Guid EmployeeId, DateOnly Date), StoredEntry> _entries = [];
     private readonly List<ScheduleDraft> _drafts = [];
-    private readonly Employee[] _employees =
-    [
-        CreateEmployee(
-            ServiceManagementEmployeeId,
-            "Sarah",
-            "Leitung",
-            InitialEmployeeTypeCatalog.Type1),
-        CreateEmployee(
-            NormalEmployeeId,
-            "Erika",
-            "Muster",
-            InitialEmployeeTypeCatalog.Type25),
-        CreateEmployee(
-            AuxiliaryEmployeeId,
-            "Alex",
-            "Beispiel",
-            InitialEmployeeTypeCatalog.TypeAh1),
-    ];
+    private readonly Employee[] _employees;
+
+    public FakeScheduleDataAccess(int additionalNormalEmployees = 0)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(additionalNormalEmployees);
+
+        _employees =
+        [
+            CreateEmployee(
+                ServiceManagementEmployeeId,
+                "Sarah",
+                "Leitung",
+                InitialEmployeeTypeCatalog.Type1),
+            CreateEmployee(
+                NormalEmployeeId,
+                "Erika",
+                "Muster",
+                InitialEmployeeTypeCatalog.Type25),
+            CreateEmployee(
+                AuxiliaryEmployeeId,
+                "Alex",
+                "Beispiel",
+                InitialEmployeeTypeCatalog.TypeAh1),
+            .. Enumerable.Range(1, additionalNormalEmployees)
+                .Select(index => CreateEmployee(
+                    Guid.Parse($"00000000-0000-0000-0000-{index:000000000000}"),
+                    "Test",
+                    $"Person {index:00}",
+                    InitialEmployeeTypeCatalog.Type25)),
+        ];
+    }
 
     public int LoadCallCount { get; private set; }
 
@@ -242,5 +256,89 @@ internal sealed class RecordingUnexpectedErrorReporter : IUnexpectedErrorReporte
     {
         Exception = exception;
         Operation = operation;
+    }
+}
+
+internal sealed class ControlledScheduleFeedbackDelay : IScheduleFeedbackDelay
+{
+    private readonly List<DelayRequest> _requests = [];
+
+    public bool IgnoreCancellation { get; init; }
+
+    public IReadOnlyList<TimeSpan> RequestedDurations =>
+        _requests.Select(request => request.Duration).ToArray();
+
+    public int PendingCount => _requests.Count(request => !request.Completion.Task.IsCompleted);
+
+    public Task DelayAsync(
+        TimeSpan duration,
+        CancellationToken cancellationToken)
+    {
+        TaskCompletionSource completion = new(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        DelayRequest request = new(duration, completion);
+        _requests.Add(request);
+        if (!IgnoreCancellation)
+        {
+            request.CancellationRegistration = cancellationToken.Register(() =>
+                completion.TrySetCanceled(cancellationToken));
+        }
+
+        return completion.Task;
+    }
+
+    public void Complete(int requestIndex)
+    {
+        DelayRequest request = _requests[requestIndex];
+        request.CancellationRegistration.Dispose();
+        Assert.True(request.Completion.TrySetResult());
+    }
+
+    private sealed class DelayRequest(
+        TimeSpan duration,
+        TaskCompletionSource completion)
+    {
+        public TimeSpan Duration { get; } = duration;
+
+        public TaskCompletionSource Completion { get; } = completion;
+
+        public CancellationTokenRegistration CancellationRegistration { get; set; }
+    }
+}
+
+internal sealed class UnusedAutomaticScheduleGenerationActions
+    : IAutomaticScheduleGenerationActions
+{
+    public Task<AutomaticScheduleGenerationOutcome> GenerateAsync(
+        GenerateAutomaticScheduleRequest request,
+        CancellationToken cancellationToken)
+    {
+        throw new InvalidOperationException(
+            "Automatic generation is not expected in this test.");
+    }
+
+    public Task<AutomaticScheduleAcceptanceOutcome> AcceptAsync(
+        AcceptAutomaticScheduleProposalRequest request,
+        CancellationToken cancellationToken)
+    {
+        throw new InvalidOperationException(
+            "Automatic acceptance is not expected in this test.");
+    }
+
+    public bool DiscardPreview()
+    {
+        return false;
+    }
+}
+
+internal sealed class UnusedAutomaticScheduleResetActions
+    : IAutomaticScheduleResetActions
+{
+    public Task<AutomaticScheduleDiscardOutcome> DiscardAsync(
+        DiscardAutomaticScheduleRequest request,
+        CancellationToken cancellationToken)
+    {
+        throw new InvalidOperationException(
+            "Automatic schedule reset is not expected in this test.");
     }
 }

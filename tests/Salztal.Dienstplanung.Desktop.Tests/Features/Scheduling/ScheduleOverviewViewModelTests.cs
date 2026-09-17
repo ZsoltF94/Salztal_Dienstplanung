@@ -57,6 +57,92 @@ public sealed class ScheduleOverviewViewModelTests
     }
 
     [Fact]
+    public async Task SuccessFeedbackWaitsFadesAndExpiresWithoutBlockingLoad()
+    {
+        ControlledScheduleFeedbackDelay delay = new();
+        ScheduleOverviewViewModel viewModel = CreateViewModel(
+            new FakeScheduleDataAccess(),
+            feedbackDelay: delay);
+
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+
+        Assert.True(viewModel.HasFeedback);
+        Assert.Equal("Hinweis", viewModel.FeedbackStatusDisplay);
+        Assert.Equal("Dienstplanmeldung Hinweis", viewModel.FeedbackAutomationName);
+        Assert.False(viewModel.IsSuccessMessageFading);
+        Assert.Equal([TimeSpan.FromSeconds(4)], delay.RequestedDurations);
+
+        delay.Complete(0);
+        await WaitUntilAsync(() => viewModel.IsSuccessMessageFading);
+
+        Assert.True(viewModel.HasSuccessMessage);
+        Assert.Equal(
+            [TimeSpan.FromSeconds(4), TimeSpan.FromMilliseconds(350)],
+            delay.RequestedDurations);
+
+        delay.Complete(1);
+        await WaitUntilAsync(() => !viewModel.HasFeedback);
+
+        Assert.Null(viewModel.SuccessMessage);
+        Assert.False(viewModel.IsSuccessMessageFading);
+    }
+
+    [Fact]
+    public async Task OlderFeedbackDelayCannotHideNewerSuccessMessage()
+    {
+        ControlledScheduleFeedbackDelay delay = new()
+        {
+            IgnoreCancellation = true,
+        };
+        FakeScheduleDataAccess dataAccess = new();
+        ScheduleOverviewViewModel viewModel = CreateViewModel(
+            dataAccess,
+            feedbackDelay: delay);
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        SelectCell(viewModel, FakeScheduleDataAccess.NormalEmployeeId, PeriodMonday);
+
+        await viewModel.SetVacationCommand.ExecuteAsync(null);
+
+        Assert.Equal("Der Tageseintrag wurde gespeichert.", viewModel.SuccessMessage);
+        Assert.Equal(2, delay.PendingCount);
+
+        delay.Complete(0);
+        await Task.Yield();
+        await Task.Yield();
+
+        Assert.Equal("Der Tageseintrag wurde gespeichert.", viewModel.SuccessMessage);
+        Assert.False(viewModel.IsSuccessMessageFading);
+
+        delay.Complete(1);
+        await WaitUntilAsync(() => viewModel.IsSuccessMessageFading);
+        delay.Complete(2);
+        await WaitUntilAsync(() => !viewModel.HasFeedback);
+    }
+
+    [Fact]
+    public async Task ErrorFeedbackReplacesSuccessAndNeverStartsAutomaticDismissal()
+    {
+        ControlledScheduleFeedbackDelay delay = new();
+        FakeScheduleDataAccess dataAccess = new();
+        ScheduleOverviewViewModel viewModel = CreateViewModel(
+            dataAccess,
+            feedbackDelay: delay);
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        dataAccess.RejectNextChange = true;
+        SelectCell(viewModel, FakeScheduleDataAccess.NormalEmployeeId, PeriodMonday);
+
+        await viewModel.SetFixedDayOffCommand.ExecuteAsync(null);
+
+        Assert.True(viewModel.HasError);
+        Assert.False(viewModel.HasSuccessMessage);
+        Assert.True(viewModel.HasFeedback);
+        Assert.Equal("Fehler", viewModel.FeedbackStatusDisplay);
+        Assert.Equal("Dienstplanmeldung Fehler", viewModel.FeedbackAutomationName);
+        Assert.Contains("zwischenzeitlich geändert", viewModel.FeedbackMessage);
+        Assert.Equal(0, delay.PendingCount);
+    }
+
+    [Fact]
     public async Task EmptyCellCanBeSetAndRemovedThroughCoordinatedCommands()
     {
         FakeScheduleDataAccess dataAccess = new();
@@ -70,37 +156,186 @@ public sealed class ScheduleOverviewViewModelTests
             viewModel.SelectedCell).EntryDisplay);
         viewModel.RequestRemovalCommand.Execute(null);
         Assert.True(viewModel.IsConfirmationOpen);
-        await viewModel.ConfirmPendingActionCommand.ExecuteAsync(null);
+        await viewModel.ConfirmActiveConfirmationCommand.ExecuteAsync(null);
         Assert.Equal(string.Empty, Assert.IsType<ScheduleCellViewModel>(
             viewModel.SelectedCell).EntryDisplay);
         Assert.Equal(2, dataAccess.ChangeCallCount);
     }
 
     [Fact]
-    public async Task Typ1OffersStructuredOfficeOptionAndStoresB()
+    public async Task UnifiedConfirmationCancelsCellRemovalAndBlocksBackgroundCommands()
+    {
+        FakeScheduleDataAccess dataAccess = new();
+        dataAccess.Add(
+            FakeScheduleDataAccess.NormalEmployeeId,
+            PeriodMonday,
+            AvailabilityEntryKind.Vacation);
+        ScheduleOverviewViewModel viewModel = CreateViewModel(dataAccess);
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        SelectCell(viewModel, FakeScheduleDataAccess.NormalEmployeeId, PeriodMonday);
+
+        viewModel.RequestRemovalCommand.Execute(null);
+
+        Assert.True(viewModel.IsConfirmationOpen);
+        Assert.Equal("Änderung am Tagesfeld bestätigen?", viewModel.ConfirmationTitle);
+        Assert.Equal("Bestätigen", viewModel.ConfirmationConfirmText);
+        Assert.False(viewModel.LoadCommand.CanExecute(null));
+        Assert.False(viewModel.SetFixedDayOffCommand.CanExecute(null));
+        Assert.False(viewModel.AutomaticReset.RequestCommand.CanExecute(null));
+        Assert.True(viewModel.CancelActiveConfirmationCommand.CanExecute(null));
+        Assert.Equal("U", viewModel.SelectedCell?.EntryDisplay);
+        Assert.Equal(0, dataAccess.ChangeCallCount);
+
+        viewModel.CancelActiveConfirmationCommand.Execute(null);
+
+        Assert.False(viewModel.IsConfirmationOpen);
+        Assert.Equal("U", viewModel.SelectedCell?.EntryDisplay);
+        Assert.Equal(0, dataAccess.ChangeCallCount);
+    }
+
+    [Fact]
+    public async Task UnifiedConfirmationRoutesAutomaticResetWithoutChangingWarningText()
+    {
+        RecordingAutomaticScheduleResetActions resetActions = new();
+        ScheduleOverviewViewModel viewModel = CreateViewModel(
+            new FakeScheduleDataAccess(),
+            resetActions: resetActions);
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        viewModel.AutomaticReset.ApplyContext(
+            AutomaticScheduleResetTestData.AcceptedContext(12, 4),
+            false);
+
+        viewModel.AutomaticReset.RequestCommand.Execute(null);
+
+        Assert.True(viewModel.IsConfirmationOpen);
+        Assert.Equal(
+            "Automatischen Plan wirklich vollständig verwerfen?",
+            viewModel.ConfirmationTitle);
+        Assert.Equal("Vollständig verwerfen", viewModel.ConfirmationConfirmText);
+        Assert.Contains("12 automatisch erzeugte Einteilungen", viewModel.ConfirmationMessage);
+        Assert.Contains("4 schwarze X", viewModel.ConfirmationMessage);
+        Assert.Contains("Typ1-Dienste, U, K, rote X", viewModel.ConfirmationMessage);
+        Assert.False(viewModel.LoadCommand.CanExecute(null));
+
+        await viewModel.ConfirmActiveConfirmationCommand.ExecuteAsync(null);
+
+        Assert.Equal(1, resetActions.CallCount);
+        Assert.False(viewModel.IsConfirmationOpen);
+    }
+
+    [Fact]
+    public async Task UnifiedConfirmationCancelsTyp1RemovalWithoutWriting()
     {
         FakeScheduleDataAccess dataAccess = new();
         ScheduleOverviewViewModel viewModel = CreateViewModel(dataAccess);
         await viewModel.LoadAsync(TestContext.Current.CancellationToken);
-        SelectCell(
+        await SetTyp1Async(viewModel, PeriodMonday);
+        int changesBeforeRemoval = dataAccess.ChangeCallCount;
+
+        viewModel.RequestRemovalCommand.Execute(null);
+
+        Assert.True(viewModel.IsConfirmationOpen);
+        Assert.True(viewModel.SelectedCell?.HasAssignment);
+        Assert.Equal(changesBeforeRemoval, dataAccess.ChangeCallCount);
+
+        viewModel.CancelActiveConfirmationCommand.Execute(null);
+
+        Assert.False(viewModel.IsConfirmationOpen);
+        Assert.True(viewModel.SelectedCell?.HasAssignment);
+        Assert.Equal(changesBeforeRemoval, dataAccess.ChangeCallCount);
+    }
+
+    [Fact]
+    public async Task Typ1CellOffersStructuredOfficeOptionStoresAndMarksB()
+    {
+        FakeScheduleDataAccess dataAccess = new();
+        ScheduleOverviewViewModel viewModel = CreateViewModel(dataAccess);
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        ScheduleCellViewModel cell = SelectCell(
             viewModel,
             FakeScheduleDataAccess.ServiceManagementEmployeeId,
             PeriodMonday);
+        Assert.True(cell.IsAssignmentEditorOpen);
         ServiceManagementAssignmentOptionViewModel office = Assert.Single(
-            viewModel.Typ1Editor.Options,
+            cell.AssignmentOptions,
             option => option.Snapshot.Kind
                     == ServiceManagementAssignmentSelectionKind.OfficeTime
                 && option.Snapshot.FirstSlot.Ordinal == 1
                 && option.Snapshot.FirstSlot.ShiftTypeName == "Frühdienst");
-        viewModel.Typ1Editor.SelectedOption = office;
-
-        await viewModel.SetTyp1AssignmentCommand.ExecuteAsync(null);
+        await viewModel.SetTyp1AssignmentCommand.ExecuteAsync(office);
 
         ScheduleCellViewModel selected = Assert.IsType<ScheduleCellViewModel>(
             viewModel.SelectedCell);
         Assert.Equal("B", selected.EntryDisplay);
         Assert.Contains("Bedarf bleibt offen", selected.EntryMeaning);
+        Assert.False(selected.IsAssignmentEditorOpen);
+        Assert.Same(
+            Assert.Single(selected.AssignmentOptions, option => option.IsCurrent),
+            selected.AssignmentOptions.First(option => option.Snapshot.Kind
+                == ServiceManagementAssignmentSelectionKind.OfficeTime));
         Assert.Equal("Der Typ1-Dienst wurde gespeichert.", viewModel.SuccessMessage);
+    }
+
+    [Fact]
+    public async Task Typ1SelectionReplacingDayEntryRequiresVisibleConfirmation()
+    {
+        FakeScheduleDataAccess dataAccess = new();
+        dataAccess.Add(
+            FakeScheduleDataAccess.ServiceManagementEmployeeId,
+            PeriodMonday,
+            AvailabilityEntryKind.Vacation);
+        ScheduleOverviewViewModel viewModel = CreateViewModel(dataAccess);
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        ScheduleCellViewModel cell = SelectCell(
+            viewModel,
+            FakeScheduleDataAccess.ServiceManagementEmployeeId,
+            PeriodMonday);
+        ServiceManagementAssignmentOptionViewModel option = cell.AssignmentOptions[0];
+
+        await viewModel.SetTyp1AssignmentCommand.ExecuteAsync(option);
+
+        Assert.True(viewModel.IsConfirmationOpen);
+        Assert.Contains("Urlaub", viewModel.ConfirmationMessage);
+        Assert.Equal("U", viewModel.SelectedCell?.EntryDisplay);
+        Assert.Equal(0, dataAccess.ChangeCallCount);
+    }
+
+    [Fact]
+    public async Task Typ1StoreConflictKeepsCellEmptyAndShowsReloadMessage()
+    {
+        FakeScheduleDataAccess dataAccess = new()
+        {
+            RejectNextChange = true,
+        };
+        ScheduleOverviewViewModel viewModel = CreateViewModel(dataAccess);
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        ScheduleCellViewModel cell = SelectCell(
+            viewModel,
+            FakeScheduleDataAccess.ServiceManagementEmployeeId,
+            PeriodMonday);
+
+        await viewModel.SetTyp1AssignmentCommand.ExecuteAsync(cell.AssignmentOptions[0]);
+
+        Assert.True(viewModel.HasError);
+        Assert.Contains("zwischenzeitlich geändert", viewModel.ErrorMessage);
+        Assert.Equal(string.Empty, viewModel.SelectedCell?.EntryDisplay);
+        Assert.False(cell.IsAssignmentEditorOpen);
+    }
+
+    [Fact]
+    public async Task NonTyp1CellNeverOpensAssignmentEditor()
+    {
+        ScheduleOverviewViewModel viewModel = CreateViewModel(new FakeScheduleDataAccess());
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+
+        ScheduleCellViewModel cell = SelectCell(
+            viewModel,
+            FakeScheduleDataAccess.NormalEmployeeId,
+            PeriodMonday);
+
+        Assert.False(cell.CanOpenAssignmentEditor);
+        Assert.False(cell.IsAssignmentEditorOpen);
+        Assert.Empty(cell.AssignmentOptions);
     }
 
     [Fact]
@@ -214,7 +449,9 @@ public sealed class ScheduleOverviewViewModelTests
 
     internal static ScheduleOverviewViewModel CreateViewModel(
         FakeScheduleDataAccess dataAccess,
-        RecordingUnexpectedErrorReporter? reporter = null)
+        RecordingUnexpectedErrorReporter? reporter = null,
+        IScheduleFeedbackDelay? feedbackDelay = null,
+        IAutomaticScheduleResetActions? resetActions = null)
     {
         return new ScheduleOverviewViewModel(
             new OpenOrCreateScheduleDraftCommand(dataAccess, dataAccess),
@@ -224,8 +461,11 @@ public sealed class ScheduleOverviewViewModelTests
             new ChangeScheduleDayEntryCommand(dataAccess, dataAccess),
             new RemoveScheduleDayEntryCommand(dataAccess, dataAccess),
             new PreparePlanningInputCommand(dataAccess, dataAccess),
+            new UnusedAutomaticScheduleGenerationActions(),
+            resetActions ?? new UnusedAutomaticScheduleResetActions(),
             PeriodMonday,
-            reporter ?? new RecordingUnexpectedErrorReporter());
+            reporter ?? new RecordingUnexpectedErrorReporter(),
+            feedbackDelay ?? new ControlledScheduleFeedbackDelay());
     }
 
     internal static ScheduleCellViewModel SelectCell(
@@ -247,17 +487,26 @@ public sealed class ScheduleOverviewViewModelTests
         ScheduleOverviewViewModel viewModel,
         DateOnly date)
     {
-        SelectCell(
+        ScheduleCellViewModel cell = SelectCell(
             viewModel,
             FakeScheduleDataAccess.ServiceManagementEmployeeId,
             date);
         ServiceManagementAssignmentOptionViewModel option = Assert.Single(
-            viewModel.Typ1Editor.Options,
+            cell.AssignmentOptions,
             item => item.Snapshot.Kind
                     == ServiceManagementAssignmentSelectionKind.NormalDemand
                 && item.Snapshot.FirstSlot.Ordinal == 1
                 && item.Snapshot.FirstSlot.ShiftTypeName == "Frühdienst");
-        viewModel.Typ1Editor.SelectedOption = option;
-        await viewModel.SetTyp1AssignmentCommand.ExecuteAsync(null);
+        await viewModel.SetTyp1AssignmentCommand.ExecuteAsync(option);
+    }
+
+    private static async Task WaitUntilAsync(Func<bool> condition)
+    {
+        for (int attempt = 0; attempt < 100 && !condition(); attempt++)
+        {
+            await Task.Delay(1, TestContext.Current.CancellationToken);
+        }
+
+        Assert.True(condition());
     }
 }

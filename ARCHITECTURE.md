@@ -1,6 +1,6 @@
 # Architektur der Salztal-Dienstplanung
 
-Status: Grundarchitektur abgenommen am 2026-09-13; System-07-Regelgrenzen am 2026-09-16 abgenommen
+Status: Grundarchitektur abgenommen am 2026-09-13; System-07-Regelgrenzen am 2026-09-16 abgenommen; System-09-Optimierungsziel und Reihenfolge S09A/S09B vor AG-15 am 2026-09-17 bestätigt
 
 Stand: 2026-09-16
 
@@ -311,13 +311,19 @@ Die Optimierung erfolgt hierarchisch:
 1. zwingende Regeln einhalten,
 2. ungedeckten Bedarf minimieren,
 3. weiche Regeln mit Priorität hoch optimieren,
-4. weiche Regeln mit Priorität mittel optimieren,
-5. weiche Regeln mit Priorität niedrig optimieren,
-6. bei ansonsten gleichwertigen Lösungen eine stabile und nachvollziehbare Verteilung bevorzugen.
+4. bei ansonsten gleichwertigen Plänen zuerst `Spr` und anschließend `D` minimieren,
+5. das erreichbare AH-Mindestziel von 180 Minuten je Person und Woche optimieren,
+6. alle automatisch planbaren Personen relativ fair an ihr individuelles Wochenziel annähern,
+7. verbleibende weiche Regeln mit Priorität mittel und danach niedrig optimieren,
+8. bei ansonsten gleichwertigen Lösungen eine stabile und nachvollziehbare Einsatzverteilung bevorzugen.
 
 Die Stufen werden durch getrennte Optimierungsläufe oder nachweisbar dominante Grenzen abgesichert. Viele niedrige Wünsche dürfen zusammen niemals einen höheren Wunsch überstimmen.
 
-AH bildet eine nachgelagerte, fachlich sichtbare Planungsphase: Zuerst werden alle automatisch planbaren Nicht-AH-Typen innerhalb der Regeln verteilt. Erst danach darf AH noch ungedeckte, zulässige Plätze füllen. Die zweite Phase verdrängt keine bereits geplante Nicht-AH-Person und erzeugt keine Überbesetzung. Zehn AH-Stunden bleiben das mittlere Ziel, zwölf Stunden die zwingende Obergrenze der Automatik. Unter sechs oder über zehn geplante AH-Stunden erzeugen strukturierte Berichtshinweise; die Unterschreitung von sechs Stunden ist kein Generierungsverbot. Mehr als zwölf Stunden sind nur als später bestätigte manuelle Abweichung zulässig.
+Der vor AG-15 bestätigte Zielstand verwendet eine gemeinsame globale Optimierung aller automatisch planbaren Nicht-AH- und AH-Personen. Eine Nicht-AH-Zwischenlösung wird nicht mehr vor der AH-Betrachtung eingefroren. Zuweisungen dürfen zwischen beiden Rollen umverteilt werden, solange kein früheres Ziel verschlechtert wird.
+
+Nach Bedarfsdeckung und den bestehenden hohen Regeln werden zuerst `Spr` und anschließend `D` minimiert. Danach soll jede AH-Person bei vorhandenem zulässigem Bedarf möglichst mindestens 180 Minuten je Woche erhalten. Dieses Ziel darf den normalen Mindestkorridor von `wirksames Wochensoll minus drei Stunden` nicht verschlechtern. Anschließend werden alle Personen relativ zu ihrem individuellen Wochenziel angenähert; für AH bleiben 600 Minuten das Ziel und 720 Minuten die zwingende Obergrenze. Unter 360 oder über 600 bis höchstens 720 AH-Minuten entstehen weiterhin strukturierte Hinweise.
+
+Die technische Umstellung erfolgt versioniert. Vorbereitete Momentaufnahmen mit der bisherigen Regelkatalogversion werden nicht still umgedeutet, sondern verlangen vor dem nächsten Lauf eine bewusste neue Vorbereitung. Die frühere fünfstufige Ablaufidee bleibt nur als dokumentierter Rückfall und darf erst nach einem eigenen fachlichen Gate und einem gesondert abgenommenen Folgeplan implementiert werden.
 
 ### Wiederholbarkeit und Laufzeit
 
@@ -326,6 +332,19 @@ AH bildet eine nachgelagerte, fachlich sichtbare Planungsphase: Zuerst werden al
 - Produktive Läufe erhalten eine konfigurierbare Zeitgrenze.
 - Die App unterscheidet zwischen optimal, zulässig aber noch nicht nachweislich optimal und technisch abgebrochen.
 - Ein technisch abgebrochener Lauf ersetzt keinen bestehenden Plan ohne bewusste Bestätigung.
+
+### Planungsqualitätsbericht vor der endgültigen Optimierung
+
+Der nach dem reinen UI-Zwischenschritt S09A noch zu planende S09B-Bericht beurteilt zunächst den fachlich unveränderten Generator. Er ist ein lesender Mess- und Vergleichsweg und keine Rückkopplung, die Regeln, Zielwerte, Eingaben oder Solverbedingungen automatisch verändert.
+
+Die genaue Auswahl der Kennzahlen wird erst in einem eigenen Fragenkatalog bestätigt. Für ihre spätere technische Einordnung gelten bereits folgende Grenzen:
+
+- `Planning` liefert ausschließlich strukturierte primitive Ergebniswerte, Zielvektoren, Regelbewertungen, Bedarfsdeckungen und Laufmetadaten; es formuliert keine deutschen Berichtssätze.
+- Fachliche Berechnungen und stabile Vergleichswerte liegen in `Domain` oder `Application`, nicht in WPF-ViewModels, XAML oder Code-behind.
+- `Desktop` stellt vorbereitete Berichtswerte dar und entscheidet weder über ihre fachliche Bedeutung noch über eine Solveränderung.
+- S09B verändert den Generator nicht. Jede spätere Optimierung von Laufzeit, Regelübersetzung, Zielmatrix oder Algorithmus benötigt einen eigenen abgenommenen Folgeplan.
+- S09B bleibt von System 10 getrennt. Vollständige Ursachenanalysen je ausgeschlossener Person und ausformulierte Lösungsvorschläge bleiben Bestandteil der Konflikterklärung.
+- Tests und dokumentierte Vergleichsfälle verwenden ausschließlich synthetische Daten. Lokale Anwendungsdaten dürfen sichtbar beurteilt, aber nicht in Repository, Testfälle oder Berichtsexporte übernommen werden.
 
 ### Konflikterklärung
 
@@ -355,6 +374,13 @@ Lösungsvorschläge sind Hinweise. Sie verändern niemals automatisch Stammdaten
 4. `Planning` liefert Plan, offene Plätze, Zielerfüllung und Konfliktdaten.
 5. `Application` speichert den neuen Entwurf gemeinsam mit den verwendeten Eingaben.
 6. `Desktop` zeigt Plan und Konflikte an.
+
+### Planungsqualitätsauswertung
+
+1. `Application` liest den gespeicherten oder flüchtigen Planungsvorschlag mit seinen strukturierten Ergebnis- und Laufwerten.
+2. `Domain` beziehungsweise `Application` berechnet die später bestätigten stabilen Qualitäts- und Vergleichswerte ohne erneuten Solverlauf.
+3. `Desktop` zeigt die vorbereiteten Werte verständlich an, ohne sie fachlich neu zu berechnen.
+4. Die Auswertung verändert weder Plan, Vorbereitung, Regeln noch Generator und löst keine automatische Neugenerierung aus.
 
 ### Manuelle Bearbeitung
 

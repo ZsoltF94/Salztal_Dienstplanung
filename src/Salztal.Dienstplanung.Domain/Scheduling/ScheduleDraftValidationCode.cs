@@ -16,4 +16,6 @@ public enum ScheduleDraftValidationCode
     GeneratedDayOffConflictsAssignment,
     LockReferencesUnknownAssignment,
     DuplicateAssignmentLock,
+    ReplacementAssignmentMustBeAutomatic,
+    VersionCannotAdvance,
 }

@@ -7,13 +7,24 @@ public static class GetRuleCatalogQuery
     public static Task<RuleCatalogSnapshot> ExecuteAsync(
         CancellationToken cancellationToken = default)
     {
+        return ExecuteAsync(InitialRuleCatalog.Version.Value, cancellationToken);
+    }
+
+    public static Task<RuleCatalogSnapshot> ExecuteAsync(
+        int version,
+        CancellationToken cancellationToken = default)
+    {
         cancellationToken.ThrowIfCancellationRequested();
+        if (!RuleCatalogVersion.TryCreate(version, out RuleCatalogVersion? requestedVersion))
+        {
+            throw new ArgumentOutOfRangeException(nameof(version));
+        }
 
         RuleCatalogReadResult readResult = InitialRuleCatalog.Read(
-            InitialRuleCatalog.Version);
+            requestedVersion);
         RuleCatalog catalog = readResult.Value
             ?? throw new InvalidOperationException(
-                $"Initial rule catalog cannot be read: {readResult.Error?.Code}.");
+                $"Rule catalog version {version} cannot be read: {readResult.Error?.Code}.");
 
         RuleDefinitionSnapshot[] definitions = catalog.Definitions
             .Select(CreateDefinitionSnapshot)
@@ -61,6 +72,8 @@ public static class GetRuleCatalogQuery
             PlanningPeriodFreeWeekendParameters => parameters,
             ShiftPatternMinimizationParameters => parameters,
             WeeklyMinutesTargetParameters => parameters,
+            WeeklyMinutesMinimumParameters => parameters,
+            RelativeWeeklyTargetParameters => parameters,
             WeeklyMinutesBelowNoticeParameters => parameters,
             WeeklyMinutesRangeNoticeParameters => parameters,
             CurrentPeriodFairDistributionParameters => parameters,

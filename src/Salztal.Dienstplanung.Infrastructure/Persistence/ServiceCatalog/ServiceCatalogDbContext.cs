@@ -63,6 +63,9 @@ internal sealed class ServiceCatalogDbContext(DbContextOptions<ServiceCatalogDbC
     public DbSet<PlanningSnapshotComponentEntity> PlanningSnapshotComponents =>
         Set<PlanningSnapshotComponentEntity>();
 
+    public DbSet<AutomaticScheduleRunEntity> AutomaticScheduleRuns =>
+        Set<AutomaticScheduleRunEntity>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new WorkLocationEntityConfiguration());
