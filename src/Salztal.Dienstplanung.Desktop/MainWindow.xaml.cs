@@ -15,6 +15,7 @@ internal sealed partial class MainWindow : Window
     private readonly StaffingDemandOverviewViewModel _staffingDemands;
     private readonly StandardStaffingDemandEditorViewModel _standardStaffingDemands;
     private readonly ScheduleOverviewViewModel _schedule;
+    private readonly AutomaticScheduleReportWindowCoordinator _reportCoordinator;
 
     public MainWindow(
         ServiceCatalogViewModel serviceCatalog,
@@ -22,7 +23,8 @@ internal sealed partial class MainWindow : Window
         EmployeeTypeOverviewViewModel employeeTypes,
         StaffingDemandOverviewViewModel staffingDemands,
         StandardStaffingDemandEditorViewModel standardStaffingDemands,
-        ScheduleOverviewViewModel schedule)
+        ScheduleOverviewViewModel schedule,
+        AutomaticScheduleReportWindowCoordinator reportCoordinator)
     {
         ArgumentNullException.ThrowIfNull(serviceCatalog);
         ArgumentNullException.ThrowIfNull(employees);
@@ -30,6 +32,7 @@ internal sealed partial class MainWindow : Window
         ArgumentNullException.ThrowIfNull(staffingDemands);
         ArgumentNullException.ThrowIfNull(standardStaffingDemands);
         ArgumentNullException.ThrowIfNull(schedule);
+        ArgumentNullException.ThrowIfNull(reportCoordinator);
 
         _serviceCatalog = serviceCatalog;
         _employees = employees;
@@ -37,7 +40,10 @@ internal sealed partial class MainWindow : Window
         _staffingDemands = staffingDemands;
         _standardStaffingDemands = standardStaffingDemands;
         _schedule = schedule;
+        _reportCoordinator = reportCoordinator;
         InitializeComponent();
+        _reportCoordinator.AttachOwner(this);
+        Closed += OnClosed;
         DataContext = new MainWindowViewModel(
             serviceCatalog,
             employees,
@@ -57,5 +63,11 @@ internal sealed partial class MainWindow : Window
             _staffingDemands.LoadCommand.ExecuteAsync(null),
             _standardStaffingDemands.LoadEffectiveWeekCommand.ExecuteAsync(null),
             _schedule.LoadCommand.ExecuteAsync(null));
+    }
+
+    private void OnClosed(object? sender, EventArgs e)
+    {
+        Closed -= OnClosed;
+        _reportCoordinator.Close();
     }
 }

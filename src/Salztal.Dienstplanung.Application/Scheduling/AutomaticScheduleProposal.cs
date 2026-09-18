@@ -111,4 +111,16 @@ public sealed class AutomaticScheduleProposal
     public ScheduleRuleEvaluationSet RuleEvaluations { get; }
 
     public AutomaticScheduleRunMetadata Metadata { get; }
+
+    internal AutomaticScheduleProposal WithMetadata(
+        AutomaticScheduleRunMetadata metadata) => new(
+        SnapshotId,
+        DraftId,
+        ExpectedDraftVersion,
+        Assignments,
+        GeneratedDayOffs,
+        OpenDemands,
+        ObjectiveVector,
+        RuleEvaluations,
+        metadata);
 }

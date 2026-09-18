@@ -1,8 +1,8 @@
 # S09A – Dienstplan-Oberfläche neu ordnen und Bedienung vereinheitlichen
 
-Status: In Umsetzung; UI-01 bis UI-04 abgenommen, UI-05 umgesetzt und automatisch geprüft, sichtbare Abnahme offen
+Status: Abgeschlossen; UI-01 bis UI-09 am 2026-09-18 vollständig geprüft und ausdrücklich abgenommen
 
-Stand: 2026-09-17
+Stand: 2026-09-18
 
 ## Zweck und Nutzen
 
@@ -89,13 +89,15 @@ Darüber, ohne eigenen Platz im Layout:
 - feldgebundene Typ1-Dienstauswahl,
 - kleine platzneutrale Meldungsdarstellung für den Dienstplan,
 - einheitliches modales Bestätigungspanel für alle dortigen zerstörerischen Aktionen,
+- sichtbare Wochen- und Mitarbeitergruppierung anhand der bereits vorhandenen fachlichen Planungsrolle,
+- minimale Ergänzung der Application-Anzeige-Momentaufnahme um diese vorhandene Planungsrolle,
 - notwendige kleine Desktop-ViewModel- und Darstellungsbausteine,
-- angepasste Desktop- und WPF-Renderprüfungen,
+- angepasste Application-, Desktop- und WPF-Renderprüfungen,
 - abschließende sichtbare Prüfung mit ausschließlich synthetischen Daten.
 
 ## Nicht-Umfang
 
-- keine neue Domain-, Application-, Planning-, Infrastructure- oder Datenbankfunktion,
+- keine neue fachliche Domain-, Application-, Planning-, Infrastructure- oder Datenbankfunktion; die vorhandene Planungsrolle wird nur zusätzlich in der Anzeige-Momentaufnahme bereitgestellt,
 - keine Änderung fachlicher Zulässigkeits-, Bedarfs-, Typ1-, Abwesenheits- oder Generierungsregeln,
 - keine neue Migration und kein neues Paket,
 - keine manuelle Dienstzuweisung für Nicht-Typ1-Personen; diese gehört zu System 11,
@@ -109,7 +111,7 @@ Darüber, ohne eigenen Platz im Layout:
 
 ## Architektur- und Dateigrenzen
 
-- Die Änderung bleibt grundsätzlich in `Salztal.Dienstplanung.Desktop.Features.Scheduling` und den zugehörigen Desktop-Tests.
+- Die Änderung bleibt grundsätzlich in `Salztal.Dienstplanung.Desktop.Features.Scheduling` und den zugehörigen Desktop-Tests. Für die bestätigte Mitarbeitergruppierung darf die vorhandene Planungsrolle zusätzlich über `AvailabilityPeriodEmployeeSnapshot` projiziert und mit fokussierten Application-Tests abgesichert werden.
 - `ScheduleOverviewView.xaml` beschreibt Reihenfolge, Überlagerungen, Darstellung und Bindings.
 - ViewModels koordinieren ausschließlich UI-Zustand und vorhandene Application-Aktionen. Fachlogik oder Zulässigkeitsregeln werden nicht in die Oberfläche kopiert.
 - Die vorhandene Typ1-Optionsquelle bleibt maßgeblich; sichtbare Namen oder Texte steuern keine fachliche Auswahl.
@@ -124,10 +126,13 @@ Darüber, ohne eigenen Platz im Layout:
 - `src/Salztal.Dienstplanung.Desktop/Features/Scheduling/ScheduleOverviewView.xaml.cs`
 - `src/Salztal.Dienstplanung.Desktop/Features/Scheduling/ScheduleOverviewViewModel.cs`
 - `src/Salztal.Dienstplanung.Desktop/Features/Scheduling/ScheduleCellViewModel.cs`
+- `src/Salztal.Dienstplanung.Application/Availabilities/AvailabilityPeriodEmployeeSnapshot.cs`
+- `src/Salztal.Dienstplanung.Application/Availabilities/AvailabilityPeriodSnapshotProjector.cs`
 - `src/Salztal.Dienstplanung.Desktop/Features/Scheduling/ServiceManagementAssignmentEditorViewModel.cs`
 - `src/Salztal.Dienstplanung.Desktop/Features/Scheduling/AutomaticScheduleGenerationView.xaml`
 - `src/Salztal.Dienstplanung.Desktop/Features/Scheduling/AutomaticScheduleResetView.xaml`
 - zugehörige Dateien unter `tests/Salztal.Dienstplanung.Desktop.Tests/Features/Scheduling`
+- `tests/Salztal.Dienstplanung.Application.Tests/Availabilities/GetAvailabilityPeriodQueryTests.cs`
 - betroffene Architekturtests nur, falls sich öffentliche Desktop-Verträge oder Verdrahtung tatsächlich ändern
 
 Die Liste ist keine Freigabe, derzeit laufende System-09-Dateien parallel zu bearbeiten. Der tatsächliche Stand nach der System-09-Abnahme ist verbindlich.
@@ -274,7 +279,7 @@ Umgesetzt und automatisch geprüft am 2026-09-17:
 
 ### UI-05 – Einheitliches modales Bestätigungspanel
 
-Status: `[~]` – umgesetzt und automatisch geprüft; sichtbare Abnahme offen
+Status: `[x]` – umgesetzt, automatisch und sichtbar geprüft sowie am 2026-09-18 ausdrücklich abgenommen
 
 Umfang:
 
@@ -304,16 +309,106 @@ Umgesetzt und automatisch geprüft am 2026-09-17:
 - `Abbrechen` erhält beim Öffnen den sicheren Anfangsfokus. Der Panelbereich führt Tabulator- und Richtungstasten zyklisch, `Escape` bricht ab und nach Schließen wird der vorherige Fokus wiederhergestellt. Logischer und realer WPF-Fokus werden gemeinsam gesetzt, damit das Verhalten auch bei geöffneten Popups und im sichtbaren Fenster stabil bleibt.
 - ViewModel-Tests prüfen beide zentral weitergeleiteten Bestätigungsarten, Abbruch ohne Schreibzugriff, gesperrte Hintergrundbefehle, unveränderte Tageswerte und Typ1-Zuweisungen sowie den unveränderten Warntext des vollständigen Verwerfens. Ein gemeinsamer WPF-Test prüft dieselbe Overlay-Instanz, sicheren Fokus, Fokusbindung, `Escape`, Fokuswiederherstellung, Schaltflächen, Automation-Namen und die textlich erklärte Modalität.
 - Der vollständige Solution-Build im separaten Ausgabeverzeichnis bestand mit 0 Warnungen und 0 Fehlern. Alle 997 vorhandenen Tests aus Domain, Application, Planning, Infrastructure, Desktop und Architektur bestanden; davon sind 121 Desktop-Tests grün. Das weiterhin leere Excel-Testprojekt enthält unverändert keine Tests.
-- Die geänderten C#-Dateien bestehen die fokussierte Formatprüfung. Die sichtbare Bedienprüfung aller Bestätigungsarten mit Maus und Tastatur bleibt als Abnahmegate offen.
+- Die geänderten C#-Dateien bestehen die fokussierte Formatprüfung.
+- Die Service-Leitung hat die sichtbare Bedienung aller Bestätigungsarten mit Maus und Tastatur am 2026-09-18 ausdrücklich bestätigt.
 
-### UI-06 – Gemeinsame Sichtprüfung, Höhenoptimierung und Abschluss
+### UI-06 – Vertikale Grenzen der drei Kalenderwochen
 
-Status: `[ ]`
+Status: `[x]` – technisch, automatisch und sichtbar geprüft sowie am 2026-09-18 ausdrücklich abgenommen
+
+Umfang:
+
+- eine stärkere vertikale Linie vor dem ersten Montag, zwischen erstem Sonntag und zweitem Montag, zwischen zweitem Sonntag und drittem Montag sowie nach dem dritten Sonntag darstellen,
+- alle vier Grenzen durch Tabellenkopf und sämtliche Mitarbeiterzeilen führen,
+- vorhandene Tagesbreiten, Kalenderzuordnung, horizontales Scrollen und Wochensummen unverändert lassen.
+
+Prüfung:
+
+- WPF-Renderprüfungen finden genau die vier Grenzen vor Tag 1, zwischen Tag 7 und 8, zwischen Tag 14 und 15 sowie nach Tag 21,
+- Tabellenkopf und jede synthetische Mitarbeiterzeile verwenden dieselben Grenzpositionen,
+- Standardgröße, Mindestgröße und maximiertes Fenster behalten ausgerichtete Spalten und den vorhandenen horizontalen Scrollbereich.
+
+Umgesetzt und automatisch geprüft am 2026-09-18:
+
+- Vier nicht interaktive, drei Pixel starke Linien überlagern die unveränderte Tabellenstruktur gemeinsam über Kopf und sämtliche Mitarbeiterzeilen. Sie liegen vor Tag 1, nach Tag 7, nach Tag 14 und nach Tag 21; Zellbreiten, Auswahlrahmen, Wochensummen und Scrolllogik bleiben unverändert.
+- Ein WPF-Render-Test prüft die exakt vier Grenzpositionen `226`, `604`, `982` und `1360`, ihre vollständige Tabellenhöhe und den unveränderten horizontalen Scrollbereich bei `900 × 600`, `1160 × 760` und `1920 × 1080`.
+- Der vollständige Solution-Build bestand mit 0 Warnungen und 0 Fehlern. Alle 1001 automatischen Prüfungen aus Domain, Application, Planning, Infrastructure, Desktop und Architektur bestanden; davon sind 125 Desktop-Tests grün.
+- Die vollständige Formatprüfung und `git diff --check` sind grün. Die gemeinsame sichtbare Bewertung von Stärke und Farbe erfolgte wie vorgesehen in UI-09.
+- Die Service-Leitung hat die vier sichtbaren Wochengrenzen nach einem aktuellen Debug-Build am 2026-09-18 ausdrücklich bestätigt. Die gemeinsame Feinbeurteilung mit den weiteren Tabellenänderungen wurde in UI-09 ebenfalls abgenommen.
+
+Abnahmebedingung:
+
+- Die vier Wochengrenzen sind technisch durchgängig umgesetzt, automatisch geprüft und in UI-09 gemeinsam sichtbar abgenommen.
+
+### UI-07 – Typ1 immer als erste Mitarbeiterzeile
+
+Status: `[x]` – technisch, automatisch und sichtbar geprüft sowie am 2026-09-18 ausdrücklich abgenommen
+
+Umfang:
+
+- die vorhandene fachliche Planungsrolle über die unveränderliche Application-Anzeige-Momentaufnahme bereitstellen,
+- die aktive Person mit der Rolle `ServiceManagement` immer als erste Mitarbeiterzeile darstellen,
+- ohne aktive Typ1-Person die vorhandene Namenssortierung der übrigen Personen beibehalten,
+- weder Typcode noch Name in der UI zur Erkennung von Typ1 auswerten.
+
+Prüfung:
+
+- Application-Tests sichern die unveränderte Übergabe der Planungsrolle,
+- ViewModel-Tests sichern Typ1 an erster Stelle unabhängig vom Namen sowie den Fall ohne Typ1,
+- bestehende Typ1-Auswahl, Tageswerte, Wochensummen und fachliche Befehle bleiben unverändert.
+
+Umgesetzt und automatisch geprüft am 2026-09-18:
+
+- Die vorhandene fachliche Planungsrolle wird über `AvailabilityPeriodEmployeeSnapshot` als unveränderlicher `EmployeeTypePlanningRoleKind` bereitgestellt. Ein gemeinsamer Application-Mapper verhindert doppelte Übersetzungslogik zwischen Domain- und Anzeige-Rolle.
+- Der Dienstplan ordnet ausschließlich Personen mit `ServiceManagement` stabil vor die bereits nach Nachname, Vorname und Kennung sortierten übrigen Personen. Typcode und sichtbarer Name werden dafür nicht ausgewertet; ohne aktive Typ1-Person bleibt die vorhandene Namensreihenfolge unverändert.
+- Fokussierte Application-Tests prüfen die Projektion von `Normal`, `ServiceManagement` und `Auxiliary`. Desktop-ViewModel-Tests prüfen Typ1 vor einer alphabetisch früheren Person und den unveränderten Fall ohne Typ1.
+- Release- und Debug-Build bestanden mit 0 Warnungen und 0 Fehlern. Alle 1004 automatischen Prüfungen bestanden; davon sind 127 Desktop-Tests grün. Die vollständige Formatprüfung und `git diff --check` sind grün.
+- Die Service-Leitung hat Typ1 als erste Mitarbeiterzeile am 2026-09-18 ausdrücklich bestätigt. Die gemeinsame sichtbare Beurteilung aller Gruppen wurde in UI-09 ebenfalls abgenommen.
+
+Abnahmebedingung:
+
+- Eine vorhandene aktive Typ1-Person steht technisch immer in der ersten Zeile; die gemeinsame sichtbare Beurteilung ist in UI-09 erfolgt.
+
+### UI-08 – Reguläre Personen vor AH und horizontale AH-Grenze
+
+Status: `[x]` – technisch, automatisch und sichtbar geprüft sowie am 2026-09-18 ausdrücklich abgenommen
+
+Umfang:
+
+- nach Typ1 zuerst Personen mit der Rolle `Normal` und danach Personen mit der Rolle `Auxiliary` anzeigen,
+- innerhalb der regulären und der AH-Gruppe die vorhandene Sortierung nach Nachname, Vorname und stabiler Kennung beibehalten,
+- den Beginn des AH-Blocks mit einer stärkeren horizontalen Linie über Namensspalte, 21 Tagesfelder und drei Wochensummen kennzeichnen,
+- die Linie auch zwischen Typ1 und AH anzeigen, wenn keine reguläre Person vorhanden ist; ohne AH-Gruppe keine leere Trennlinie darstellen,
+- weder Typcodes noch Namen in der UI zur Erkennung von AH auswerten.
+
+Prüfung:
+
+- ViewModel-Tests sichern die Reihenfolge `Typ1 → regulär → AH` und die vorhandene Namenssortierung innerhalb der beiden Gruppen,
+- Grenzfälle ohne reguläre Personen, ohne Typ1 beziehungsweise ohne AH sind abgedeckt,
+- WPF-Renderprüfungen sichern genau eine durchgängige AH-Grenze an der korrekten Zeile.
+
+Umgesetzt und automatisch geprüft am 2026-09-18:
+
+- Der Dienstplan ordnet stabil nach der vorhandenen fachlichen Rolle in der Reihenfolge `ServiceManagement → Normal → Auxiliary`. Die bereits in Application festgelegte Sortierung nach Nachname, Vorname und Kennung bleibt innerhalb der regulären und AH-Gruppe erhalten; Typcodes und Namen steuern die Gruppierung nicht.
+- Ausschließlich die erste AH-Zeile trägt ein eigenes Darstellungsmerkmal. XAML legt dort eine nicht interaktive, drei Pixel starke Linie über die vollständigen 1690 Pixel aus Namensspalte, 21 Tagesfeldern und drei Wochensummen; Zeilenhöhe, Zellbedienung, Wochenlinien und Scrollbereich bleiben unverändert.
+- ViewModel-Tests prüfen die vollständige Gruppen- und Namensreihenfolge sowie die Fälle ohne reguläre Personen, ohne Typ1 und ohne AH. WPF-Renderprüfungen sichern genau eine sichtbare Linie an der ersten AH-Zeile beziehungsweise keine Linie ohne AH.
+- Release- und Debug-Build bestanden mit 0 Warnungen und 0 Fehlern. Alle 1010 automatischen Prüfungen bestanden; davon sind 133 Desktop-Tests grün. Die vollständige Formatprüfung und `git diff --check` sind grün.
+- Die Service-Leitung hat die Reihenfolge `Typ1 → regulär → AH` und die durchgängige horizontale Grenze vor dem AH-Block im Rahmen der gemeinsamen Sichtprüfung am 2026-09-18 ausdrücklich bestätigt.
+
+Abnahmebedingung:
+
+- Gruppenreihenfolge und AH-Grenze sind technisch umgesetzt, automatisch geprüft und gemeinsam sichtbar abgenommen.
+
+### UI-09 – Gemeinsame Sichtprüfung, Höhenoptimierung und Abschluss
+
+Status: `[x]` – vollständig umgesetzt, automatisch geprüft und am 2026-09-18 gemeinsam sichtbar abgenommen
 
 Umfang:
 
 - alle neuen UI-Bausteine gemeinsam mit dem abgeschlossenen System-09-Ablauf prüfen,
-- Abstände, Zeilenhöhen und verfügbare Planhöhe in kleinen sichtbaren Iterationen optimieren,
+- vertikale Mausradbewegungen über dem ausschließlich horizontal scrollbaren Wochenplan an den gemeinsamen vertikalen Arbeitsbereich weitergeben,
+- die Ergebnisse aus UI-06 bis UI-08 gemeinsam sichtbar beurteilen,
+- Abstände, Linienwirkung, Zeilenhöhen und verfügbare Planhöhe in kleinen sichtbaren Iterationen optimieren,
 - ausschließlich visuelle Feinabstimmungen innerhalb des bestätigten Umfangs vornehmen,
 - Dokumentation und Projektstatus nach tatsächlichem Ergebnis aktualisieren,
 - Roadmap erst nach ausdrücklicher Abnahme nach `docs/roadmaps/completed` verschieben.
@@ -321,22 +416,37 @@ Umfang:
 Prüfung:
 
 - vollständiger Build ohne neue Warnungen oder Fehler,
-- betroffene Desktop- und Architekturtests sowie vollständiger Regressionstest,
+- betroffene Application-, Desktop- und Architekturtests sowie vollständiger Regressionstest,
 - `dotnet format ... --verify-no-changes --no-restore` und `git diff --check`,
 - sichtbarer Gesamtablauf mit synthetischen Daten: Zeitraum öffnen, Zelle auswählen, `U/K/X` speichern, Typ1-Dienst direkt wählen, Leeren abbrechen und bestätigen, Planung vorbereiten, Plan erzeugen, Vorschlag behandeln und vollständiges Verwerfen abbrechen und bestätigen,
-- Meldungen und modale Panels bei Standardgröße, Mindestgröße und maximiertem Fenster prüfen,
+- Wochengrenzen, Typ1-Erstplatzierung, regulärer Block und AH-Block bei Standardgröße, Mindestgröße und maximiertem Fenster prüfen,
+- Mausrad über Tabelle und übriger Seite, horizontalen Tabellen-Scrollbalken und eigenen Scrollbereich des Typ1-Popups gegenprüfen,
 - Datenschutzprüfung: keine echten Namen, Pläne, Datenbanken, Sicherungen oder Exporte im Repository.
+
+Vorgezogene Scrollkorrektur umgesetzt, automatisch und sichtbar geprüft am 2026-09-18:
+
+- Der gemeinsame vertikale Arbeitsbereich und der ausschließlich horizontale Scrollbereich der Drei-Wochen-Planung besitzen eindeutige Namen. Vertikale Mausradbewegungen über Tabellenzellen, Tabellenköpfen und Summen verwenden nun den äußeren Arbeitsbereich; der horizontale Tabellenversatz bleibt unverändert.
+- Die Weiterleitung gilt nur für den Wochenplan. Das getrennte Typ1-Popup behält seinen eigenen vertikalen Scrollbereich. Die Windows-Einstellung für Zeilen- beziehungsweise Seitenscrollen wird verwendet; feste Pixelabstände wurden nicht eingeführt.
+- Ein neuer WPF-Ereignistest prüft beide Scrollrichtungen, unveränderten horizontalen und inneren vertikalen Offset sowie obere und untere Grenze. Die bestehenden Renderfälle für `900 × 600`, `1160 × 760` und `1920 × 1080` bleiben grün.
+- Der vollständige Solution-Build bestand mit 0 Warnungen und 0 Fehlern. Alle 998 vorhandenen Tests aus Domain, Application, Planning, Infrastructure, Desktop und Architektur bestanden; davon sind 122 Desktop-Tests grün. Das weiterhin leere Excel-Testprojekt meldete den dokumentierten Exitcode 8.
+- Die Service-Leitung hat das vertikale Scrollen des vollständigen Tabs über der Wochenplanung am 2026-09-18 sichtbar bestätigt. Der horizontale Tabellen-Scrollbalken bleibt erhalten.
+
+Gemeinsame Sichtprüfung und Abschluss am 2026-09-18:
+
+- Die Service-Leitung hat die gesamte Sichtprüfung ausdrücklich abgenommen. Bestätigt sind damit die Wochengrenzen, die Typ1-Erstplatzierung, die Reihenfolge der regulären und AH-Personen, die horizontale AH-Grenze sowie das durchgängige Scrollverhalten des Dienstplan-Tabs.
+- Die bereits sichtbaren UI-01- bis UI-05-Ergebnisse, der horizontale Tabellen-Scrollbalken und der eigene Scrollbereich der Typ1-Auswahl bleiben Bestandteil der abgenommenen Gesamtdarstellung. Weitere Höhen-, Linien- oder Abstandskorrekturen waren nicht erforderlich.
+- Der reine UI-Zwischenschritt S09A ist damit abgeschlossen. Der Generator und seine Ergebnisqualität wurden in S09A nicht verändert oder fachlich abgenommen; System 09 bleibt bis S09B, dem daraus abgeleiteten Folgeplan sowie AG-15 und AG-16 offen.
 
 Abnahmebedingung:
 
-- Die Service-Leitung bestätigt Reihenfolge, möglichst große sichtbare Wochenplanung, feldgebundene Typ1-Auswahl, platzneutrale Meldungen und alle modalen Bestätigungen. Erst danach wird der Zwischenschritt abgeschlossen; anschließend wird der Fragenkatalog für den S09B-Planungsqualitätsbericht erstellt. System 09 bleibt bis Bericht, gezielter Optimierung, AG-15 und AG-16 offen.
+- Die Service-Leitung bestätigt Reihenfolge, Wochengrenzen, AH-Grenze, möglichst große sichtbare Wochenplanung, feldgebundene Typ1-Auswahl, platzneutrale Meldungen und alle modalen Bestätigungen. Erst danach wird der Zwischenschritt abgeschlossen; anschließend wird der Fragenkatalog für den S09B-Planungsqualitätsbericht erstellt. System 09 bleibt bis Bericht, gezielter Optimierung, AG-15 und AG-16 offen.
 
 ## Echte manuelle Gates
 
 - ausdrückliche Abnahme dieser Roadmap vor UI-01 beziehungsweise jeder Codeänderung,
 - nachweislich technisch stabiler und während S09A unveränderter Generierungsstand vor UI-02,
 - sichtbare Zwischenabnahme der Tabellenhöhe und Reihenfolge in UI-02,
-- sichtbare Bedienabnahme des Gesamtumbaus in UI-06,
+- sichtbare Bedienabnahme des Gesamtumbaus in UI-09,
 - eigener Fragenkatalog und danach eigener Roadmap-Entwurf für S09B nach Abschluss dieses Zwischenschritts.
 
 ## Risiken und Schutzmaßnahmen
@@ -361,11 +471,13 @@ Abnahmebedingung:
 Der UI-Umbau ist erst zur Abnahme bereit, wenn:
 
 - der technisch funktionsfähige System-09-Ausgangsstand bestätigt und während S09A fachlich unverändert geblieben ist,
-- alle sechs Schritte im freigegebenen Umfang umgesetzt und geprüft sind,
+- alle neun Schritte im freigegebenen Umfang umgesetzt und geprüft sind,
 - die Wochenplanung in der bestätigten Reihenfolge möglichst viel sichtbare Höhe erhält,
 - Typ1-Dienste ausschließlich aus zulässigen vorhandenen Optionen direkt am Feld gespeichert werden,
 - Meldungen keinen dauerhaften Platz belegen und Fehler nicht automatisch verloren gehen,
 - alle zerstörerischen Bestätigungen tatsächlich modal und tastaturbedienbar sind,
+- die vier Wochengrenzen und der Beginn des AH-Blocks über die vollständige Tabelle klar erkennbar sind,
+- Typ1, reguläre Personen und AH in der bestätigten Gruppenreihenfolge erscheinen und die Namenssortierung innerhalb der regulären und AH-Gruppe erhalten bleibt,
 - keine Fachlogik in XAML, Code-behind oder ViewModels dupliziert wurde,
 - Build, relevante Tests, Format- und Datenschutzprüfung grün sind,
 - das sichtbare WPF-Gate ausdrücklich bestätigt wurde,
@@ -375,4 +487,4 @@ Abgeschlossen und archiviert wird die Roadmap erst nach ausdrücklicher Abnahme.
 
 ## Nächster minimaler Schritt
 
-Der nächste minimale Schritt ist die sichtbare Abnahme von UI-05: Ersetzen und Leeren eines Tagesfelds, Ersetzen beziehungsweise Entfernen eines Typ1-Dienstes sowie das vollständige Verwerfen werden jeweils geöffnet und zunächst abgebrochen. Dabei werden Hintergrundsperre, sicherer Anfangsfokus, Tabulatorbindung, `Escape` und Fokuswiederherstellung geprüft. Anschließend werden die zulässigen Bestätigungen bewusst ausgeführt und ihre unveränderten fachlichen Folgen kontrolliert. Erst nach dieser Bestätigung beginnt UI-06. Der Fragenkatalog für S09B entsteht weiterhin erst nach Abschluss von S09A.
+S09A ist vollständig umgesetzt, geprüft, sichtbar abgenommen und archiviert. Der nächste minimale Schritt innerhalb des weiterhin offenen Systems 09 ist ein eigener Fragenkatalog für S09B. Er klärt Inhalt und Abnahmebedingungen des neutralen Planungsqualitätsberichts, bevor eine S09B-Roadmap oder weitere Implementierung beginnt.

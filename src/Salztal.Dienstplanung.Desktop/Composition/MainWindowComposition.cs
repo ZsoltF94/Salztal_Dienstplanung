@@ -103,6 +103,7 @@ internal static class MainWindowComposition
             staffingDemands.LoadAsync,
             errorReporter);
         SchedulingDependencies scheduling = dependencies.Scheduling;
+        AutomaticScheduleReportWindowCoordinator reportCoordinator = new();
         ScheduleOverviewViewModel schedule = new(
             new OpenOrCreateScheduleDraftCommand(
                 scheduling.WorkspaceReader,
@@ -137,7 +138,8 @@ internal static class MainWindowComposition
                     scheduling.DiscardAutomaticScheduleStore)),
             currentWeekMonday,
             errorReporter,
-            new ScheduleFeedbackDelay());
+            new ScheduleFeedbackDelay(),
+            reportCoordinator);
         serviceCatalog.SelectedWorkLocationChanged +=
             standardStaffingDemands.SelectWorkLocation;
 
@@ -147,7 +149,8 @@ internal static class MainWindowComposition
             employeeTypes,
             staffingDemands,
             standardStaffingDemands,
-            schedule);
+            schedule,
+            reportCoordinator);
     }
 
     public static async Task<MainWindowDependencies> CreateInitializedAsync(

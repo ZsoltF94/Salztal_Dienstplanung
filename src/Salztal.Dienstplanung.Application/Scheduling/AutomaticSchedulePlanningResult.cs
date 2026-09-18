@@ -64,11 +64,13 @@ public sealed class AutomaticSchedulePlanningResult
     private AutomaticSchedulePlanningResult(
         AutomaticSchedulePlanningStatus status,
         AutomaticSchedulePreview? preview,
-        ReadOnlyCollection<AutomaticScheduleError> errors)
+        ReadOnlyCollection<AutomaticScheduleError> errors,
+        ReadOnlyCollection<AutomaticSchedulePhaseSnapshot> phases)
     {
         Status = status;
         Preview = preview;
         Errors = errors;
+        Phases = phases;
     }
 
     public AutomaticSchedulePlanningStatus Status { get; }
@@ -77,6 +79,8 @@ public sealed class AutomaticSchedulePlanningResult
 
     public ReadOnlyCollection<AutomaticScheduleError> Errors { get; }
 
+    public ReadOnlyCollection<AutomaticSchedulePhaseSnapshot> Phases { get; }
+
     public static AutomaticSchedulePlanningResult Success(
         AutomaticSchedulePlanningStatus status,
         AutomaticScheduleProposal proposal)
@@ -84,12 +88,14 @@ public sealed class AutomaticSchedulePlanningResult
         return new AutomaticSchedulePlanningResult(
             status,
             new AutomaticSchedulePreview(status, proposal),
-            Array.AsReadOnly(Array.Empty<AutomaticScheduleError>()));
+            Array.AsReadOnly(Array.Empty<AutomaticScheduleError>()),
+            proposal.Metadata.Phases);
     }
 
     public static AutomaticSchedulePlanningResult Failure(
         AutomaticSchedulePlanningStatus status,
-        IEnumerable<AutomaticScheduleError>? errors = null)
+        IEnumerable<AutomaticScheduleError>? errors = null,
+        IEnumerable<AutomaticSchedulePhaseSnapshot>? phases = null)
     {
         if (status is AutomaticSchedulePlanningStatus.Optimal
             or AutomaticSchedulePlanningStatus.FeasibleNotProvenOptimal)
@@ -108,6 +114,30 @@ public sealed class AutomaticSchedulePlanningResult
         return new AutomaticSchedulePlanningResult(
             status,
             null,
-            Array.AsReadOnly(errorValues));
+            Array.AsReadOnly(errorValues),
+            AutomaticSchedulePhaseSequence.Create(phases ?? []));
+    }
+
+    public AutomaticSchedulePlanningResult PrependPhase(
+        AutomaticSchedulePhaseSnapshot phase)
+    {
+        ArgumentNullException.ThrowIfNull(phase);
+        AutomaticSchedulePhaseSnapshot[] values = [phase, .. Phases];
+        ReadOnlyCollection<AutomaticSchedulePhaseSnapshot> validated =
+            AutomaticSchedulePhaseSequence.Create(values);
+        AutomaticSchedulePreview? updatedPreview = Preview;
+        if (Preview is not null)
+        {
+            AutomaticScheduleProposal proposal = Preview.Proposal.WithMetadata(
+                Preview.Proposal.Metadata.PrependPhase(phase));
+            updatedPreview = new AutomaticSchedulePreview(Status, proposal);
+            validated = proposal.Metadata.Phases;
+        }
+
+        return new AutomaticSchedulePlanningResult(
+            Status,
+            updatedPreview,
+            Errors,
+            validated);
     }
 }

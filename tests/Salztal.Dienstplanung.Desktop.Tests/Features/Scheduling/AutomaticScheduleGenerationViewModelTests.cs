@@ -80,8 +80,25 @@ public sealed class AutomaticScheduleGenerationViewModelTests
         Assert.True(viewModel.HasPreview);
         Assert.Equal("Optimaler Vorschlag", viewModel.Preview!.StatusDisplay);
         Assert.Contains("1 vollständig, 1 teilweise", viewModel.Preview.OpenDemandDisplay);
-        Assert.Contains("4 Std. 30 min", viewModel.Preview.OpenDemandDisplay);
+        Assert.Contains("4 Std. 00 min", viewModel.Preview.OpenDemandDisplay);
         Assert.Contains("1 schwarzes X", viewModel.Preview.AssignmentDisplay);
+        Assert.NotNull(viewModel.Preview.DemandReport);
+        Assert.Equal(3, viewModel.Preview.DemandReport.Demands.Count);
+        Assert.NotNull(viewModel.Preview.EmployeeReport);
+        Assert.NotNull(viewModel.Preview.GenerationReport);
+        Assert.True(viewModel.HasGenerationReport);
+        Assert.NotNull(viewModel.GenerationReport);
+        Assert.Equal(15, viewModel.GenerationReport.Phases.Count);
+        AutomaticScheduleGenerationPhaseViewModel reliefPhase =
+            viewModel.GenerationReport.Phases[6];
+        Assert.Equal("Spr minimieren", reliefPhase.Name);
+        Assert.Equal("2", reliefPhase.Metrics[0].InitialDisplay);
+        Assert.Equal("0", reliefPhase.Metrics[0].AchievedDisplay);
+        Assert.NotNull(viewModel.GenerationReport.TechnicalDetails);
+        Assert.Contains(
+            "Testsolver",
+            viewModel.GenerationReport.TechnicalDetails.SolverDisplay);
+        Assert.Contains("Optimalität", viewModel.GenerationReport.StatusDisplay);
 
         await viewModel.AcceptCommand.ExecuteAsync(null);
 
@@ -130,8 +147,77 @@ public sealed class AutomaticScheduleGenerationViewModelTests
 
         Assert.False(viewModel.HasPreview);
         Assert.True(viewModel.HasErrorCode);
+        Assert.True(viewModel.HasGenerationReport);
+        Assert.Equal(
+            "Technischer Fehler",
+            viewModel.GenerationReport!.StatusDisplay);
+        Assert.Equal(
+            "Zuletzt erreicht: Modellaufbau",
+            viewModel.GenerationReport.LastReachedPhaseDisplay);
         Assert.Contains("TechnicalFailure", viewModel.ErrorCodeDisplay);
         Assert.Contains("test-4711", viewModel.ErrorCodeDisplay);
+    }
+
+    [Fact]
+    public async Task GeneratedReportCanBeOpenedThroughPresenter()
+    {
+        RecordingAutomaticScheduleGenerationActions actions = new();
+        RecordingAutomaticScheduleReportPresenter presenter = new();
+        AutomaticScheduleGenerationViewModel viewModel = CreateReadyViewModel(
+            actions,
+            reportPresenter: presenter);
+        actions.CompleteGeneration(AutomaticScheduleGenerationTestData.SuccessOutcome());
+
+        await viewModel.StartCommand.ExecuteAsync(null);
+        viewModel.OpenReportCommand.Execute(null);
+
+        Assert.True(viewModel.OpenReportCommand.CanExecute(null));
+        Assert.NotNull(presenter.Source);
+        Assert.StartsWith("preview:", presenter.Source.Identity, StringComparison.Ordinal);
+        Assert.Equal("Flüchtiger Generierungsvorschlag", presenter.Source.SourceDisplay);
+        Assert.Equal(1, presenter.ShowCallCount);
+    }
+
+    [Fact]
+    public void LaterDraftVersionInvalidatesAcceptedReportImmediately()
+    {
+        RecordingAutomaticScheduleGenerationActions actions = new();
+        RecordingAutomaticScheduleReportPresenter presenter = new();
+        AutomaticScheduleGenerationReport report =
+            AutomaticScheduleGenerationTestData.SuccessOutcome().Report;
+        AutomaticScheduleGenerationViewModel viewModel = CreateViewModel(
+            actions,
+            reportPresenter: presenter);
+
+        viewModel.ApplyContext(
+            AutomaticScheduleGenerationTestData.ReadyContext() with
+            {
+                AcceptedAutomaticSchedule = new AcceptedAutomaticScheduleSnapshot(
+                    0,
+                    0,
+                    AcceptedAutomaticScheduleReportStatus.Current,
+                    report),
+            },
+            false,
+            false);
+        Assert.True(viewModel.HasGenerationReport);
+        Assert.StartsWith("accepted:", presenter.Source!.Identity, StringComparison.Ordinal);
+
+        viewModel.ApplyContext(
+            AutomaticScheduleGenerationTestData.ReadyContext() with
+            {
+                Version = 4,
+                AcceptedAutomaticSchedule = new AcceptedAutomaticScheduleSnapshot(
+                    0,
+                    0,
+                    AcceptedAutomaticScheduleReportStatus.ChangedAfterGeneration),
+            },
+            false,
+            false);
+
+        Assert.False(viewModel.HasGenerationReport);
+        Assert.Null(presenter.Source);
+        Assert.Contains("nach der automatischen Übernahme geändert", presenter.UnavailableMessage);
     }
 
     [Fact]
@@ -156,11 +242,13 @@ public sealed class AutomaticScheduleGenerationViewModelTests
 
     private static AutomaticScheduleGenerationViewModel CreateReadyViewModel(
         RecordingAutomaticScheduleGenerationActions actions,
-        Func<CancellationToken, Task>? reload = null)
+        Func<CancellationToken, Task>? reload = null,
+        IAutomaticScheduleReportPresenter? reportPresenter = null)
     {
         AutomaticScheduleGenerationViewModel viewModel = CreateViewModel(
             actions,
-            reload);
+            reload,
+            reportPresenter);
         viewModel.ApplyContext(
             AutomaticScheduleGenerationTestData.ReadyContext(),
             false,
@@ -170,12 +258,14 @@ public sealed class AutomaticScheduleGenerationViewModelTests
 
     private static AutomaticScheduleGenerationViewModel CreateViewModel(
         RecordingAutomaticScheduleGenerationActions actions,
-        Func<CancellationToken, Task>? reload = null)
+        Func<CancellationToken, Task>? reload = null,
+        IAutomaticScheduleReportPresenter? reportPresenter = null)
     {
         return new AutomaticScheduleGenerationViewModel(
             actions,
             reload ?? (_ => Task.CompletedTask),
-            new RecordingUnexpectedErrorReporter());
+            new RecordingUnexpectedErrorReporter(),
+            reportPresenter);
     }
 
     private static async Task WaitUntilAsync(Func<bool> predicate)

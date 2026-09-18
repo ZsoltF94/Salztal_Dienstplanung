@@ -4,6 +4,7 @@ using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Salztal.Dienstplanung.Application.Availabilities;
+using Salztal.Dienstplanung.Application.Employees;
 using Salztal.Dienstplanung.Application.Scheduling;
 using Salztal.Dienstplanung.Desktop.Shared;
 
@@ -47,7 +48,8 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         IAutomaticScheduleResetActions resetActions,
         DateOnly initialPeriodMonday,
         IUnexpectedErrorReporter errorReporter,
-        IScheduleFeedbackDelay feedbackDelay)
+        IScheduleFeedbackDelay feedbackDelay,
+        IAutomaticScheduleReportPresenter? reportPresenter = null)
     {
         ArgumentNullException.ThrowIfNull(openCommand);
         ArgumentNullException.ThrowIfNull(query);
@@ -83,7 +85,8 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         Generation = new AutomaticScheduleGenerationViewModel(
             generationActions,
             ReloadAfterAutomaticAcceptanceAsync,
-            errorReporter);
+            errorReporter,
+            reportPresenter);
         AutomaticReset = new AutomaticScheduleResetViewModel(
             resetActions,
             ReloadAfterAutomaticDiscardAsync,
@@ -945,9 +948,6 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
         }
 
         _snapshot = snapshot;
-        HashSet<Guid> serviceManagementIds = snapshot.ServiceManagementReadiness
-            .Select(item => item.EmployeeId)
-            .ToHashSet();
         Dictionary<(Guid EmployeeId, DateOnly Date), ScheduleAssignmentSnapshot>
             assignments = snapshot.Assignments.ToDictionary(item =>
                 (item.EmployeeId, item.Date));
@@ -967,11 +967,21 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
             Days.Add(new ScheduleDayHeaderViewModel(day.Date));
         }
 
-        foreach (AvailabilityPeriodEmployeeSnapshot employee in snapshot.Availability.Employees)
+        AvailabilityPeriodEmployeeSnapshot[] orderedEmployees = snapshot
+            .Availability
+            .Employees
+            .OrderBy(employee => GetEmployeeGroupOrder(employee.PlanningRole))
+            .ToArray();
+        Guid? firstAuxiliaryEmployeeId = orderedEmployees
+            .FirstOrDefault(employee => employee.PlanningRole
+                == EmployeeTypePlanningRoleKind.Auxiliary)
+            ?.EmployeeId;
+        foreach (AvailabilityPeriodEmployeeSnapshot employee in orderedEmployees)
         {
             Dictionary<DateOnly, AvailabilityPeriodEntrySnapshot> entries = employee.Entries
                 .ToDictionary(entry => entry.Date);
-            bool isServiceManagement = serviceManagementIds.Contains(employee.EmployeeId);
+            bool isServiceManagement = employee.PlanningRole
+                == EmployeeTypePlanningRoleKind.ServiceManagement;
             ScheduleCellViewModel[] cells = snapshot.Availability.Days.Select(day =>
             {
                 entries.TryGetValue(day.Date, out AvailabilityPeriodEntrySnapshot? entry);
@@ -1017,6 +1027,7 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
                 employee.EmployeeTypeName,
                 employee.AllowsVacationAndSickness,
                 isServiceManagement,
+                employee.EmployeeId == firstAuxiliaryEmployeeId,
                 cells,
                 weeks));
         }
@@ -1049,6 +1060,18 @@ internal sealed class ScheduleOverviewViewModel : ObservableObject
 
         NotifyViewStateChanged();
         NotifyCommandsChanged();
+    }
+
+    private static int GetEmployeeGroupOrder(EmployeeTypePlanningRoleKind planningRole)
+    {
+        return planningRole switch
+        {
+            EmployeeTypePlanningRoleKind.ServiceManagement => 0,
+            EmployeeTypePlanningRoleKind.Normal => 1,
+            EmployeeTypePlanningRoleKind.Auxiliary => 2,
+            _ => throw new InvalidOperationException(
+                $"Unsupported employee-type planning role: {planningRole}"),
+        };
     }
 
     private void ClearSnapshot()

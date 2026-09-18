@@ -13,10 +13,12 @@ internal sealed class AutomaticScheduleGenerationViewModel : ObservableObject
     private readonly IAutomaticScheduleGenerationActions _actions;
     private readonly Func<CancellationToken, Task> _reloadWorkspace;
     private readonly IUnexpectedErrorReporter _errorReporter;
+    private readonly IAutomaticScheduleReportPresenter _reportPresenter;
     private readonly Stopwatch _stopwatch = new();
     private AutomaticScheduleGenerationContext? _context;
     private CancellationTokenSource? _runCancellation;
     private AutomaticSchedulePreviewViewModel? _preview;
+    private AutomaticScheduleGenerationReportViewModel? _generationReport;
     private bool _isRunning;
     private bool _isAccepting;
     private bool _isParentBusy;
@@ -25,11 +27,13 @@ internal sealed class AutomaticScheduleGenerationViewModel : ObservableObject
         .CreateElapsedDisplay(TimeSpan.Zero, MaximumRuntime);
     private string? _statusMessage;
     private string? _errorCodeDisplay;
+    private string? _reportAvailabilityMessage;
 
     public AutomaticScheduleGenerationViewModel(
         IAutomaticScheduleGenerationActions actions,
         Func<CancellationToken, Task> reloadWorkspace,
-        IUnexpectedErrorReporter errorReporter)
+        IUnexpectedErrorReporter errorReporter,
+        IAutomaticScheduleReportPresenter? reportPresenter = null)
     {
         ArgumentNullException.ThrowIfNull(actions);
         ArgumentNullException.ThrowIfNull(reloadWorkspace);
@@ -37,10 +41,15 @@ internal sealed class AutomaticScheduleGenerationViewModel : ObservableObject
         _actions = actions;
         _reloadWorkspace = reloadWorkspace;
         _errorReporter = errorReporter;
+        _reportPresenter = reportPresenter
+            ?? NullAutomaticScheduleReportPresenter.Instance;
         StartCommand = new AsyncRelayCommand(StartAsync, CanStart);
         CancelCommand = new RelayCommand(Cancel, () => IsRunning);
         AcceptCommand = new AsyncRelayCommand(AcceptAsync, CanAccept);
         DiscardCommand = new RelayCommand(Discard, CanDiscard);
+        OpenReportCommand = new RelayCommand(
+            _reportPresenter.ShowCurrent,
+            () => HasGenerationReport);
     }
 
     public IAsyncRelayCommand StartCommand { get; }
@@ -50,6 +59,8 @@ internal sealed class AutomaticScheduleGenerationViewModel : ObservableObject
     public IAsyncRelayCommand AcceptCommand { get; }
 
     public IRelayCommand DiscardCommand { get; }
+
+    public IRelayCommand OpenReportCommand { get; }
 
     public bool IsRunning
     {
@@ -91,6 +102,36 @@ internal sealed class AutomaticScheduleGenerationViewModel : ObservableObject
             }
         }
     }
+
+    public AutomaticScheduleGenerationReportViewModel? GenerationReport
+    {
+        get => _generationReport;
+        private set
+        {
+            if (SetProperty(ref _generationReport, value))
+            {
+                OnPropertyChanged(nameof(HasGenerationReport));
+                OpenReportCommand.NotifyCanExecuteChanged();
+            }
+        }
+    }
+
+    public bool HasGenerationReport => GenerationReport is not null;
+
+    public string? ReportAvailabilityMessage
+    {
+        get => _reportAvailabilityMessage;
+        private set
+        {
+            if (SetProperty(ref _reportAvailabilityMessage, value))
+            {
+                OnPropertyChanged(nameof(HasReportAvailabilityMessage));
+            }
+        }
+    }
+
+    public bool HasReportAvailabilityMessage =>
+        !string.IsNullOrWhiteSpace(ReportAvailabilityMessage);
 
     public string ElapsedDisplay
     {
@@ -141,12 +182,18 @@ internal sealed class AutomaticScheduleGenerationViewModel : ObservableObject
         bool isParentBusy)
     {
         ArgumentNullException.ThrowIfNull(next);
-        if (_context is not null && _context != next)
+        bool contextChanged = _context != next;
+        if (_context is not null && contextChanged)
         {
             ClearPreview();
         }
 
         _context = next;
+        if (contextChanged)
+        {
+            ApplyAcceptedReport(next.AcceptedAutomaticSchedule);
+        }
+
         _hasLocalRunOptionChange = hasLocalRunOptionChange;
         _isParentBusy = isParentBusy;
         NotifyStateChanged();
@@ -157,6 +204,7 @@ internal sealed class AutomaticScheduleGenerationViewModel : ObservableObject
         _context = null;
         _hasLocalRunOptionChange = false;
         ClearPreview();
+        ClearReport("Für den geschlossenen Planungszeitraum ist kein aktueller Bericht mehr verfügbar.");
         NotifyStateChanged();
     }
 
@@ -186,6 +234,7 @@ internal sealed class AutomaticScheduleGenerationViewModel : ObservableObject
         AutomaticScheduleGenerationContext context = _context
             ?? throw new InvalidOperationException("A generation context is required.");
         ClearFeedback();
+        ClearReport("Ein neuer Generierungslauf wird ausgeführt. Der vorherige Bericht ist nicht mehr aktuell.");
         using CancellationTokenSource linked =
             CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         _runCancellation = linked;
@@ -213,6 +262,8 @@ internal sealed class AutomaticScheduleGenerationViewModel : ObservableObject
             StatusMessage =
                 "Die automatische Planung konnte wegen eines unerwarteten Fehlers nicht abgeschlossen werden.";
             ErrorCodeDisplay = "Technischer Code: DesktopUnexpectedError";
+            ClearReport(
+                "Für den unerwartet abgebrochenen Desktop-Vorgang liegt kein strukturierter Generierungsbericht vor.");
         }
         finally
         {
@@ -265,6 +316,8 @@ internal sealed class AutomaticScheduleGenerationViewModel : ObservableObject
             {
                 ErrorCodeDisplay = $"Übernahmecode: {result.Status}";
                 ClearPreview();
+                ClearReport(
+                    "Der Bericht gehört zu einem nicht mehr aktuellen Vorschlag und wurde geschlossen.");
             }
         }
         catch (Exception exception)
@@ -274,6 +327,8 @@ internal sealed class AutomaticScheduleGenerationViewModel : ObservableObject
                 "Der Vorschlag konnte wegen eines unerwarteten Fehlers nicht übernommen werden.";
             ErrorCodeDisplay = "Technischer Code: DesktopUnexpectedError";
             ClearPreview();
+            ClearReport(
+                "Der Bericht gehört zu einem nicht mehr aktuellen Vorschlag und wurde geschlossen.");
         }
         finally
         {
@@ -289,6 +344,8 @@ internal sealed class AutomaticScheduleGenerationViewModel : ObservableObject
     private void Discard()
     {
         ClearPreview();
+        ClearReport(
+            "Der Vorschlag und sein Bericht wurden verworfen. Der Entwurf blieb unverändert.");
         StatusMessage = "Der Vorschlag wurde verworfen. Der Entwurf blieb unverändert.";
         ErrorCodeDisplay = null;
     }
@@ -301,9 +358,19 @@ internal sealed class AutomaticScheduleGenerationViewModel : ObservableObject
     private void ApplyGenerationResult(AutomaticScheduleGenerationOutcome result)
     {
         StatusMessage = result.Message;
+        SetReport(
+            result.Report,
+            new AutomaticScheduleReportSource(
+                CreateTransientReportIdentity(result.Report),
+                result.Report.PlanningReport is null
+                    ? "Letzter Generierungsversuch ohne Vorschlag"
+                    : "Flüchtiger Generierungsvorschlag",
+                result.Report));
         Preview = result.Preview is null
             ? null
-            : new AutomaticSchedulePreviewViewModel(result.Preview);
+            : new AutomaticSchedulePreviewViewModel(
+                result.Preview,
+                result.Report);
         ErrorCodeDisplay =
             AutomaticScheduleGenerationPresentation.CreateErrorCodeDisplay(result);
     }
@@ -320,6 +387,71 @@ internal sealed class AutomaticScheduleGenerationViewModel : ObservableObject
         ErrorCodeDisplay = null;
     }
 
+    private void ApplyAcceptedReport(AcceptedAutomaticScheduleSnapshot? accepted)
+    {
+        if (accepted is null)
+        {
+            ClearReport("Für diesen Entwurf ist kein aktueller automatischer Bericht vorhanden.");
+            return;
+        }
+
+        switch (accepted.ReportStatus)
+        {
+            case AcceptedAutomaticScheduleReportStatus.Current
+                when accepted.Report is not null:
+                SetReport(
+                    accepted.Report,
+                    new AutomaticScheduleReportSource(
+                        CreateAcceptedReportIdentity(accepted.Report),
+                        "Übernommener automatischer Lauf",
+                        accepted.Report));
+                break;
+            case AcceptedAutomaticScheduleReportStatus.ChangedAfterGeneration:
+                ClearReport(
+                    "Der Entwurf wurde nach der automatischen Übernahme geändert. Der frühere Generierungsbericht wird nicht als aktuell angezeigt.");
+                break;
+            default:
+                ClearReport(
+                    "Für diesen übernommenen Lauf sind keine vollständigen Berichtsdetails verfügbar.");
+                break;
+        }
+    }
+
+    private void SetReport(
+        AutomaticScheduleGenerationReport report,
+        AutomaticScheduleReportSource source)
+    {
+        GenerationReport = new AutomaticScheduleGenerationReportViewModel(report);
+        ReportAvailabilityMessage = null;
+        _reportPresenter.SetSource(source, string.Empty);
+    }
+
+    private void ClearReport(string unavailableMessage)
+    {
+        GenerationReport = null;
+        ReportAvailabilityMessage = unavailableMessage;
+        _reportPresenter.SetSource(null, unavailableMessage);
+    }
+
+    private static string CreateTransientReportIdentity(
+        AutomaticScheduleGenerationReport report)
+    {
+        AutomaticSchedulePlanningReport? planning = report.PlanningReport;
+        return planning is null
+            ? $"attempt:{Guid.NewGuid():D}"
+            : $"preview:{planning.SnapshotId:D}:{planning.DraftId:D}:{planning.DraftVersion}";
+    }
+
+    private static string CreateAcceptedReportIdentity(
+        AutomaticScheduleGenerationReport report)
+    {
+        AutomaticSchedulePlanningReport planning = report.PlanningReport
+            ?? throw new ArgumentException(
+                "An accepted report requires planning values.",
+                nameof(report));
+        return $"accepted:{planning.SnapshotId:D}:{planning.DraftId:D}:{planning.DraftVersion}";
+    }
+
     private void NotifyStateChanged()
     {
         OnPropertyChanged(nameof(IsOperationActive));
@@ -333,6 +465,7 @@ internal sealed class AutomaticScheduleGenerationViewModel : ObservableObject
         CancelCommand.NotifyCanExecuteChanged();
         AcceptCommand.NotifyCanExecuteChanged();
         DiscardCommand.NotifyCanExecuteChanged();
+        OpenReportCommand.NotifyCanExecuteChanged();
     }
 
 }

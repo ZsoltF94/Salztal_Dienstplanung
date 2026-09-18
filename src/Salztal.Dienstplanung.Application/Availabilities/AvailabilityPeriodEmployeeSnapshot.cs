@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Salztal.Dienstplanung.Application.Employees;
 
 namespace Salztal.Dienstplanung.Application.Availabilities;
 
@@ -10,6 +11,7 @@ public sealed class AvailabilityPeriodEmployeeSnapshot
         Guid employeeTypeId,
         string employeeTypeCode,
         string employeeTypeName,
+        EmployeeTypePlanningRoleKind planningRole,
         bool allowsVacationAndSickness,
         int? absenceDayValueMinutes,
         IEnumerable<AvailabilityPeriodEntrySnapshot> entries,
@@ -20,6 +22,7 @@ public sealed class AvailabilityPeriodEmployeeSnapshot
         EmployeeTypeId = employeeTypeId;
         EmployeeTypeCode = employeeTypeCode;
         EmployeeTypeName = employeeTypeName;
+        PlanningRole = planningRole;
         AllowsVacationAndSickness = allowsVacationAndSickness;
         AbsenceDayValueMinutes = absenceDayValueMinutes;
         Entries = Array.AsReadOnly(entries.ToArray());
@@ -35,6 +38,8 @@ public sealed class AvailabilityPeriodEmployeeSnapshot
     public string EmployeeTypeCode { get; }
 
     public string EmployeeTypeName { get; }
+
+    public EmployeeTypePlanningRoleKind PlanningRole { get; }
 
     public bool AllowsVacationAndSickness { get; }
 

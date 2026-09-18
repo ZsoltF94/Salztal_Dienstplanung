@@ -1,10 +1,12 @@
 using Salztal.Dienstplanung.Application.Availabilities;
+using Salztal.Dienstplanung.Application.Rules;
 using Salztal.Dienstplanung.Application.Scheduling;
 using Salztal.Dienstplanung.Application.ServiceCatalog;
 using Salztal.Dienstplanung.Domain.Availabilities;
 using Salztal.Dienstplanung.Domain.Employees;
 using Salztal.Dienstplanung.Domain.Scheduling;
 using Salztal.Dienstplanung.Domain.Scheduling.Optimization;
+using Salztal.Dienstplanung.Domain.ShiftPatterns;
 using Salztal.Dienstplanung.Domain.ShiftTypes;
 
 namespace Salztal.Dienstplanung.Application.Tests.Scheduling;
@@ -139,6 +141,104 @@ public sealed class GetScheduleWorkspaceQueryTests
             AcceptedAutomaticScheduleSnapshot>(snapshot.AcceptedAutomaticSchedule);
         Assert.Equal(1, accepted.AssignmentCount);
         Assert.Equal(1, accepted.GeneratedDayOffCount);
+        Assert.Equal(
+            AcceptedAutomaticScheduleReportStatus.DetailsUnavailable,
+            accepted.ReportStatus);
+        Assert.Null(accepted.Report);
+    }
+
+    [Fact]
+    public async Task ExecuteProjectsAcceptedReportOnlyForImmediateAcceptedVersion()
+    {
+        Guid snapshotId = Guid.NewGuid();
+        ScheduleDraft currentDraft = ScheduleWorkspaceTestContext.CreateDraft(version: 2);
+        PlanningInputSnapshot prepared = CreateMinimalPreparedSnapshot(
+            snapshotId,
+            currentDraft.Id.Value,
+            1);
+        AutomaticScheduleRunRecord run = CreateAutomaticRun(snapshotId, withPhase: true);
+
+        ScheduleWorkspaceSnapshot current = await ExecuteSuccessfully(
+            new FakeScheduleWorkspaceReader(
+                ScheduleWorkspaceTestContext.CreateReadDataForDraft(
+                    currentDraft,
+                    preparedSnapshot: prepared,
+                    automaticScheduleRun: run)));
+
+        AcceptedAutomaticScheduleSnapshot accepted = Assert.IsType<
+            AcceptedAutomaticScheduleSnapshot>(current.AcceptedAutomaticSchedule);
+        Assert.Equal(AcceptedAutomaticScheduleReportStatus.Current, accepted.ReportStatus);
+        Assert.NotNull(accepted.Report);
+        Assert.Equal(snapshotId, accepted.Report.PlanningReport!.SnapshotId);
+
+        ScheduleDraft changedDraft = ScheduleWorkspaceTestContext.CreateDraft(version: 3);
+        ScheduleWorkspaceSnapshot changed = await ExecuteSuccessfully(
+            new FakeScheduleWorkspaceReader(
+                ScheduleWorkspaceTestContext.CreateReadDataForDraft(
+                    changedDraft,
+                    preparedSnapshot: prepared,
+                    automaticScheduleRun: run)));
+
+        AcceptedAutomaticScheduleSnapshot stale = Assert.IsType<
+            AcceptedAutomaticScheduleSnapshot>(changed.AcceptedAutomaticSchedule);
+        Assert.Equal(
+            AcceptedAutomaticScheduleReportStatus.ChangedAfterGeneration,
+            stale.ReportStatus);
+        Assert.Null(stale.Report);
+    }
+
+    [Fact]
+    public async Task ExecuteProjectsTerminationExplanationFromStoredRun()
+    {
+        Guid snapshotId = Guid.NewGuid();
+        ScheduleDraft currentDraft = ScheduleWorkspaceTestContext.CreateDraft(version: 2);
+        PlanningInputSnapshot prepared = CreateMinimalPreparedSnapshot(
+            snapshotId,
+            currentDraft.Id.Value,
+            1);
+        AutomaticSchedulePhaseSnapshot[] phases =
+        [
+            new AutomaticSchedulePhaseSnapshot(
+                AutomaticSchedulePhaseKind.InputValidation,
+                AutomaticSchedulePhaseStatus.Completed,
+                TimeSpan.FromMilliseconds(1)),
+            new AutomaticSchedulePhaseSnapshot(
+                AutomaticSchedulePhaseKind.RegularCoverage,
+                AutomaticSchedulePhaseStatus.Interrupted,
+                TimeSpan.FromSeconds(120),
+                termination: new AutomaticSchedulePhaseTerminationSnapshot(
+                    AutomaticSchedulePhaseTerminationReason
+                        .TimeLimitWithFeasibleSelection,
+                    AutomaticScheduleOptimizationTargetKind.RegularCoveredMinutes,
+                    TimeSpan.FromSeconds(120),
+                    TimeSpan.FromMilliseconds(120_011))),
+        ];
+        AutomaticScheduleRunRecord run = CreateAutomaticRun(
+            snapshotId,
+            resultStatus: AutomaticSchedulePlanningStatus.FeasibleNotProvenOptimal,
+            phases: phases);
+
+        ScheduleWorkspaceSnapshot current = await ExecuteSuccessfully(
+            new FakeScheduleWorkspaceReader(
+                ScheduleWorkspaceTestContext.CreateReadDataForDraft(
+                    currentDraft,
+                    preparedSnapshot: prepared,
+                    automaticScheduleRun: run)));
+
+        AcceptedAutomaticScheduleSnapshot accepted = Assert.IsType<
+            AcceptedAutomaticScheduleSnapshot>(current.AcceptedAutomaticSchedule);
+        AutomaticScheduleGenerationReport report = Assert.IsType<
+            AutomaticScheduleGenerationReport>(accepted.Report);
+        AutomaticScheduleGenerationPhaseReportSnapshot regular = Assert.Single(
+            report.PhaseReports,
+            phase => phase.Kind == AutomaticSchedulePhaseKind.RegularCoverage);
+        Assert.Contains("Zeitgrenze von 120,000 s", regular.Explanation);
+        Assert.Contains("regulär gedeckte Mitarbeiterminuten", regular.Explanation);
+        AutomaticScheduleGenerationPhaseReportSnapshot following = Assert.Single(
+            report.PhaseReports,
+            phase => phase.Kind == AutomaticSchedulePhaseKind.ReliefCoverage);
+        Assert.Contains("Nicht begonnen", following.Explanation);
+        Assert.Contains("Reguläre Bedarfsdeckung", following.Explanation);
     }
 
     [Fact]
@@ -356,18 +456,29 @@ public sealed class GetScheduleWorkspaceQueryTests
             TestContext.Current.CancellationToken);
     }
 
-    private static AutomaticScheduleRunRecord CreateAutomaticRun()
+    private static AutomaticScheduleRunRecord CreateAutomaticRun(
+        Guid? snapshotId = null,
+        bool withPhase = false,
+        AutomaticSchedulePlanningStatus resultStatus =
+            AutomaticSchedulePlanningStatus.Optimal,
+        IEnumerable<AutomaticSchedulePhaseSnapshot>? phases = null)
     {
         AutomaticScheduleRunMetadata metadata = new(
             "Synthetischer Testsolver",
             "1.0",
-            AutomaticSchedulePlanningStatus.Optimal,
+            resultStatus,
             TimeSpan.FromMinutes(2),
             TimeSpan.Zero,
             TimeSpan.Zero,
             TimeSpan.Zero,
             TimeSpan.Zero,
-            []);
+            [],
+            phases ?? (withPhase
+                ? [new AutomaticSchedulePhaseSnapshot(
+                    AutomaticSchedulePhaseKind.InputValidation,
+                    AutomaticSchedulePhaseStatus.Completed,
+                    TimeSpan.Zero)]
+                : []));
         AutomaticScheduleObjectiveSnapshot objective = new(
             0,
             0,
@@ -376,6 +487,49 @@ public sealed class GetScheduleWorkspaceQueryTests
             [],
             [],
             []);
-        return new AutomaticScheduleRunRecord(Guid.NewGuid(), metadata, objective);
+        return new AutomaticScheduleRunRecord(
+            snapshotId ?? Guid.NewGuid(),
+            metadata,
+            objective);
+    }
+
+    private static PlanningInputSnapshot CreateMinimalPreparedSnapshot(
+        Guid snapshotId,
+        Guid draftId,
+        long draftVersion)
+    {
+        return new PlanningInputSnapshot(
+            snapshotId,
+            draftId,
+            draftVersion,
+            ScheduleWorkspaceTestContext.PeriodMonday,
+            ScheduleWorkspaceTestContext.PeriodMonday.AddDays(20),
+            [],
+            [],
+            new PlanningServiceCatalogSnapshot(
+                [],
+                [],
+                new PlanningSplitShiftPatternSnapshot(
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    180,
+                    600),
+                new PlanningReliefShiftPatternSnapshot(
+                    Guid.NewGuid(),
+                    DayOfWeek.Saturday,
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    ReliefShiftSwitchRule.EndOfFirstActualDemand,
+                    false)),
+            [],
+            [],
+            [],
+            new RuleCatalogSnapshot(1, []),
+            PlanningRunOptions.Default,
+            new PlanningHistorySnapshot(PlanningHistoryCompleteness.Missing, []));
     }
 }

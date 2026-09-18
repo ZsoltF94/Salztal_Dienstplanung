@@ -78,12 +78,25 @@ internal sealed class AutomaticSchedulePlanningEngine : IAutomaticSchedulePlanni
     {
         Stopwatch totalStopwatch = Stopwatch.StartNew();
         PlanningEngineStage stage = PlanningEngineStage.ModelBuilding;
+        List<AutomaticSchedulePhaseSnapshot> phases = [];
+        Stopwatch stageStopwatch = Stopwatch.StartNew();
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
-            Stopwatch stageStopwatch = Stopwatch.StartNew();
             PlanningCandidateSet candidates = candidateBuilder(request.Snapshot);
             TimeSpan modelBuildDuration = stageStopwatch.Elapsed;
+            phases.Add(new AutomaticSchedulePhaseSnapshot(
+                AutomaticSchedulePhaseKind.ModelBuilding,
+                AutomaticSchedulePhaseStatus.Completed,
+                modelBuildDuration,
+                [
+                    new AutomaticSchedulePhaseValue(
+                        "candidate_count",
+                        candidates.Candidates.Count),
+                    new AutomaticSchedulePhaseValue(
+                        "remaining_demand_count",
+                        candidates.RemainingDemands.Count),
+                ]));
 
             stage = PlanningEngineStage.Solving;
             AutomaticScheduleOptimizationRun run = optimizationRunner.Optimize(
@@ -91,6 +104,7 @@ internal sealed class AutomaticSchedulePlanningEngine : IAutomaticSchedulePlanni
                 candidates,
                 request.TimeLimit,
                 cancellationToken);
+            phases.AddRange(run.Phases);
             cancellationToken.ThrowIfCancellationRequested();
 
             stage = PlanningEngineStage.Mapping;
@@ -99,6 +113,15 @@ internal sealed class AutomaticSchedulePlanningEngine : IAutomaticSchedulePlanni
                 request.Snapshot,
                 run.Result);
             TimeSpan mappingDuration = stageStopwatch.Elapsed;
+            phases.Add(new AutomaticSchedulePhaseSnapshot(
+                AutomaticSchedulePhaseKind.ResultMapping,
+                AutomaticSchedulePhaseStatus.Completed,
+                mappingDuration,
+                [
+                    new AutomaticSchedulePhaseValue(
+                        "assignment_count",
+                        prepared.Assignments.Count),
+                ]));
             AutomaticScheduleRunMetadata metadata = CreateMetadata(
                 request.TimeLimit,
                 modelBuildDuration,
@@ -107,7 +130,8 @@ internal sealed class AutomaticSchedulePlanningEngine : IAutomaticSchedulePlanni
                     ? AutomaticSchedulePlanningStatus.Optimal
                     : AutomaticSchedulePlanningStatus.FeasibleNotProvenOptimal,
                 mappingDuration,
-                totalStopwatch.Elapsed);
+                totalStopwatch.Elapsed,
+                phases);
             AutomaticScheduleProposal proposal = proposalMapper.Complete(
                 request.Snapshot,
                 run.Result,
@@ -121,8 +145,44 @@ internal sealed class AutomaticSchedulePlanningEngine : IAutomaticSchedulePlanni
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
+            AddTerminalPhase(
+                phases,
+                stage,
+                AutomaticSchedulePhaseStatus.Interrupted,
+                stageStopwatch.Elapsed,
+                AutomaticSchedulePhaseTerminationReason.CancellationRequested);
             return AutomaticSchedulePlanningResult.Failure(
-                AutomaticSchedulePlanningStatus.Cancelled);
+                AutomaticSchedulePlanningStatus.Cancelled,
+                phases: phases);
+        }
+        catch (AutomaticScheduleOptimizationFailureException exception)
+        {
+            phases.AddRange(exception.Phases);
+            Exception cause = exception.InnerException ?? exception;
+            if (cause is OperationCanceledException
+                && cancellationToken.IsCancellationRequested)
+            {
+                return AutomaticSchedulePlanningResult.Failure(
+                    AutomaticSchedulePlanningStatus.Cancelled,
+                    phases: phases);
+            }
+
+            if (cause is PlanningTimeLimitWithoutFeasibleSelectionException)
+            {
+                return AutomaticSchedulePlanningResult.Failure(
+                    AutomaticSchedulePlanningStatus.TimedOutWithoutFeasibleResult,
+                    phases: phases);
+            }
+
+            AutomaticScheduleErrorCode code = cause is UnexpectedPlanningSolverStatusException
+                ? AutomaticScheduleErrorCode.UnexpectedSolverStatus
+                : AutomaticScheduleErrorCode.TechnicalFailure;
+            return Failure(
+                AutomaticSchedulePlanningStatus.TechnicalFailure,
+                code,
+                cause,
+                stage,
+                phases);
         }
         catch (PlanningTimeLimitWithoutFeasibleSelectionException)
         {
@@ -135,7 +195,8 @@ internal sealed class AutomaticSchedulePlanningEngine : IAutomaticSchedulePlanni
                 AutomaticSchedulePlanningStatus.TechnicalFailure,
                 AutomaticScheduleErrorCode.UnexpectedSolverStatus,
                 exception,
-                stage);
+                stage,
+                phases);
         }
         catch (InvalidOperationException exception)
             when (stage == PlanningEngineStage.Mapping)
@@ -144,7 +205,8 @@ internal sealed class AutomaticSchedulePlanningEngine : IAutomaticSchedulePlanni
                 AutomaticSchedulePlanningStatus.TechnicalFailure,
                 AutomaticScheduleErrorCode.ResultValidationFailed,
                 exception,
-                stage);
+                stage,
+                phases);
         }
         catch (Exception exception)
         {
@@ -152,7 +214,8 @@ internal sealed class AutomaticSchedulePlanningEngine : IAutomaticSchedulePlanni
                 AutomaticSchedulePlanningStatus.TechnicalFailure,
                 AutomaticScheduleErrorCode.TechnicalFailure,
                 exception,
-                stage);
+                stage,
+                phases);
         }
     }
 
@@ -162,7 +225,8 @@ internal sealed class AutomaticSchedulePlanningEngine : IAutomaticSchedulePlanni
         AutomaticScheduleOptimizationRun run,
         AutomaticSchedulePlanningStatus resultStatus,
         TimeSpan mappingDuration,
-        TimeSpan elapsed)
+        TimeSpan elapsed,
+        IEnumerable<AutomaticSchedulePhaseSnapshot> phases)
     {
         TimeSpan measured = modelBuildDuration
             + run.OptimizationDuration
@@ -181,7 +245,8 @@ internal sealed class AutomaticSchedulePlanningEngine : IAutomaticSchedulePlanni
                 new AutomaticScheduleSetting("random_seed", "0"),
                 new AutomaticScheduleSetting("search_branching", "FIXED_SEARCH_FOR_TIE_BREAK"),
                 new AutomaticScheduleSetting("optimization_stages", OptimizationStages),
-            ]);
+            ],
+            phases);
     }
 
     private static AutomaticSchedulePlanningResult Failure(
@@ -196,7 +261,16 @@ internal sealed class AutomaticSchedulePlanningEngine : IAutomaticSchedulePlanni
         AutomaticSchedulePlanningStatus status,
         AutomaticScheduleErrorCode code,
         Exception exception,
-        PlanningEngineStage stage) => AutomaticSchedulePlanningResult.Failure(
+        PlanningEngineStage stage,
+        List<AutomaticSchedulePhaseSnapshot> phases)
+    {
+        AddTerminalPhase(
+            phases,
+            stage,
+            AutomaticSchedulePhaseStatus.Failed,
+            TimeSpan.Zero,
+            AutomaticSchedulePhaseTerminationReason.TechnicalFailure);
+        return AutomaticSchedulePlanningResult.Failure(
             status,
             [new AutomaticScheduleError(
                 code,
@@ -205,7 +279,36 @@ internal sealed class AutomaticSchedulePlanningEngine : IAutomaticSchedulePlanni
                 TechnicalDetails:
                     AutomaticScheduleTechnicalFailureDetails.FromException(
                         MapTechnicalStage(stage),
-                        exception))]);
+                        exception))],
+            phases);
+    }
+
+    private static void AddTerminalPhase(
+        List<AutomaticSchedulePhaseSnapshot> phases,
+        PlanningEngineStage stage,
+        AutomaticSchedulePhaseStatus status,
+        TimeSpan duration,
+        AutomaticSchedulePhaseTerminationReason terminationReason)
+    {
+        AutomaticSchedulePhaseKind kind = stage switch
+        {
+            PlanningEngineStage.ModelBuilding => AutomaticSchedulePhaseKind.ModelBuilding,
+            PlanningEngineStage.Solving => AutomaticSchedulePhaseKind.HardRules,
+            PlanningEngineStage.Mapping => AutomaticSchedulePhaseKind.ResultMapping,
+            _ => throw new ArgumentOutOfRangeException(nameof(stage)),
+        };
+        if (phases.Any(value => value.Kind == kind))
+        {
+            return;
+        }
+
+        phases.Add(new AutomaticSchedulePhaseSnapshot(
+            kind,
+            status,
+            duration,
+            termination: new AutomaticSchedulePhaseTerminationSnapshot(
+                terminationReason)));
+    }
 
     private static AutomaticScheduleTechnicalStage MapTechnicalStage(
         PlanningEngineStage stage) => stage switch

@@ -28,6 +28,8 @@ public sealed class SqliteServiceCatalogStoreTests
         "20260917125952_AddAutomaticScheduleRuns";
     private const string JointOptimizationDurationsMigration =
         "20260917173925_RenameJointOptimizationDurations";
+    private const string AutomaticSchedulePhasesMigration =
+        "20260918164237_PersistAutomaticSchedulePhases";
 
     [Fact]
     public async Task InitializeAsyncOnEmptyDatabaseCreatesMigrationAndCompleteInitialCatalog()
@@ -72,7 +74,7 @@ public sealed class SqliteServiceCatalogStoreTests
         await store.InitializeAsync(TestContext.Current.CancellationToken);
         await store.InitializeAsync(TestContext.Current.CancellationToken);
 
-        Assert.Equal(9L, await ExecuteScalarAsync(
+        Assert.Equal(10L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM __EFMigrationsHistory;"));
         Assert.Equal(2L, await ExecuteScalarAsync(
@@ -142,6 +144,7 @@ public sealed class SqliteServiceCatalogStoreTests
                 SchedulingMigration + "|10.0.12",
                 AutomaticScheduleRunsMigration + "|10.0.12",
                 JointOptimizationDurationsMigration + "|10.0.12",
+                AutomaticSchedulePhasesMigration + "|10.0.12",
             ],
             await ReadMigrationHistoryAsync(database.Path));
         Assert.Equal(

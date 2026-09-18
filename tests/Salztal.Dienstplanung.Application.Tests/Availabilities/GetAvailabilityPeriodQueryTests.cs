@@ -1,4 +1,5 @@
 using Salztal.Dienstplanung.Application.Availabilities;
+using Salztal.Dienstplanung.Application.Employees;
 using Salztal.Dienstplanung.Domain.Availabilities;
 using Salztal.Dienstplanung.Domain.Employees;
 
@@ -60,8 +61,46 @@ public sealed class GetAvailabilityPeriodQueryTests
         Assert.Equal(type.Id.Value, row.EmployeeTypeId);
         Assert.Equal("Typ25", row.EmployeeTypeCode);
         Assert.Equal("Restaurant - 25 Stunden", row.EmployeeTypeName);
+        Assert.Equal(EmployeeTypePlanningRoleKind.Normal, row.PlanningRole);
         Assert.True(row.AllowsVacationAndSickness);
         Assert.Equal(300, row.AbsenceDayValueMinutes);
+    }
+
+    [Fact]
+    public async Task ExecuteProjectsEveryEmployeeTypePlanningRole()
+    {
+        Guid serviceManagementId = new("1462617e-f0c8-45df-b90f-e58be36a302c");
+        Guid auxiliaryId = new("848338fd-6a72-4c20-8265-bab9dd91c469");
+        Employee normal = CreateEmployee(
+            EmployeeIdentifier,
+            InitialEmployeeTypeCatalog.Type25,
+            true);
+        Employee serviceManagement = CreateEmployee(
+            serviceManagementId,
+            InitialEmployeeTypeCatalog.Type1,
+            true);
+        Employee auxiliary = CreateEmployee(
+            auxiliaryId,
+            InitialEmployeeTypeCatalog.TypeAh1,
+            true);
+        FakeAvailabilityReader reader = new(CreateReadData(
+            [normal, serviceManagement, auxiliary],
+            [
+                InitialEmployeeTypeCatalog.Type25,
+                InitialEmployeeTypeCatalog.Type1,
+                InitialEmployeeTypeCatalog.TypeAh1,
+            ],
+            []));
+
+        AvailabilityPeriodSnapshot period = await ExecuteSuccessfully(reader);
+
+        Dictionary<Guid, EmployeeTypePlanningRoleKind> roles = period.Employees
+            .ToDictionary(employee => employee.EmployeeId, employee => employee.PlanningRole);
+        Assert.Equal(EmployeeTypePlanningRoleKind.Normal, roles[EmployeeIdentifier]);
+        Assert.Equal(
+            EmployeeTypePlanningRoleKind.ServiceManagement,
+            roles[serviceManagementId]);
+        Assert.Equal(EmployeeTypePlanningRoleKind.Auxiliary, roles[auxiliaryId]);
     }
 
     [Fact]

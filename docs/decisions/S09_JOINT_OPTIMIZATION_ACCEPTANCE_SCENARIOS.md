@@ -37,7 +37,7 @@ Die Service-Leitung prüft diese Fälle weiterhin vor AG-15:
 4. Sind `D` in Fall D und die sichtbare Teildeckung bei `Spr` in Fall E verständlich?
 5. Zeigt die laufende WPF-App Start, Laufzustand, Abbruch, Vorschau, offene Bedarfe, schwarze `X`, Übernehmen, Verwerfen und vollständiges Zurücksetzen wie erwartet?
 
-Die erneute sichtbare Generierung funktioniert, ihre Ergebnisqualität ist jedoch ausdrücklich noch nicht angenommen. Deshalb bleibt der produktive Generator zunächst unverändert. Nach dem reinen UI-Umbau S09A wird ein eigener S09B-Planungsqualitätsbericht geplant und am eingefrorenen Ausgangsstand ausgeführt. Erst auf Grundlage dieses Berichts entsteht ein eigener abgenommener Plan für gezielte Optimierungen oder den Rückfall.
+Die erneute sichtbare Generierung funktioniert, ihre Ergebnisqualität ist jedoch ausdrücklich noch nicht angenommen. Deshalb bleibt der produktive Generator zunächst unverändert. Der reine UI-Umbau S09A ist abgeschlossen. Der S09B-Fragenkatalog ist vollständig beantwortet und die Roadmap auf die bestätigten Berichtskennzahlen, Fehlerberichte und das eigene nicht-modale Fenster angepasst; ihre gemeinsame ausdrückliche Abnahme steht noch aus. Erst der anschließend am eingefrorenen Ausgangsstand ausgeführte Bericht begründet einen eigenen abgenommenen Plan für gezielte Optimierungen oder den Rückfall.
 
 Danach ist genau eine ausdrückliche Entscheidung über den endgültig vorgesehenen Algorithmus erforderlich:
 

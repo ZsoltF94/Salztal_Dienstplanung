@@ -47,6 +47,10 @@ public sealed class AutomaticSchedulePlannerTests
         Assert.Equal(expectedStatus, result.Status);
         Assert.Equal(0, engine.CallCount);
         Assert.NotEmpty(result.Errors);
+        AutomaticSchedulePhaseSnapshot phase = Assert.Single(result.Phases);
+        Assert.Equal(AutomaticSchedulePhaseKind.InputValidation, phase.Kind);
+        Assert.Equal(AutomaticSchedulePhaseStatus.Completed, phase.Status);
+        Assert.True(Assert.Single(phase.Values).Value > 0);
     }
 
     [Fact]
@@ -63,6 +67,9 @@ public sealed class AutomaticSchedulePlannerTests
 
         Assert.Equal(AutomaticSchedulePlanningStatus.TechnicalFailure, result.Status);
         Assert.Equal(1, engine.CallCount);
+        Assert.Equal(
+            AutomaticSchedulePhaseKind.InputValidation,
+            Assert.Single(result.Phases).Kind);
     }
 
     [Fact]
@@ -80,6 +87,12 @@ public sealed class AutomaticSchedulePlannerTests
         Assert.Equal(AutomaticSchedulePlanningStatus.Cancelled, result.Status);
         Assert.Equal(0, engine.CallCount);
         Assert.Empty(result.Errors);
+        Assert.Equal(
+            AutomaticSchedulePhaseStatus.Interrupted,
+            Assert.Single(result.Phases).Status);
+        Assert.Equal(
+            AutomaticSchedulePhaseTerminationReason.CancellationRequested,
+            Assert.Single(result.Phases).Termination?.Reason);
     }
 
     [Fact]
@@ -145,6 +158,9 @@ public sealed class AutomaticSchedulePlannerTests
             AutomaticScheduleTechnicalStage.PlanningBoundary,
             error.TechnicalDetails?.Stage);
         Assert.DoesNotContain(SensitiveMessage, string.Join('|', result.Errors));
+        Assert.Equal(
+            AutomaticSchedulePhaseTerminationReason.TechnicalFailure,
+            Assert.Single(result.Phases).Termination?.Reason);
     }
 
     private static PlanningInputSnapshot CreateWithUnprotectedAssignment()

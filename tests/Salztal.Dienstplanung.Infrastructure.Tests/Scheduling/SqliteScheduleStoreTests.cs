@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -11,6 +12,8 @@ using Salztal.Dienstplanung.Domain.Availabilities;
 using Salztal.Dienstplanung.Domain.Employees;
 using Salztal.Dienstplanung.Domain.Rules;
 using Salztal.Dienstplanung.Domain.Scheduling;
+using Salztal.Dienstplanung.Domain.Scheduling.Evaluation;
+using Salztal.Dienstplanung.Domain.Scheduling.Optimization;
 using Salztal.Dienstplanung.Domain.ShiftTypes;
 using Salztal.Dienstplanung.Domain.StaffingDemands;
 using Salztal.Dienstplanung.Infrastructure.Persistence.Availabilities;
@@ -54,7 +57,7 @@ public sealed class SqliteScheduleStoreTests
 
         await store.InitializeAsync(TestContext.Current.CancellationToken);
 
-        Assert.Equal(9L, await ExecuteScalarAsync(
+        Assert.Equal(10L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM __EFMigrationsHistory;"));
         Assert.Equal(1L, await ExecuteScalarAsync(
@@ -91,7 +94,7 @@ public sealed class SqliteScheduleStoreTests
         await new SqliteScheduleStore(database.Path).InitializeAsync(
             TestContext.Current.CancellationToken);
 
-        Assert.Equal(9L, await ExecuteScalarAsync(
+        Assert.Equal(10L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM __EFMigrationsHistory;"));
         Assert.Equal(1L, await ExecuteScalarAsync(
@@ -109,7 +112,7 @@ public sealed class SqliteScheduleStoreTests
     }
 
     [Fact]
-    public async Task JointDurationMigrationPreservesBothHistoricalPhaseDurations()
+    public async Task UpgradeFromAutomaticScheduleRunsPreservesDurationsAndInitializesEmptyPhases()
     {
         using TemporarySqliteDatabase database = new();
         Guid draftId = new("a77b5cab-e1a1-4cd3-8aa8-dd16159498a3");
@@ -142,6 +145,9 @@ public sealed class SqliteScheduleStoreTests
         Assert.Equal(300L, await ExecuteScalarAsync(
             database.Path,
             "SELECT LegacyPhaseDurationTicks FROM AutomaticScheduleRuns;"));
+        Assert.Equal(1L, await ExecuteScalarAsync(
+            database.Path,
+            "SELECT COUNT(*) FROM AutomaticScheduleRuns WHERE PhasesPayload = '[]';"));
         Assert.Equal(1L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM ScheduleDrafts WHERE Version = 3;"));
@@ -414,7 +420,7 @@ public sealed class SqliteScheduleStoreTests
             draft,
             snapshot.Id,
             dayOffset: 2,
-            seed: 1);
+            seed: 2);
 
         AcceptAutomaticScheduleProposalStoreResult result = await store.AcceptAsync(
             change,
@@ -449,6 +455,115 @@ public sealed class SqliteScheduleStoreTests
         Assert.Equal(195L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM ScheduleDemandSlots;"));
+    }
+
+    [Fact]
+    public async Task LegacyPhasePayloadWithoutTerminationRemainsReadable()
+    {
+        using TemporarySqliteDatabase database = new();
+        SqliteScheduleStore store = await InitializeAsync(
+            database.Path,
+            createServiceManagementEmployee: true);
+        ScheduleDraft draft = await CreateReadyDraftAsync(store);
+        PlanningInputSnapshot snapshot = await PrepareAsync(
+            store,
+            draft,
+            null,
+            PlanningRunOptions.Default);
+        AcceptAutomaticScheduleProposalChange change = CreateAutomaticChange(
+            draft,
+            snapshot.Id,
+            dayOffset: 2,
+            seed: 2);
+        await store.AcceptAsync(change, TestContext.Current.CancellationToken);
+        const string legacyPayload =
+            "[{\"Kind\":0,\"Status\":0,\"DurationTicks\":100000,\"Values\":[]},"
+            + "{\"Kind\":3,\"Status\":2,\"DurationTicks\":1200000000,"
+            + "\"Values\":[{\"Key\":\"required_minutes\",\"Value\":240},"
+            + "{\"Key\":\"uncovered_minutes\",\"Value\":120}]}]";
+        await ExecuteNonQueryAsync(
+            database.Path,
+            "UPDATE AutomaticScheduleRuns SET PhasesPayload = '"
+            + legacyPayload
+            + "';");
+
+        ScheduleWorkspaceReadData reloaded = await ((IScheduleWorkspaceReader)
+            new SqliteScheduleStore(database.Path)).LoadAsync(
+                draft.Period,
+                TestContext.Current.CancellationToken);
+
+        AutomaticScheduleRunRecord run = Assert.IsType<AutomaticScheduleRunRecord>(
+            reloaded.AutomaticScheduleRun);
+        Assert.Equal(
+            AutomaticSchedulePhaseTraceCompleteness.Complete,
+            run.Metadata.PhaseTraceCompleteness);
+        AutomaticSchedulePhaseSnapshot interrupted = Assert.Single(
+            run.Metadata.Phases,
+            phase => phase.Kind == AutomaticSchedulePhaseKind.RegularCoverage);
+        Assert.Equal(AutomaticSchedulePhaseStatus.Interrupted, interrupted.Status);
+        Assert.Null(interrupted.Termination);
+        Assert.Equal(
+            AutomaticSchedulePhaseDetailAvailability.TerminationDetailsNotRecorded,
+            interrupted.DetailAvailability);
+    }
+
+    [Fact]
+    public async Task GenerationAcceptanceAndWorkspaceReloadKeepTerminationDetails()
+    {
+        using TemporarySqliteDatabase database = new();
+        SqliteScheduleStore store = await InitializeAsync(
+            database.Path,
+            createServiceManagementEmployee: true);
+        ScheduleDraft draft = await CreateReadyDraftAsync(store);
+        PlanningInputSnapshot snapshot = await PrepareAsync(
+            store,
+            draft,
+            null,
+            PlanningRunOptions.Default);
+        AutomaticScheduleProposal proposal = CreateInterruptedProposal(snapshot);
+        GenerateAutomaticScheduleCommand generationCommand = new(
+            store,
+            new FixedPlanner(AutomaticSchedulePlanningResult.Success(
+                AutomaticSchedulePlanningStatus.FeasibleNotProvenOptimal,
+                proposal)));
+
+        AutomaticScheduleGenerationResult generation = await generationCommand.ExecuteAsync(
+            new GenerateAutomaticScheduleRequest(
+                draft.Id.Value,
+                draft.Version.Value,
+                draft.Period.StartMonday,
+                snapshot.Id),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            AutomaticScheduleGenerationStatus.FeasibleNotProvenOptimal,
+            generation.Status);
+        AutomaticSchedulePreview preview = Assert.IsType<AutomaticSchedulePreview>(
+            generationCommand.CurrentPreview);
+        AssertPhaseTerminationEqual(
+            proposal.Metadata.Phases,
+            preview.Proposal.Metadata.Phases);
+        AutomaticScheduleAcceptanceResult acceptance = await
+            new AcceptAutomaticScheduleProposalCommand(store, store).ExecuteAsync(
+                new AcceptAutomaticScheduleProposalRequest(
+                    draft.Period.StartMonday,
+                    preview.Proposal),
+                TestContext.Current.CancellationToken);
+        Assert.Equal(AutomaticScheduleAcceptanceStatus.Succeeded, acceptance.Status);
+
+        ScheduleWorkspaceReadData reloaded = await ((IScheduleWorkspaceReader)
+            new SqliteScheduleStore(database.Path)).LoadAsync(
+                draft.Period,
+                TestContext.Current.CancellationToken);
+
+        AutomaticScheduleRunRecord run = Assert.IsType<AutomaticScheduleRunRecord>(
+            reloaded.AutomaticScheduleRun);
+        AssertPhaseTerminationEqual(
+            preview.Proposal.Metadata.Phases,
+            run.Metadata.Phases);
+        Assert.Equal(1L, await ExecuteScalarAsync(
+            database.Path,
+            "SELECT COUNT(*) FROM AutomaticScheduleRuns;"));
     }
 
     [Fact]
@@ -983,6 +1098,101 @@ public sealed class SqliteScheduleStoreTests
         Assert.Empty(reloaded.ExactDraft!.Assignments);
     }
 
+    private static AutomaticScheduleProposal CreateInterruptedProposal(
+        PlanningInputSnapshot snapshot)
+    {
+        HashSet<(Guid SourceId, DateOnly Date, Guid WorkLocationId,
+            Guid ShiftTypeId, int Ordinal)> covered = snapshot
+            .ServiceManagementAssignments
+            .SelectMany(assignment => assignment.Coverages)
+            .Select(coverage => (
+                coverage.DemandSourceId,
+                coverage.Date,
+                coverage.WorkLocationId,
+                coverage.ShiftTypeId,
+                coverage.Ordinal))
+            .ToHashSet();
+        AutomaticScheduleOpenDemand[] openDemands = snapshot.DemandSlots
+            .Where(demand => !covered.Contains((
+                demand.SourceId,
+                demand.Date,
+                demand.WorkLocationId,
+                demand.ShiftTypeId,
+                demand.Ordinal)))
+            .Select(demand => new AutomaticScheduleOpenDemand(
+                demand.SourceId,
+                demand.Date,
+                demand.WorkLocationId,
+                demand.ShiftTypeId,
+                demand.Ordinal,
+                demand.ActualStart,
+                demand.ActualEnd,
+                demand.DurationMinutes,
+                AutomaticScheduleOpenDemandKind.FullyUncovered))
+            .ToArray();
+        RuleCatalog catalog = Assert.IsType<RuleCatalog>(
+            InitialRuleCatalog.Read(InitialRuleCatalog.Version).Value);
+        ScheduleRuleEvaluationSet evaluations = new(
+            catalog,
+            catalog.Definitions.Select(definition => RuleEvaluationResult.Create(
+                definition.Id,
+                RuleEvaluationStatus.Satisfied,
+                NoRuleResultParameters.Instance)));
+        ScheduleObjectiveVector objective = new(
+            openDemands.Sum(demand => demand.UncoveredMinutes),
+            openDemands.Length,
+            RuleViolationSet.Empty,
+            RuleViolationSet.Empty,
+            RuleViolationSet.Empty,
+            RuleViolationSet.Empty,
+            []);
+        AutomaticScheduleRunMetadata metadata = new(
+            "Synthetic interrupted solver",
+            "10.0.3",
+            AutomaticSchedulePlanningStatus.FeasibleNotProvenOptimal,
+            TimeSpan.FromSeconds(120),
+            TimeSpan.FromMilliseconds(25),
+            TimeSpan.FromSeconds(120),
+            TimeSpan.FromMilliseconds(5),
+            TimeSpan.FromMilliseconds(120_050),
+            [new AutomaticScheduleSetting("workers", "1")],
+            [
+                new AutomaticSchedulePhaseSnapshot(
+                    AutomaticSchedulePhaseKind.InputValidation,
+                    AutomaticSchedulePhaseStatus.Completed,
+                    TimeSpan.FromMilliseconds(20)),
+                new AutomaticSchedulePhaseSnapshot(
+                    AutomaticSchedulePhaseKind.RegularCoverage,
+                    AutomaticSchedulePhaseStatus.Interrupted,
+                    TimeSpan.FromSeconds(120),
+                    [
+                        new AutomaticSchedulePhaseValue(
+                            "required_minutes",
+                            snapshot.DemandSlots.Sum(demand => demand.DurationMinutes)),
+                        new AutomaticSchedulePhaseValue(
+                            "uncovered_minutes",
+                            openDemands.Sum(demand => demand.UncoveredMinutes)),
+                    ],
+                    new AutomaticSchedulePhaseTerminationSnapshot(
+                        AutomaticSchedulePhaseTerminationReason
+                            .TimeLimitWithFeasibleSelection,
+                        AutomaticScheduleOptimizationTargetKind
+                            .RegularTouchedDemandSlots,
+                        TimeSpan.FromSeconds(120),
+                        TimeSpan.FromMilliseconds(120_005))),
+            ]);
+        return new AutomaticScheduleProposal(
+            snapshot.Id,
+            snapshot.DraftId,
+            snapshot.DraftVersion,
+            [],
+            [],
+            openDemands,
+            objective,
+            evaluations,
+            metadata);
+    }
+
     private static AcceptAutomaticScheduleProposalChange CreateAutomaticChange(
         ScheduleDraft current,
         Guid snapshotId,
@@ -1020,6 +1230,35 @@ public sealed class SqliteScheduleStoreTests
                 new AutomaticScheduleSetting("random_seed", seed.ToString(
                     System.Globalization.CultureInfo.InvariantCulture)),
                 new AutomaticScheduleSetting("workers", "1"),
+            ],
+            [
+                new AutomaticSchedulePhaseSnapshot(
+                    AutomaticSchedulePhaseKind.InputValidation,
+                    AutomaticSchedulePhaseStatus.Completed,
+                    TimeSpan.FromMilliseconds(10 + seed)),
+                new AutomaticSchedulePhaseSnapshot(
+                    AutomaticSchedulePhaseKind.RegularCoverage,
+                    seed % 2 == 0
+                        ? AutomaticSchedulePhaseStatus.Interrupted
+                        : AutomaticSchedulePhaseStatus.Completed,
+                    TimeSpan.FromMilliseconds(20 + seed),
+                    [
+                        new AutomaticSchedulePhaseValue(
+                            "required_minutes",
+                            120 * seed),
+                        new AutomaticSchedulePhaseValue(
+                            "uncovered_minutes",
+                            60 * seed),
+                    ],
+                    seed % 2 == 0
+                        ? new AutomaticSchedulePhaseTerminationSnapshot(
+                            AutomaticSchedulePhaseTerminationReason
+                                .TimeLimitWithFeasibleSelection,
+                            AutomaticScheduleOptimizationTargetKind
+                                .RegularTouchedDemandSlots,
+                            TimeSpan.FromSeconds(120),
+                            TimeSpan.FromMilliseconds(120_000 + seed))
+                        : null),
             ]);
         AutomaticScheduleObjectiveSnapshot objective = new(
             120 * seed,
@@ -1101,6 +1340,32 @@ public sealed class SqliteScheduleStoreTests
             actual.Metadata.ResultMappingDuration);
         Assert.Equal(expected.Metadata.TotalDuration, actual.Metadata.TotalDuration);
         Assert.Equal(expected.Metadata.Settings, actual.Metadata.Settings);
+        Assert.Equal(expected.Metadata.Phases.Count, actual.Metadata.Phases.Count);
+        for (int index = 0; index < expected.Metadata.Phases.Count; index++)
+        {
+            AutomaticSchedulePhaseSnapshot expectedPhase = expected.Metadata.Phases[index];
+            AutomaticSchedulePhaseSnapshot actualPhase = actual.Metadata.Phases[index];
+            Assert.Equal(expectedPhase.Kind, actualPhase.Kind);
+            Assert.Equal(expectedPhase.Status, actualPhase.Status);
+            Assert.Equal(expectedPhase.Duration, actualPhase.Duration);
+            Assert.Equal(expectedPhase.Values, actualPhase.Values);
+            Assert.Equal(
+                expectedPhase.DetailAvailability,
+                actualPhase.DetailAvailability);
+            Assert.Equal(
+                expectedPhase.Termination?.Reason,
+                actualPhase.Termination?.Reason);
+            Assert.Equal(
+                expectedPhase.Termination?.ActiveTarget,
+                actualPhase.Termination?.ActiveTarget);
+            Assert.Equal(
+                expectedPhase.Termination?.TimeLimit,
+                actualPhase.Termination?.TimeLimit);
+            Assert.Equal(
+                expectedPhase.Termination?.BudgetElapsed,
+                actualPhase.Termination?.BudgetElapsed);
+        }
+
         Assert.Equal(
             expected.Objective.UncoveredEmployeeMinutes,
             actual.Objective.UncoveredEmployeeMinutes);
@@ -1134,6 +1399,35 @@ public sealed class SqliteScheduleStoreTests
         Assert.Equal(
             expected.Objective.TechnicalTieBreakerKeys,
             actual.Objective.TechnicalTieBreakerKeys);
+    }
+
+    private static void AssertPhaseTerminationEqual(
+        ReadOnlyCollection<AutomaticSchedulePhaseSnapshot> expected,
+        ReadOnlyCollection<AutomaticSchedulePhaseSnapshot> actual)
+    {
+        Assert.Equal(expected.Count, actual.Count);
+        for (int index = 0; index < expected.Count; index++)
+        {
+            Assert.Equal(expected[index].Kind, actual[index].Kind);
+            Assert.Equal(expected[index].Status, actual[index].Status);
+            Assert.Equal(expected[index].Duration, actual[index].Duration);
+            Assert.Equal(expected[index].Values, actual[index].Values);
+            Assert.Equal(
+                expected[index].DetailAvailability,
+                actual[index].DetailAvailability);
+            Assert.Equal(
+                expected[index].Termination?.Reason,
+                actual[index].Termination?.Reason);
+            Assert.Equal(
+                expected[index].Termination?.ActiveTarget,
+                actual[index].Termination?.ActiveTarget);
+            Assert.Equal(
+                expected[index].Termination?.TimeLimit,
+                actual[index].Termination?.TimeLimit);
+            Assert.Equal(
+                expected[index].Termination?.BudgetElapsed,
+                actual[index].Termination?.BudgetElapsed);
+        }
     }
 
     private static async Task<SqliteScheduleStore> InitializeAsync(
@@ -1420,6 +1714,18 @@ public sealed class SqliteScheduleStoreTests
     private static string DatabaseId(Guid id)
     {
         return id.ToString().ToUpperInvariant();
+    }
+
+    private sealed class FixedPlanner(AutomaticSchedulePlanningResult result)
+        : IAutomaticSchedulePlanner
+    {
+        public Task<AutomaticSchedulePlanningResult> PlanAsync(
+            AutomaticSchedulePlanningRequest request,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult(result);
+        }
     }
 
     private sealed class TemporarySqliteDatabase : IDisposable

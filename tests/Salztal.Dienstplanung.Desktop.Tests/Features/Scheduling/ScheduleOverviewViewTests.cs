@@ -525,6 +525,192 @@ public sealed class ScheduleOverviewViewTests
         });
     }
 
+    [Fact]
+    public void PlanningMouseWheelScrollsWorkspaceWithoutMovingPlanningScroller()
+    {
+        RunInSta(() =>
+        {
+            FakeScheduleDataAccess dataAccess = new(additionalNormalEmployees: 20);
+            ScheduleOverviewViewModel viewModel =
+                ScheduleOverviewViewModelTests.CreateViewModel(dataAccess);
+            viewModel.LoadAsync(CancellationToken.None).GetAwaiter().GetResult();
+            ScheduleOverviewView view = new()
+            {
+                DataContext = viewModel,
+            };
+            Window window = new()
+            {
+                Content = view,
+                Width = 900,
+                Height = 600,
+                WindowStyle = WindowStyle.None,
+                ShowInTaskbar = false,
+            };
+            try
+            {
+                window.Show();
+                window.Activate();
+                view.UpdateLayout();
+
+                ScrollViewer workspace = Assert.IsType<ScrollViewer>(
+                    FindNamedElement(view, "Dienstplan Arbeitsbereich"));
+                ScrollViewer planningScroller = Assert.IsType<ScrollViewer>(
+                    FindNamedElement(
+                        view,
+                        "Horizontaler Scrollbereich der Drei-Wochen-Planung"));
+                Assert.True(workspace.ScrollableHeight > 0);
+                Assert.True(planningScroller.ScrollableWidth > 0);
+                TextBlock planningContent = Assert.Single(
+                    GetVisualDescendants(planningScroller).OfType<TextBlock>(),
+                    text => text.Text == "Test Person 20");
+
+                planningScroller.ScrollToHorizontalOffset(120);
+                view.UpdateLayout();
+                double horizontalOffset = planningScroller.HorizontalOffset;
+
+                MouseWheelEventArgs scrollDown = RaiseMouseWheel(planningContent, -120);
+                view.UpdateLayout();
+
+                Assert.True(scrollDown.Handled);
+                Assert.True(workspace.VerticalOffset > 0);
+                Assert.Equal(0, planningScroller.VerticalOffset, 3);
+                Assert.Equal(horizontalOffset, planningScroller.HorizontalOffset, 3);
+
+                double scrolledDownOffset = workspace.VerticalOffset;
+                MouseWheelEventArgs scrollUp = RaiseMouseWheel(planningContent, 120);
+                view.UpdateLayout();
+
+                Assert.True(scrollUp.Handled);
+                Assert.True(workspace.VerticalOffset < scrolledDownOffset);
+                Assert.Equal(0, planningScroller.VerticalOffset, 3);
+                Assert.Equal(horizontalOffset, planningScroller.HorizontalOffset, 3);
+
+                workspace.ScrollToTop();
+                view.UpdateLayout();
+                RaiseMouseWheel(planningContent, 120);
+                view.UpdateLayout();
+                Assert.Equal(0, workspace.VerticalOffset, 3);
+
+                workspace.ScrollToEnd();
+                view.UpdateLayout();
+                RaiseMouseWheel(planningContent, -120);
+                view.UpdateLayout();
+                Assert.Equal(workspace.ScrollableHeight, workspace.VerticalOffset, 3);
+            }
+            finally
+            {
+                window.Close();
+            }
+        });
+    }
+
+    [Theory]
+    [MemberData(nameof(SupportedWindowSizes))]
+    public void PlanningTableRendersFourWeekBoundariesAcrossHeaderAndEmployeeRows(
+        double width,
+        double height)
+    {
+        RunInSta(() =>
+        {
+            FakeScheduleDataAccess dataAccess = new(additionalNormalEmployees: 3);
+            ScheduleOverviewViewModel viewModel =
+                ScheduleOverviewViewModelTests.CreateViewModel(dataAccess);
+            viewModel.LoadAsync(CancellationToken.None).GetAwaiter().GetResult();
+            ScheduleOverviewView view = new()
+            {
+                DataContext = viewModel,
+            };
+            Size size = new(width, height);
+            view.Measure(size);
+            view.Arrange(new Rect(size));
+            view.UpdateLayout();
+            Dispatcher.CurrentDispatcher.Invoke(
+                () => { },
+                DispatcherPriority.ApplicationIdle);
+            view.UpdateLayout();
+
+            Grid scheduleTable = Assert.IsType<Grid>(view.FindName("ScheduleTable"));
+            Border[] boundaries = GetVisualDescendants(scheduleTable)
+                .OfType<Border>()
+                .Where(border => Equals(border.Tag, "ScheduleWeekBoundary"))
+                .OrderBy(border => GetRight(border, scheduleTable))
+                .ToArray();
+
+            Assert.Equal(4, boundaries.Length);
+            double[] expectedBoundaryPositions = [226, 604, 982, 1360];
+            for (int index = 0; index < boundaries.Length; index++)
+            {
+                Border boundary = boundaries[index];
+                Assert.Equal(
+                    expectedBoundaryPositions[index],
+                    GetRight(boundary, scheduleTable),
+                    3);
+                Assert.Equal(3, boundary.ActualWidth, 3);
+                Assert.Equal(0, GetTop(boundary, scheduleTable), 3);
+                Assert.Equal(scheduleTable.ActualHeight, boundary.ActualHeight, 3);
+                Assert.False(boundary.IsHitTestVisible);
+            }
+            Assert.True(scheduleTable.ActualHeight > 54 * 4);
+
+            ScrollViewer planningScroller = Assert.IsType<ScrollViewer>(
+                FindNamedElement(
+                    view,
+                    "Horizontaler Scrollbereich der Drei-Wochen-Planung"));
+            Assert.Equal(ScrollBarVisibility.Auto, planningScroller.HorizontalScrollBarVisibility);
+            Assert.Equal(ScrollBarVisibility.Disabled, planningScroller.VerticalScrollBarVisibility);
+            Assert.True(planningScroller.ExtentWidth >= 1690);
+        });
+    }
+
+    [Theory]
+    [InlineData(true, 1)]
+    [InlineData(false, 0)]
+    public void PlanningTableRendersAuxiliaryBoundaryOnlyWhenAuxiliaryEmployeesExist(
+        bool includeAuxiliary,
+        int expectedVisibleBoundaries)
+    {
+        RunInSta(() =>
+        {
+            FakeScheduleDataAccess dataAccess = new(includeAuxiliary: includeAuxiliary);
+            ScheduleOverviewViewModel viewModel =
+                ScheduleOverviewViewModelTests.CreateViewModel(dataAccess);
+            viewModel.LoadAsync(CancellationToken.None).GetAwaiter().GetResult();
+            ScheduleOverviewView view = new()
+            {
+                DataContext = viewModel,
+            };
+            Size size = new(1920, 1080);
+            view.Measure(size);
+            view.Arrange(new Rect(size));
+            view.UpdateLayout();
+            Dispatcher.CurrentDispatcher.Invoke(
+                () => { },
+                DispatcherPriority.ApplicationIdle);
+            view.UpdateLayout();
+
+            Grid scheduleTable = Assert.IsType<Grid>(view.FindName("ScheduleTable"));
+            Border[] boundaries = GetVisualDescendants(scheduleTable)
+                .OfType<Border>()
+                .Where(border => Equals(border.Tag, "ScheduleAuxiliaryBoundary"))
+                .Where(border => border.Visibility == Visibility.Visible)
+                .ToArray();
+
+            Assert.Equal(expectedVisibleBoundaries, boundaries.Length);
+            if (includeAuxiliary)
+            {
+                Border boundary = Assert.Single(boundaries);
+                ScheduleEmployeeRowViewModel row =
+                    Assert.IsType<ScheduleEmployeeRowViewModel>(boundary.DataContext);
+                Assert.Equal(FakeScheduleDataAccess.AuxiliaryEmployeeId, row.EmployeeId);
+                Assert.True(row.ShowsAuxiliaryBoundary);
+                Assert.Equal(3, boundary.ActualHeight, 3);
+                Assert.Equal(1690, boundary.ActualWidth, 3);
+                Assert.Equal(1690, GetRight(boundary, scheduleTable), 3);
+                Assert.False(boundary.IsHitTestVisible);
+            }
+        });
+    }
+
     private static FrameworkElement FindNamedElement(
         DependencyObject parent,
         string automationName)
@@ -539,6 +725,14 @@ public sealed class ScheduleOverviewViewTests
         Visual ancestor)
     {
         return element.TransformToAncestor(ancestor).Transform(new Point()).Y;
+    }
+
+    private static double GetRight(
+        FrameworkElement element,
+        Visual ancestor)
+    {
+        return element.TransformToAncestor(ancestor).Transform(new Point()).X
+            + element.ActualWidth;
     }
 
     private static void RaiseEscape(FrameworkElement target)
@@ -557,6 +751,23 @@ public sealed class ScheduleOverviewViewTests
         target.RaiseEvent(escape);
 
         Assert.True(escape.Handled);
+    }
+
+    private static MouseWheelEventArgs RaiseMouseWheel(
+        FrameworkElement target,
+        int delta)
+    {
+        MouseWheelEventArgs mouseWheel = new(
+            Mouse.PrimaryDevice,
+            Environment.TickCount,
+            delta)
+        {
+            RoutedEvent = Mouse.PreviewMouseWheelEvent,
+        };
+
+        target.RaiseEvent(mouseWheel);
+
+        return mouseWheel;
     }
 
     private static void RunInSta(Action action)
@@ -600,4 +811,5 @@ public sealed class ScheduleOverviewViewTests
             }
         }
     }
+
 }

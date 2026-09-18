@@ -28,10 +28,27 @@ internal sealed class AutomaticScheduleRunEntity
 
     public required string SettingsPayload { get; set; }
 
+    public required string PhasesPayload { get; set; }
+
     public required string ObjectivePayload { get; set; }
 }
 
 internal sealed record StoredAutomaticScheduleSetting(string Key, string Value);
+
+internal sealed record StoredAutomaticSchedulePhase(
+    int Kind,
+    int Status,
+    long DurationTicks,
+    StoredAutomaticSchedulePhaseValue[] Values,
+    StoredAutomaticSchedulePhaseTermination? Termination = null);
+
+internal sealed record StoredAutomaticSchedulePhaseValue(string Key, long Value);
+
+internal sealed record StoredAutomaticSchedulePhaseTermination(
+    int Reason,
+    int? ActiveTarget,
+    long? TimeLimitTicks,
+    long? BudgetElapsedTicks);
 
 internal sealed record StoredAutomaticScheduleRuleViolation(
     string RuleId,

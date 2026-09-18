@@ -38,6 +38,122 @@ public sealed class ScheduleOverviewViewModelTests
     }
 
     [Fact]
+    public async Task LoadPlacesServiceManagementEmployeeBeforeAlphabeticallyEarlierEmployees()
+    {
+        ScheduleOverviewViewModel viewModel = CreateViewModel(new FakeScheduleDataAccess());
+
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            FakeScheduleDataAccess.ServiceManagementEmployeeId,
+            viewModel.Employees[0].EmployeeId);
+        Assert.True(viewModel.Employees[0].IsServiceManagement);
+        Assert.Contains(
+            viewModel.Employees,
+            employee => employee.EmployeeId == FakeScheduleDataAccess.AuxiliaryEmployeeId);
+        Assert.Contains(
+            viewModel.Employees,
+            employee => employee.EmployeeId == FakeScheduleDataAccess.NormalEmployeeId);
+    }
+
+    [Fact]
+    public async Task LoadWithoutServiceManagementEmployeeKeepsExistingNameOrder()
+    {
+        FakeScheduleDataAccess dataAccess = new(
+            additionalNormalEmployees: 2,
+            includeServiceManagement: false,
+            includeAuxiliary: false);
+        ScheduleOverviewViewModel viewModel = CreateViewModel(dataAccess);
+
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            ["Erika Muster", "Test Person 01", "Test Person 02"],
+            viewModel.Employees.Select(employee => employee.DisplayName));
+        Assert.DoesNotContain(viewModel.Employees, employee => employee.IsServiceManagement);
+    }
+
+    [Fact]
+    public async Task LoadGroupsServiceManagementNormalAndAuxiliaryEmployees()
+    {
+        FakeScheduleDataAccess dataAccess = new(
+            additionalNormalEmployees: 2,
+            additionalAuxiliaryEmployees: 2);
+        ScheduleOverviewViewModel viewModel = CreateViewModel(dataAccess);
+
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            [
+                "Sarah Leitung",
+                "Erika Muster",
+                "Test Person 01",
+                "Test Person 02",
+                "Alex Beispiel",
+                "Weitere Person AH 01",
+                "Weitere Person AH 02",
+            ],
+            viewModel.Employees.Select(employee => employee.DisplayName));
+        ScheduleEmployeeRowViewModel boundaryRow = Assert.Single(
+            viewModel.Employees,
+            employee => employee.ShowsAuxiliaryBoundary);
+        Assert.Equal(FakeScheduleDataAccess.AuxiliaryEmployeeId, boundaryRow.EmployeeId);
+    }
+
+    [Fact]
+    public async Task LoadWithoutNormalEmployeesPlacesBoundaryBetweenTyp1AndAuxiliary()
+    {
+        FakeScheduleDataAccess dataAccess = new(includeNormal: false);
+        ScheduleOverviewViewModel viewModel = CreateViewModel(dataAccess);
+
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            [
+                FakeScheduleDataAccess.ServiceManagementEmployeeId,
+                FakeScheduleDataAccess.AuxiliaryEmployeeId,
+            ],
+            viewModel.Employees.Select(employee => employee.EmployeeId));
+        Assert.True(viewModel.Employees[1].ShowsAuxiliaryBoundary);
+    }
+
+    [Fact]
+    public async Task LoadWithoutServiceManagementStartsWithNormalBeforeAuxiliary()
+    {
+        FakeScheduleDataAccess dataAccess = new(includeServiceManagement: false);
+        ScheduleOverviewViewModel viewModel = CreateViewModel(dataAccess);
+
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            [
+                FakeScheduleDataAccess.NormalEmployeeId,
+                FakeScheduleDataAccess.AuxiliaryEmployeeId,
+            ],
+            viewModel.Employees.Select(employee => employee.EmployeeId));
+        Assert.True(viewModel.Employees[1].ShowsAuxiliaryBoundary);
+    }
+
+    [Fact]
+    public async Task LoadWithoutAuxiliaryEmployeesDoesNotMarkBoundary()
+    {
+        FakeScheduleDataAccess dataAccess = new(includeAuxiliary: false);
+        ScheduleOverviewViewModel viewModel = CreateViewModel(dataAccess);
+
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            [
+                FakeScheduleDataAccess.ServiceManagementEmployeeId,
+                FakeScheduleDataAccess.NormalEmployeeId,
+            ],
+            viewModel.Employees.Select(employee => employee.EmployeeId));
+        Assert.DoesNotContain(
+            viewModel.Employees,
+            employee => employee.ShowsAuxiliaryBoundary);
+    }
+
+    [Fact]
     public async Task DateSelectionAndNavigationUseCompleteThreeWeekPeriods()
     {
         FakeScheduleDataAccess dataAccess = new();

@@ -234,9 +234,12 @@ public sealed class GenerateAutomaticScheduleCommand
                         AutomaticScheduleErrorCode.ResultValidationFailed)]);
             }
 
+            AutomaticSchedulePlanningReport report =
+                AutomaticSchedulePlanningReportCalculator.Create(prepared, proposal);
             SetPreview(planningResult.Preview);
             return AutomaticScheduleGenerationResult.Success(
                 planningResult,
+                report,
                 planningResult.Status == AutomaticSchedulePlanningStatus.Optimal
                     ? "Der automatische Vorschlag wurde erfolgreich erzeugt. Bitte prüfen Sie ihn vor der späteren Übernahme."
                     : "Ein zulässiger Vorschlag wurde erzeugt, seine Optimalität konnte innerhalb der Zeitgrenze aber nicht nachgewiesen werden. Bitte prüfen Sie ihn besonders sorgfältig.");
@@ -244,28 +247,34 @@ public sealed class GenerateAutomaticScheduleCommand
 
         return planningResult.Status switch
         {
-            AutomaticSchedulePlanningStatus.Cancelled => Cancelled(),
+            AutomaticSchedulePlanningStatus.Cancelled => Cancelled(
+                planningResult.Phases),
             AutomaticSchedulePlanningStatus.TimedOutWithoutFeasibleResult => Failure(
                 AutomaticScheduleGenerationStatus.TimedOutWithoutFeasibleResult,
-                "Innerhalb der Zeitgrenze wurde kein zulässiger Vorschlag gefunden. Der Entwurf blieb unverändert."),
+                "Innerhalb der Zeitgrenze wurde kein zulässiger Vorschlag gefunden. Der Entwurf blieb unverändert.",
+                planningPhases: planningResult.Phases),
             AutomaticSchedulePlanningStatus.BlockedByInput => Failure(
                 AutomaticScheduleGenerationStatus.BlockedByInput,
                 "Die vorbereiteten Eingaben blockieren die automatische Planung. Bitte prüfen und aktualisieren Sie die Vorbereitung.",
-                planningResult.Errors),
+                planningResult.Errors,
+                planningResult.Phases),
             AutomaticSchedulePlanningStatus.UnsupportedRule => Failure(
                 AutomaticScheduleGenerationStatus.UnsupportedRule,
                 "Mindestens eine vorbereitete Regel wird technisch noch nicht unterstützt. Bitte aktualisieren Sie die Vorbereitung oder melden Sie den Fehler.",
-                planningResult.Errors),
+                planningResult.Errors,
+                planningResult.Phases),
             AutomaticSchedulePlanningStatus.TechnicalFailure
                 when planningResult.Errors.Any(error =>
                     error.Code == AutomaticScheduleErrorCode.ConcurrentRun) => Failure(
                         AutomaticScheduleGenerationStatus.ConcurrentRun,
                         "Eine automatische Planung läuft bereits. Bitte warten Sie auf deren Abschluss oder brechen Sie sie ab.",
-                        planningResult.Errors),
+                        planningResult.Errors,
+                        planningResult.Phases),
             AutomaticSchedulePlanningStatus.TechnicalFailure => Failure(
                 AutomaticScheduleGenerationStatus.TechnicalFailure,
                 TechnicalFailureMessage(planningResult.Errors),
-                planningResult.Errors),
+                planningResult.Errors,
+                planningResult.Phases),
             _ => Failure(
                 AutomaticScheduleGenerationStatus.TechnicalFailure,
                 "Das Planungsergebnis besitzt einen unerwarteten Status und wurde verworfen.",
@@ -312,18 +321,22 @@ public sealed class GenerateAutomaticScheduleCommand
         };
     }
 
-    private static AutomaticScheduleGenerationResult Cancelled() => Failure(
-        AutomaticScheduleGenerationStatus.Cancelled,
-        "Die automatische Planung wurde abgebrochen. Der Entwurf blieb unverändert.");
+    private static AutomaticScheduleGenerationResult Cancelled(
+        IEnumerable<AutomaticSchedulePhaseSnapshot>? planningPhases = null) => Failure(
+            AutomaticScheduleGenerationStatus.Cancelled,
+            "Die automatische Planung wurde abgebrochen. Der Entwurf blieb unverändert.",
+            planningPhases: planningPhases);
 
     private static AutomaticScheduleGenerationResult Failure(
         AutomaticScheduleGenerationStatus status,
         string message,
-        IEnumerable<AutomaticScheduleError>? planningErrors = null) =>
+        IEnumerable<AutomaticScheduleError>? planningErrors = null,
+        IEnumerable<AutomaticSchedulePhaseSnapshot>? planningPhases = null) =>
         AutomaticScheduleGenerationResult.Failure(
             status,
             message,
-            planningErrors ?? []);
+            planningErrors ?? [],
+            planningPhases ?? []);
 
     private static string TechnicalFailureMessage(
         IEnumerable<AutomaticScheduleError> errors)

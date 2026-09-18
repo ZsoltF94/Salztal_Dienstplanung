@@ -721,6 +721,16 @@ public sealed class SqliteScheduleStore :
                     entity.ObjectivePayload,
                     JsonOptions)
                 ?? throw InvalidStored("automatic schedule objective", draftId);
+            StoredAutomaticSchedulePhase[] storedPhases = JsonSerializer.Deserialize<
+                    StoredAutomaticSchedulePhase[]>(
+                    entity.PhasesPayload,
+                    JsonOptions)
+                ?? throw InvalidStored("automatic schedule phases", draftId);
+            if (storedPhases.Any(phase => phase is null || phase.Values is null))
+            {
+                throw InvalidStored("automatic schedule phases", draftId);
+            }
+
             AutomaticScheduleRunMetadata metadata = new(
                 entity.SolverName,
                 entity.SolverVersion,
@@ -733,7 +743,14 @@ public sealed class SqliteScheduleStore :
                 TimeSpan.FromTicks(entity.ResultMappingDurationTicks),
                 TimeSpan.FromTicks(entity.TotalDurationTicks),
                 settings.Select(setting =>
-                    new AutomaticScheduleSetting(setting.Key, setting.Value)));
+                    new AutomaticScheduleSetting(setting.Key, setting.Value)),
+                storedPhases.Select(value => new AutomaticSchedulePhaseSnapshot(
+                    (AutomaticSchedulePhaseKind)value.Kind,
+                    (AutomaticSchedulePhaseStatus)value.Status,
+                    TimeSpan.FromTicks(value.DurationTicks),
+                    value.Values.Select(item =>
+                        new AutomaticSchedulePhaseValue(item.Key, item.Value)),
+                    CreateTermination(value.Termination))));
             AutomaticScheduleObjectiveSnapshot objective = new(
                 storedObjective.UncoveredEmployeeMinutes,
                 storedObjective.FullyUncoveredDemandSlotCount,
@@ -1053,11 +1070,48 @@ public sealed class SqliteScheduleStore :
                         setting.Key,
                         setting.Value)),
                 JsonOptions),
+            PhasesPayload = JsonSerializer.Serialize(
+                metadata.Phases.Select(phase => new StoredAutomaticSchedulePhase(
+                    (int)phase.Kind,
+                    (int)phase.Status,
+                    phase.Duration.Ticks,
+                    phase.Values.Select(value =>
+                        new StoredAutomaticSchedulePhaseValue(
+                            value.Key,
+                            value.Value)).ToArray(),
+                    CreateStoredTermination(phase.Termination))),
+                JsonOptions),
             ObjectivePayload = JsonSerializer.Serialize(
                 CreateStoredObjective(run.Objective),
                 JsonOptions),
         };
     }
+
+    private static AutomaticSchedulePhaseTerminationSnapshot? CreateTermination(
+        StoredAutomaticSchedulePhaseTermination? termination) => termination is null
+            ? null
+            : new AutomaticSchedulePhaseTerminationSnapshot(
+                (AutomaticSchedulePhaseTerminationReason)termination.Reason,
+                termination.ActiveTarget is null
+                    ? null
+                    : (AutomaticScheduleOptimizationTargetKind)termination.ActiveTarget.Value,
+                termination.TimeLimitTicks is null
+                    ? null
+                    : TimeSpan.FromTicks(termination.TimeLimitTicks.Value),
+                termination.BudgetElapsedTicks is null
+                    ? null
+                    : TimeSpan.FromTicks(termination.BudgetElapsedTicks.Value));
+
+    private static StoredAutomaticSchedulePhaseTermination? CreateStoredTermination(
+        AutomaticSchedulePhaseTerminationSnapshot? termination) => termination is null
+            ? null
+            : new StoredAutomaticSchedulePhaseTermination(
+                (int)termination.Reason,
+                termination.ActiveTarget is null
+                    ? null
+                    : (int)termination.ActiveTarget.Value,
+                termination.TimeLimit?.Ticks,
+                termination.BudgetElapsed?.Ticks);
 
     private static StoredAutomaticScheduleObjective CreateStoredObjective(
         AutomaticScheduleObjectiveSnapshot objective) => new(

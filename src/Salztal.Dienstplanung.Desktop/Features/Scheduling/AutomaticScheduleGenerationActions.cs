@@ -41,7 +41,8 @@ internal sealed class AutomaticScheduleGenerationActions
             result.Status,
             result.Message,
             result.Preview,
-            result.PlanningErrors);
+            result.PlanningErrors,
+            result.Report);
     }
 
     public async Task<AutomaticScheduleAcceptanceOutcome> AcceptAsync(
@@ -63,7 +64,8 @@ internal sealed record AutomaticScheduleGenerationOutcome(
     AutomaticScheduleGenerationStatus Status,
     string Message,
     AutomaticSchedulePreview? Preview,
-    IReadOnlyList<AutomaticScheduleError> PlanningErrors);
+    IReadOnlyList<AutomaticScheduleError> PlanningErrors,
+    AutomaticScheduleGenerationReport Report);
 
 internal sealed record AutomaticScheduleAcceptanceOutcome(
     AutomaticScheduleAcceptanceStatus Status,

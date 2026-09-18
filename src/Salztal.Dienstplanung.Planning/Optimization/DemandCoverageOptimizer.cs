@@ -29,36 +29,122 @@ internal static class DemandCoverageOptimizer
         ArgumentNullException.ThrowIfNull(snapshot);
         ArgumentNullException.ThrowIfNull(candidateSet);
         PlanningSolveBudget budget = new(timeLimit, cancellationToken);
+        return Optimize(snapshot, candidateSet, budget);
+    }
+
+    internal static AutomaticScheduleOptimizationRun Optimize(
+        PlanningInputSnapshot snapshot,
+        PlanningCandidateSet candidateSet,
+        PlanningSolveBudget budget)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+        ArgumentNullException.ThrowIfNull(candidateSet);
+        ArgumentNullException.ThrowIfNull(budget);
         Stopwatch solveStopwatch = Stopwatch.StartNew();
+        PhaseCollector phases = new();
         try
         {
             DemandCoverageOptimizationResult result = OptimizeJoint(
                 snapshot,
                 candidateSet,
-                budget);
+                budget,
+                phases);
             return new AutomaticScheduleOptimizationRun(
                 result,
                 true,
-                solveStopwatch.Elapsed);
+                solveStopwatch.Elapsed,
+                phases.Snapshots);
         }
         catch (PlanningTimeLimitWithFeasibleSelectionException exception)
         {
+            DemandCoverageOptimizationResult result = CreateFallbackResult(
+                snapshot,
+                candidateSet,
+                exception.SelectedCandidateKeys);
+            phases.InterruptCurrent(
+                CreateInterruptedPhaseValues(
+                    phases,
+                    candidateSet,
+                    result),
+                exception.Termination);
             return new AutomaticScheduleOptimizationRun(
-                CreateFallbackResult(snapshot, candidateSet, exception.SelectedCandidateKeys),
+                result,
                 false,
-                solveStopwatch.Elapsed);
+                solveStopwatch.Elapsed,
+                phases.Snapshots);
+        }
+        catch (PlanningTimeLimitWithoutFeasibleSelectionException exception)
+        {
+            phases.InterruptCurrent(
+                [],
+                exception.Termination);
+            throw new AutomaticScheduleOptimizationFailureException(
+                exception,
+                phases.Snapshots);
+        }
+        catch (OperationCanceledException exception)
+        {
+            phases.InterruptCurrent(
+                [],
+                budget.CreateTermination(
+                    AutomaticSchedulePhaseTerminationReason.CancellationRequested));
+            throw new AutomaticScheduleOptimizationFailureException(
+                exception,
+                phases.Snapshots);
+        }
+        catch (Exception exception)
+        {
+            phases.FailCurrent(
+                budget.CreateTermination(
+                    AutomaticSchedulePhaseTerminationReason.TechnicalFailure));
+
+            throw new AutomaticScheduleOptimizationFailureException(
+                exception,
+                phases.Snapshots);
         }
     }
 
     private static DemandCoverageOptimizationResult OptimizeJoint(
         PlanningInputSnapshot snapshot,
         PlanningCandidateSet candidateSet,
-        PlanningSolveBudget budget)
+        PlanningSolveBudget budget,
+        PhaseCollector phases)
     {
-        PhaseOptimum regularOptimum = FindJointRegularOptimum(
+        phases.Begin(AutomaticSchedulePhaseKind.HardRules);
+        StructuralPlanningModel regularModel = CreateJointHardRuleModel(
             snapshot,
             candidateSet,
+            ReliefShiftEmergencyGate.None,
+            out _);
+        phases.Complete();
+
+        long requiredMinutes = candidateSet.RemainingDemands.Aggregate(
+            0L,
+            (total, value) => checked(total + value.UncoveredMinutes));
+        long initiallyFullyUncoveredDemandCount = candidateSet.RemainingDemands
+            .LongCount(value =>
+                value.Kind == PlanningRemainingDemandKind.FullyUncovered);
+        phases.Begin(AutomaticSchedulePhaseKind.RegularCoverage);
+        PhaseOptimum regularOptimum = FindJointRegularOptimum(
+            regularModel,
             budget);
+        phases.Complete(
+            new AutomaticSchedulePhaseValue(
+                "required_minutes",
+                requiredMinutes),
+            new AutomaticSchedulePhaseValue(
+                "covered_minutes",
+                regularOptimum.CoveredMinutes),
+            new AutomaticSchedulePhaseValue(
+                "uncovered_minutes",
+                requiredMinutes - regularOptimum.CoveredMinutes),
+            new AutomaticSchedulePhaseValue(
+                "covered_full_demand_count",
+                regularOptimum.TouchedFullDemands),
+            new AutomaticSchedulePhaseValue(
+                "fully_uncovered_demand_count",
+                initiallyFullyUncoveredDemandCount
+                    - regularOptimum.TouchedFullDemands));
         PlanningDemandKey[] reliefLateDemands = candidateSet.Candidates
             .Where(candidate => candidate.Kind == PlanningCandidateKind.ReliefShiftPattern)
             .Select(candidate => candidate.Coverages[1].Demand)
@@ -71,19 +157,57 @@ internal static class DemandCoverageOptimizer
             new ReliefShiftEmergencyGate(reliefLateDemands),
             out HardRulePlanningContext context);
         AddRegularOptimumBounds(model, regularOptimum);
-        _ = MaximizeAndFreeze(
+        phases.Begin(AutomaticSchedulePhaseKind.ReliefCoverage);
+        budget.SetActiveTarget(
+            AutomaticScheduleOptimizationTargetKind.ReliefCoveredMinutes);
+        long coveredWithRelief = MaximizeAndFreeze(
             model,
             CoveredMinutesExpression(model, includeRelief: true),
             budget);
-        _ = MaximizeAndFreeze(
+        budget.SetActiveTarget(
+            AutomaticScheduleOptimizationTargetKind.ReliefTouchedDemandSlots);
+        long touchedWithRelief = MaximizeAndFreeze(
             model,
             TouchedFullDemandExpression(model, includeRelief: true),
             budget);
+        phases.Complete(
+            new AutomaticSchedulePhaseValue(
+                "required_minutes",
+                requiredMinutes),
+            new AutomaticSchedulePhaseValue(
+                "initial_covered_minutes",
+                regularOptimum.CoveredMinutes),
+            new AutomaticSchedulePhaseValue("covered_minutes", coveredWithRelief),
+            new AutomaticSchedulePhaseValue(
+                "additional_covered_minutes",
+                coveredWithRelief - regularOptimum.CoveredMinutes),
+            new AutomaticSchedulePhaseValue(
+                "initial_uncovered_minutes",
+                requiredMinutes - regularOptimum.CoveredMinutes),
+            new AutomaticSchedulePhaseValue(
+                "uncovered_minutes",
+                requiredMinutes - coveredWithRelief),
+            new AutomaticSchedulePhaseValue(
+                "covered_full_demand_count",
+                touchedWithRelief),
+            new AutomaticSchedulePhaseValue(
+                "initial_fully_uncovered_demand_count",
+                initiallyFullyUncoveredDemandCount
+                    - regularOptimum.TouchedFullDemands),
+            new AutomaticSchedulePhaseValue(
+                "fully_uncovered_demand_count",
+                initiallyFullyUncoveredDemandCount - touchedWithRelief));
         HighPriorityRuleModel highRules = HighPriorityRuleModelBuilder.Apply(context);
+        phases.Begin(AutomaticSchedulePhaseKind.HighPriorityRules);
+        budget.SetActiveTarget(
+            AutomaticScheduleOptimizationTargetKind.HighPriorityRules);
         long minimumHighViolationCount = MinimizeAndFreeze(
             model,
             highRules.ViolationCount,
             budget);
+        phases.Complete(new AutomaticSchedulePhaseValue(
+            "violation_count",
+            minimumHighViolationCount));
         ParetoStage highStage = new(
             CurrentSoftRuleDefinitions.All
                 .Where(rule => rule.Priority == RulePriority.High)
@@ -92,20 +216,51 @@ internal static class DemandCoverageOptimizer
         LinearExpr reliefCount = PatternCount(
             model,
             PlanningCandidateKind.ReliefShiftPattern);
+        long initialReliefCount = SelectedPatternCount(
+            model,
+            budget,
+            PlanningCandidateKind.ReliefShiftPattern);
+        phases.Begin(AutomaticSchedulePhaseKind.ReliefShiftMinimization);
+        budget.SetActiveTarget(
+            AutomaticScheduleOptimizationTargetKind.ReliefShiftAssignments);
         long minimumReliefCount = MinimizeAndFreezeWithParetoValidation(
             model,
             reliefCount,
             [highStage],
             budget);
+        phases.Complete(
+            new AutomaticSchedulePhaseValue(
+                "initial_assignment_count",
+                initialReliefCount),
+            new AutomaticSchedulePhaseValue(
+                "assignment_count",
+                minimumReliefCount));
         LinearExpr splitCount = PatternCount(
             model,
             PlanningCandidateKind.SplitShiftPattern);
+        long initialSplitCount = SelectedPatternCount(
+            model,
+            budget,
+            PlanningCandidateKind.SplitShiftPattern);
+        phases.Begin(AutomaticSchedulePhaseKind.SplitShiftMinimization);
+        budget.SetActiveTarget(
+            AutomaticScheduleOptimizationTargetKind.SplitShiftAssignments);
         long minimumSplitCount = MinimizeAndFreezeWithParetoValidation(
             model,
             splitCount,
             [highStage],
             budget);
+        phases.Complete(
+            new AutomaticSchedulePhaseValue(
+                "initial_assignment_count",
+                initialSplitCount),
+            new AutomaticSchedulePhaseValue(
+                "assignment_count",
+                minimumSplitCount));
         JointWeeklyObjectiveModel weekly = JointWeeklyObjectiveModelBuilder.Apply(context);
+        phases.Begin(AutomaticSchedulePhaseKind.AuxiliaryMinimum);
+        budget.SetActiveTarget(
+            AutomaticScheduleOptimizationTargetKind.AuxiliaryMinimumFulfillment);
         long minimumAuxiliaryViolationCount = MinimizeAndFreezeWithParetoValidation(
             model,
             weekly.AuxiliaryViolationCount,
@@ -116,30 +271,58 @@ internal static class DemandCoverageOptimizer
             weekly.AuxiliaryMissingMinutes,
             [highStage],
             budget);
+        phases.Complete(
+            new AutomaticSchedulePhaseValue(
+                "violation_count",
+                minimumAuxiliaryViolationCount),
+            new AutomaticSchedulePhaseValue(
+                "missing_minutes",
+                minimumAuxiliaryMissingMinutes));
+        phases.Begin(AutomaticSchedulePhaseKind.RelativeWeeklyTarget);
+        budget.SetActiveTarget(
+            AutomaticScheduleOptimizationTargetKind.RelativeWeeklyTargetDeviation);
         MinimizeRelativeWeeklyTargetsAndFreeze(
             model,
             weekly.RelativeTargetCases,
             [highStage],
             budget);
+        phases.Complete();
         MediumPriorityRuleModel mediumRules = MediumPriorityRuleModelBuilder.Apply(context);
         ParetoStage mediumStage = new(
             [CurrentSoftRuleDefinitions.ThreeWeekFreeWeekend],
             mediumRules.Magnitude);
+        phases.Begin(AutomaticSchedulePhaseKind.MediumPriorityRules);
+        budget.SetActiveTarget(
+            AutomaticScheduleOptimizationTargetKind.MediumPriorityRules);
         long minimumMediumViolationCount = MinimizeAndFreezeWithParetoValidation(
             model,
             mediumRules.ViolationCount,
             [highStage],
             budget);
+        phases.Complete(new AutomaticSchedulePhaseValue(
+            "violation_count",
+            minimumMediumViolationCount));
+        phases.NotApplicable(AutomaticSchedulePhaseKind.LowPriorityRules);
         FairDistributionRuleModel stability = FairDistributionRuleModelBuilder.Apply(context);
-        _ = MinimizeAndFreezeWithParetoValidation(
+        phases.Begin(AutomaticSchedulePhaseKind.Stability);
+        budget.SetActiveTarget(
+            AutomaticScheduleOptimizationTargetKind.StabilityRules);
+        long minimumStabilitySpread = MinimizeAndFreezeWithParetoValidation(
             model,
             stability.TotalSpread,
             [highStage, mediumStage],
             budget);
+        phases.Complete(new AutomaticSchedulePhaseValue(
+            "total_spread",
+            minimumStabilitySpread));
+        phases.Begin(AutomaticSchedulePhaseKind.TechnicalTieBreak);
+        budget.SetActiveTarget(
+            AutomaticScheduleOptimizationTargetKind.TechnicalTieBreak);
         CpSolver solver = FindStableTechnicalSolution(
             model,
             [highStage, mediumStage],
             budget);
+        phases.Complete();
         PlanningAssignmentCandidate[] selected = candidateSet.Candidates
             .Where(candidate => solver.Value(
                 model.CandidateVariables[candidate.TechnicalKey]) == 1)
@@ -185,19 +368,17 @@ internal static class DemandCoverageOptimizer
     }
 
     private static PhaseOptimum FindJointRegularOptimum(
-        PlanningInputSnapshot snapshot,
-        PlanningCandidateSet candidateSet,
+        StructuralPlanningModel model,
         PlanningSolveBudget budget)
     {
-        StructuralPlanningModel model = CreateJointHardRuleModel(
-            snapshot,
-            candidateSet,
-            ReliefShiftEmergencyGate.None,
-            out _);
+        budget.SetActiveTarget(
+            AutomaticScheduleOptimizationTargetKind.RegularCoveredMinutes);
         long coveredMinutes = MaximizeAndFreeze(
             model,
             CoveredMinutesExpression(model, includeRelief: false),
             budget);
+        budget.SetActiveTarget(
+            AutomaticScheduleOptimizationTargetKind.RegularTouchedDemandSlots);
         long touchedDemands = MaximizeAndFreeze(
             model,
             TouchedFullDemandExpression(model, includeRelief: false),
@@ -221,6 +402,17 @@ internal static class DemandCoverageOptimizer
         PlanningCandidateKind kind) => LinearExpr.Sum(model.CandidateSet.Candidates
         .Where(candidate => candidate.Kind == kind)
         .Select(candidate => model.CandidateVariables[candidate.TechnicalKey]));
+
+    private static long SelectedPatternCount(
+        StructuralPlanningModel model,
+        PlanningSolveBudget budget,
+        PlanningCandidateKind kind)
+    {
+        HashSet<string> selected = budget.LastSelectedCandidateKeys.ToHashSet(
+            StringComparer.Ordinal);
+        return model.CandidateSet.Candidates.LongCount(candidate =>
+            candidate.Kind == kind && selected.Contains(candidate.TechnicalKey));
+    }
 
     private static void MinimizeRelativeWeeklyTargetsAndFreeze(
         StructuralPlanningModel model,
@@ -663,6 +855,127 @@ internal static class DemandCoverageOptimizer
             JointPlanningSelectionEvaluator.Evaluate(context, selectedKeys));
     }
 
+    private static AutomaticSchedulePhaseValue[] CreateInterruptedPhaseValues(
+        PhaseCollector phases,
+        PlanningCandidateSet candidateSet,
+        DemandCoverageOptimizationResult result)
+    {
+        long requiredMinutes = candidateSet.RemainingDemands.Aggregate(
+            0L,
+            (total, value) => checked(total + value.UncoveredMinutes));
+        long coveredMinutes = requiredMinutes - result.UncoveredEmployeeMinutes;
+        long initiallyFullyUncoveredDemandCount = candidateSet.RemainingDemands
+            .LongCount(value =>
+                value.Kind == PlanningRemainingDemandKind.FullyUncovered);
+        long coveredFullDemandCount = initiallyFullyUncoveredDemandCount
+            - result.FullyUncoveredDemandSlotCount;
+        return phases.CurrentKind switch
+        {
+            AutomaticSchedulePhaseKind.RegularCoverage =>
+            [
+                new AutomaticSchedulePhaseValue("required_minutes", requiredMinutes),
+                new AutomaticSchedulePhaseValue("covered_minutes", coveredMinutes),
+                new AutomaticSchedulePhaseValue(
+                    "uncovered_minutes",
+                    result.UncoveredEmployeeMinutes),
+                new AutomaticSchedulePhaseValue(
+                    "covered_full_demand_count",
+                    coveredFullDemandCount),
+                new AutomaticSchedulePhaseValue(
+                    "fully_uncovered_demand_count",
+                    result.FullyUncoveredDemandSlotCount),
+            ],
+            AutomaticSchedulePhaseKind.ReliefCoverage =>
+                CreateInterruptedReliefValues(
+                    phases,
+                    requiredMinutes,
+                    coveredMinutes,
+                    coveredFullDemandCount,
+                    result),
+            AutomaticSchedulePhaseKind.HighPriorityRules =>
+            [
+                new AutomaticSchedulePhaseValue(
+                    "violation_count",
+                    result.HighPriorityViolations.Count),
+            ],
+            AutomaticSchedulePhaseKind.ReliefShiftMinimization =>
+            [
+                new AutomaticSchedulePhaseValue(
+                    "assignment_count",
+                    result.ReliefShiftAssignmentCount),
+            ],
+            AutomaticSchedulePhaseKind.SplitShiftMinimization =>
+            [
+                new AutomaticSchedulePhaseValue(
+                    "assignment_count",
+                    result.SplitShiftAssignmentCount),
+            ],
+            AutomaticSchedulePhaseKind.AuxiliaryMinimum =>
+            [
+                new AutomaticSchedulePhaseValue(
+                    "violation_count",
+                    result.AuxiliaryWeeklyMinimum.ViolatedWeekCount),
+                new AutomaticSchedulePhaseValue(
+                    "missing_minutes",
+                    result.AuxiliaryWeeklyMinimum.MissingMinutes),
+            ],
+            AutomaticSchedulePhaseKind.MediumPriorityRules =>
+            [
+                new AutomaticSchedulePhaseValue(
+                    "violation_count",
+                    result.MediumPriorityViolations.Count),
+            ],
+            AutomaticSchedulePhaseKind.Stability =>
+            [
+                new AutomaticSchedulePhaseValue(
+                    "total_spread",
+                    result.StabilityViolations.MagnitudeByRule.Values.Sum()),
+            ],
+            _ => [],
+        };
+    }
+
+    private static AutomaticSchedulePhaseValue[] CreateInterruptedReliefValues(
+        PhaseCollector phases,
+        long requiredMinutes,
+        long coveredMinutes,
+        long coveredFullDemandCount,
+        DemandCoverageOptimizationResult result)
+    {
+        long initialCoveredMinutes = phases.GetCompletedValue(
+            AutomaticSchedulePhaseKind.RegularCoverage,
+            "covered_minutes");
+        long initialFullyUncoveredDemandCount = phases.GetCompletedValue(
+            AutomaticSchedulePhaseKind.RegularCoverage,
+            "fully_uncovered_demand_count");
+        return
+        [
+            new AutomaticSchedulePhaseValue("required_minutes", requiredMinutes),
+            new AutomaticSchedulePhaseValue(
+                "initial_covered_minutes",
+                initialCoveredMinutes),
+            new AutomaticSchedulePhaseValue("covered_minutes", coveredMinutes),
+            new AutomaticSchedulePhaseValue(
+                "additional_covered_minutes",
+                coveredMinutes - initialCoveredMinutes),
+            new AutomaticSchedulePhaseValue(
+                "initial_uncovered_minutes",
+                requiredMinutes - initialCoveredMinutes),
+            new AutomaticSchedulePhaseValue(
+                "uncovered_minutes",
+                result.UncoveredEmployeeMinutes),
+            new AutomaticSchedulePhaseValue(
+                "covered_full_demand_count",
+                coveredFullDemandCount),
+            new AutomaticSchedulePhaseValue(
+                "initial_fully_uncovered_demand_count",
+                initialFullyUncoveredDemandCount),
+            new AutomaticSchedulePhaseValue(
+                "fully_uncovered_demand_count",
+                result.FullyUncoveredDemandSlotCount),
+        ];
+    }
+
     private static IEnumerable<AutomaticScheduleOpenDemand> CreateOpenDemands(
         PlanningCandidateSet candidateSet,
         IEnumerable<PlanningAssignmentCandidate> selectedCandidates)
@@ -730,6 +1043,89 @@ internal static class DemandCoverageOptimizer
         IReadOnlyList<RuleDefinition> Rules,
         Func<RuleDefinition, LinearExpr> Magnitude);
 
+    private sealed class PhaseCollector
+    {
+        private readonly List<AutomaticSchedulePhaseSnapshot> snapshots = [];
+        private AutomaticSchedulePhaseKind? current;
+        private Stopwatch? stopwatch;
+
+        internal IReadOnlyList<AutomaticSchedulePhaseSnapshot> Snapshots => snapshots;
+
+        internal AutomaticSchedulePhaseKind CurrentKind => current
+            ?? throw new InvalidOperationException("No planning phase is active.");
+
+        internal void Begin(AutomaticSchedulePhaseKind kind)
+        {
+            if (current is not null)
+            {
+                throw new InvalidOperationException("A planning phase is already active.");
+            }
+
+            current = kind;
+            stopwatch = Stopwatch.StartNew();
+        }
+
+        internal void Complete(params AutomaticSchedulePhaseValue[] values) =>
+            Finish(AutomaticSchedulePhaseStatus.Completed, values);
+
+        internal void NotApplicable(AutomaticSchedulePhaseKind kind)
+        {
+            Begin(kind);
+            Finish(AutomaticSchedulePhaseStatus.NotApplicable, []);
+        }
+
+        internal void InterruptCurrent(
+            IEnumerable<AutomaticSchedulePhaseValue> values,
+            AutomaticSchedulePhaseTerminationSnapshot termination)
+        {
+            if (current is not null)
+            {
+                Finish(
+                    AutomaticSchedulePhaseStatus.Interrupted,
+                    values,
+                    termination);
+            }
+        }
+
+        internal void FailCurrent(
+            AutomaticSchedulePhaseTerminationSnapshot termination)
+        {
+            if (current is not null)
+            {
+                Finish(
+                    AutomaticSchedulePhaseStatus.Failed,
+                    [],
+                    termination);
+            }
+        }
+
+        internal long GetCompletedValue(
+            AutomaticSchedulePhaseKind kind,
+            string key) => snapshots
+            .Single(value => value.Kind == kind
+                && value.Status == AutomaticSchedulePhaseStatus.Completed)
+            .Values
+            .Single(value => StringComparer.Ordinal.Equals(value.Key, key))
+            .Value;
+
+        private void Finish(
+            AutomaticSchedulePhaseStatus status,
+            IEnumerable<AutomaticSchedulePhaseValue> values,
+            AutomaticSchedulePhaseTerminationSnapshot? termination = null)
+        {
+            AutomaticSchedulePhaseKind kind = current
+                ?? throw new InvalidOperationException("No planning phase is active.");
+            snapshots.Add(new AutomaticSchedulePhaseSnapshot(
+                kind,
+                status,
+                stopwatch?.Elapsed ?? TimeSpan.Zero,
+                values,
+                termination));
+            current = null;
+            stopwatch = null;
+        }
+    }
+
     private readonly record struct ExactFraction(long Numerator, long Denominator) :
         IComparable<ExactFraction>
     {
@@ -758,6 +1154,15 @@ internal static class DemandCoverageOptimizer
             return left;
         }
     }
+}
+
+internal sealed class AutomaticScheduleOptimizationFailureException(
+    Exception innerException,
+    IEnumerable<AutomaticSchedulePhaseSnapshot> phases)
+    : Exception("Automatic schedule optimization failed.", innerException)
+{
+    internal IReadOnlyList<AutomaticSchedulePhaseSnapshot> Phases { get; } =
+        phases.ToArray();
 }
 
 internal sealed class RetainedSelectionContainsUnknownCandidateException : Exception;

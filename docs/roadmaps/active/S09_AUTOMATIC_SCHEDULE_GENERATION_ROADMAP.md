@@ -1,6 +1,6 @@
 # Teil-Roadmap System 09 – Automatische Plangenerierung
 
-Status: AG-14B ausdrücklich abgenommen; AG-14C bis AG-14E umgesetzt und automatisch geprüft; technisch funktionsfähiger AG-14F-Ausgangsstand bestätigt; Qualitätsentscheidung nach S09A und S09B offen
+Status: AG-14B ausdrücklich abgenommen; AG-14C bis AG-14E umgesetzt und automatisch geprüft; technisch funktionsfähiger AG-14F-Ausgangsstand bestätigt; S09B-QB-06A freigegeben, QB-06A.1 bis QB-06A.4 abgenommen und QB-06A.5 technisch geprüft; Qualitätsentscheidung weiterhin offen
 
 Stand: 2026-09-17
 
@@ -14,7 +14,7 @@ Ein Planungslauf verändert den aktuellen Entwurf noch nicht. Ein zulässiges Er
 
 Die Umsetzung wird wegen der besonders hohen Korrektheitsanforderung nicht allein durch einzelne Solver-Tests abgesichert. Gemeinsame Regelszenarien, vollständige Übersetzungsmatrizen der jeweiligen Regelkatalogversion, unabhängige Kleinstfallvergleiche, generierte Invariantentests, kontrollierte Mutationsnachweise, Transaktionsprüfungen, reproduzierbare Lastfälle und ein sichtbares WPF-Gate gehören ausdrücklich zum Systemumfang.
 
-System 09 liefert damit die belastbare automatische Planung. Vor ihrem endgültigen Korrektheitsnachweis wird der technisch funktionsfähige Generator zunächst unverändert durch den UI-Zwischenschritt S09A begleitet und anschließend mit einem noch zu planenden S09B-Planungsqualitätsbericht messbar beurteilt. Der Bericht dient der Qualitätsanalyse und enthält noch nicht die ausführliche Konflikterklärung aus System 10, die allgemeine manuelle Bearbeitung aus System 11 oder die unveränderlichen Planversionen und Abnahme aus System 12.
+System 09 liefert damit die belastbare automatische Planung. Vor ihrem endgültigen Korrektheitsnachweis wurde der technisch funktionsfähige Generator unverändert durch den abgeschlossenen UI-Zwischenschritt S09A begleitet und wird nun mit dem S09B-Planungsqualitätsbericht messbar beurteilt. Der Bericht dient der Qualitätsanalyse und enthält noch nicht die ausführliche Konflikterklärung aus System 10, die allgemeine manuelle Bearbeitung aus System 11 oder die unveränderlichen Planversionen und Abnahme aus System 12.
 
 ## Verbindliche Grundlagen
 
@@ -1169,14 +1169,14 @@ Automatisch vorbereitet und geprüft am 2026-09-17:
 - Technische Planungsfehler werden lokal und begrenzt unter einer Korrelationskennung mit Stufe, Ausnahmetyp, Fehlerwert und ausschließlich geprüftem technischen Kontext protokolliert. Ausnahmetexte, Dateipfade, Namen und Planinhalte werden nicht gespeichert; ein Protokollierungsfehler verändert das Planungsergebnis nicht.
 - Der zuvor fehlschlagende vorbereitete lokale Fall wurde ausschließlich lesend erneut ausgeführt und liefert nach der Korrektur innerhalb der verkürzten Diagnosegrenze einen regulären zulässigen Status `FeasibleNotProvenOptimal` statt `TechnicalFailure`. Der vollständige Solution-Build ist ohne Warnungen und Fehler grün; 359 Domain-, 285 Application-, 132 Planning-, 81 Infrastructure-, 106 Desktop- und 19 Architekturtests, insgesamt 982 Tests, bestehen.
 - Die Service-Leitung hat den erneuten sichtbaren Generierungslauf am 2026-09-17 bestätigt: Die App kann nach der Korrektur einen Plan erzeugen. Das Ergebnis wurde dabei ausdrücklich noch nicht als optimal oder fachlich gut bewertet. Diese Qualitätsbewertung soll in den weiteren Schritten verbessert und geprüft werden.
-- Am 2026-09-17 wurde deshalb die Reihenfolge geändert: Zuerst folgt der reine UI-Umbau S09A bei eingefrorenem Generator. Danach werden Fragenkatalog und Roadmap für den messenden S09B-Planungsqualitätsbericht erstellt. Erst auf Grundlage dieses Berichts entsteht ein eigener abgenommener Plan für gezielte Optimierungen oder den dokumentierten Rückfall.
-- Offen bleiben die vollständige fachliche Sichtprüfung, die noch nicht einzeln bestätigten Teile des gemeinsamen WPF-Gates aus AG-14/AG-14A, S09A, S09B und die anschließende ausdrückliche Entscheidung über die endgültige Primärlösung.
+- Am 2026-09-17 wurde deshalb die Reihenfolge geändert: Zuerst folgte der reine UI-Umbau S09A bei eingefrorenem Generator; er ist inzwischen vollständig abgenommen und archiviert. Der S09B-Fragenkatalog, die Roadmap und QB-01 bis QB-05 sind am 2026-09-18 ausdrücklich abgenommen. QB-06 mit eigenem nicht-modalem Berichtsfenster ist technisch umgesetzt und vollständig automatisch geprüft. Die sichtbare Prüfung hat jedoch eine beim Speichern verlorene Eingangsphase sowie fehlende Angaben zur Zeitgrenze und zu deshalb nicht begonnenen Folgephasen bestätigt. QB-06A ist dafür als reiner Berichtskorrekturschritt freigegeben. QB-06A.1 bis QB-06A.4 sind abgenommen; QB-06A.5 zeigt die vollständige Phasenfolge, die belegten Solverunterbrechungsdaten und die daraus gebildeten verständlichen Aussagen nun im Generierungsbereich, ohne ältere Details oder personenbezogene Ursachen zu erfinden. Erst auf Grundlage des fertig sichtbar abgenommenen Berichts entsteht ein eigener abgenommener Plan für gezielte Optimierungen oder den dokumentierten Rückfall.
+- Offen bleiben die noch nicht einzeln bestätigten Teile des gemeinsamen WPF-Gates aus AG-14/AG-14A, S09B und die anschließende ausdrückliche Entscheidung über die endgültige Primärlösung.
 
 ## Bestätigte Zwischenreihenfolge vor AG-15
 
 1. Der aktuelle Generator bleibt als technisch funktionsfähiger, automatisch geprüfter und fachlich noch nicht angenommener Ausgangsstand unverändert.
-2. S09A ordnet ausschließlich die vorhandene Dienstplanoberfläche neu. Der eigene Roadmap-Entwurf wird in einem neuen Arbeitschat nochmals geprüft und ausdrücklich abgenommen, bevor Produktions- oder Testcode geändert wird.
-3. Nach Abschluss von S09A entsteht zuerst ein eigener Fragenkatalog und danach eine abgenommene Roadmap für S09B. Der Planungsqualitätsbericht misst den unveränderten Ausgangsstand; sein genauer Inhalt wird nicht in dieser Roadmap vorweggenommen.
+2. S09A hat ausschließlich die vorhandene Dienstplanoberfläche neu geordnet und ist vollständig abgenommen und archiviert. Der Generator blieb dabei unverändert.
+3. `S09B_PLANNING_QUALITY_REPORT_QUESTIONS.md` und `S09B_PLANNING_QUALITY_REPORT_ROADMAP.md` sowie QB-01 bis QB-05 sind ausdrücklich abgenommen. QB-06 stellt Planungs- und Generierungsbericht im eigenen nicht-modalen Einzelfenster bereit. Vor seiner erneuten sichtbaren Abnahme korrigiert der freigegebene QB-06A-Plan die vollständige Phasenherkunft und belegte Unterbrechungsangaben; QB-06A.1 bis QB-06A.4 sind abgenommen, QB-06A.5 stellt die daraus abgeleiteten wahrheitsgemäßen Application-Aussagen im Generierungsbereich dar und wartet auf die sichtbare Abnahme.
 4. S09B bleibt von System 10 getrennt: Es liefert nachvollziehbare Qualitätswerte zur Beurteilung des Generators, aber noch keine vollständigen deutschen Ursachenanalysen oder Lösungsvorschläge.
 5. Erst der Bericht bestimmt, ob Laufzeit, Regelübersetzung, Zielmatrix, gemeinsame Optimierung oder die dokumentierte Rückfalllösung geändert werden sollen. Jede fachliche oder technische Optimierung erhält vor ihrer Umsetzung einen eigenen kleinen, ausdrücklich abgenommenen Folgeplan.
 6. AG-15 prüft erst den danach als endgültig vorgesehenen Algorithmus mit Referenzlöser, Invarianten, Mutationen und Lastfällen. AG-16 schließt System 09 anschließend insgesamt ab.
@@ -1242,7 +1242,7 @@ Abnahmebedingung:
 - AG-14A: ausdrückliche Abnahme des Planungsentwurfs vor der Implementierung und sichtbare Abnahme des vollständigen Verwerfens vor AG-15.
 - AG-14B: ausdrückliche Abnahme des neuen Optimierungsplans vor jeder Codeänderung.
 - S09A: sichtbare Abnahme des reinen UI-Umbaus bei unverändertem Generator.
-- S09B: ausdrückliche Abnahme des noch zu planenden Qualitätsberichts und seiner neutralen Ausgangsmessung.
+- S09B: ausdrückliche Abnahme des Fragenkatalogs, der daran angepassten Roadmap und der anschließenden neutralen Ausgangsmessung.
 - AG-14F: fachliche Annahme des nach Bericht und gegebenenfalls gezielter Optimierung endgültig vorgesehenen Algorithmus oder ausdrückliche Entscheidung für einen eigenen Rückfallplan; vorher beginnt AG-15 nicht.
 - AG-15: fachliche Abnahme der besonders wichtigen Kombinationsfälle und Bewertung des dokumentierten Performance-Nachweises.
 - AG-16: ausdrückliche Gesamtabnahme von System 09.
@@ -1271,7 +1271,7 @@ Abnahmebedingung:
 
 ## Übergaben an spätere Systeme
 
-- System 10 erhält alle wirksamen Bedarfe des Drei-Wochen-Zeitraums, ihre Zuweisungen und stabilen offenen Zeitanteile sowie Regelbewertungen, Hinweis-, Ursache- und technische Grundcodes und fachliche Parameter. Es stellt daraus die bestätigte vollständige Übersicht aller vollständig gedeckten, im `Spr`-Sonderfall teilweise gedeckten und ungedeckten Bedarfe mit benötigten, gedeckten und offenen Personen beziehungsweise Minuten und Gesamtsummen bereit. Für teilweise oder vollständig offene Bedarfe formuliert es vollständige Konflikterklärungen und Lösungsvorschläge.
+- System 10 erhält die in S09B bereits neutral dargestellten wirksamen Bedarfe, Zuweisungen und stabilen offenen Zeitanteile sowie Regelbewertungen, Hinweis-, Ursache- und technische Grundcodes und fachliche Parameter. Es dupliziert die Bedarfsrechnung nicht, sondern ergänzt für teilweise oder vollständig offene Bedarfe vollständige Konflikterklärungen und Lösungsvorschläge.
 - System 11 verwendet den aktuellen Entwurf, ergänzt allgemeine manuelle Bearbeitung, bedienbare Einzelsperren und bestätigte Abweichungen. Es darf keine automatische Neugenerierung durch eine manuelle Änderung auslösen.
 - System 12 übernimmt einen fachlich geprüften aktuellen Entwurf in unveränderliche Planversionen und bewahrt ältere Fassungen.
 - System 15 prüft die portable Windows-Ausgabe einschließlich nativer OR-Tools-Laufzeit auf einem geeigneten sauberen Windows-11-System.
@@ -1294,4 +1294,4 @@ Der Abschlussbericht nennt jeweils:
 
 ## Nächster minimaler Schritt
 
-AG-07 bis AG-14B wurden am 2026-09-17 ausdrücklich abgenommen. AG-14C bis AG-14E sind umgesetzt und automatisch geprüft; ihre ausdrückliche Einzelabnahme ist offen. Die automatischen Vergleichsfälle und die Fehlerkorrektur aus AG-14F sind ebenfalls grün. Insgesamt bestehen 982 automatische Prüfungen sowie ein vollständiger Solution-Build ohne Warnungen oder Fehler. Die erneute sichtbare Generierung wurde bestätigt, die Ergebnisqualität aber ausdrücklich noch nicht. Der nächste minimale Schritt ist in einem neuen Arbeitschat die Prüfung und ausdrückliche Abnahme des S09A-Roadmap-Entwurfs. Danach folgt der reine UI-Umbau bei eingefrorenem Generator; Fragenkatalog und Roadmap für S09B entstehen erst nach S09A. AG-15 bleibt bis zu Bericht, gezielter Folgeentscheidung und ausdrücklicher Annahme des endgültigen Algorithmus gesperrt.
+AG-07 bis AG-14B wurden am 2026-09-17 ausdrücklich abgenommen. AG-14C bis AG-14E sind umgesetzt und automatisch geprüft; ihre ausdrückliche Einzelabnahme ist offen. Die erneute sichtbare Generierung wurde bestätigt, die Ergebnisqualität aber ausdrücklich noch nicht. S09A ist abgeschlossen und archiviert. Der S09B-Fragenkatalog, die Roadmap und QB-01 bis QB-05 sind abgenommen. QB-06 mit eigenem nicht-modalem Berichtsfenster und Aktualitätsbindung ist technisch umgesetzt. Die sichtbare Prüfung hat zwei Berichtslücken bestätigt; QB-06A ist für ihre Korrektur in fünf kleinen Teilen freigegeben. QB-06A.1 bis QB-06A.4 sind abgenommen. QB-06A.5 ist technisch umgesetzt und zeigt die vollständige Eingangsprüfung, belegte Unterbrechungsangaben, die Zwischenstandseinordnung und den Grund nicht begonnener Folgephasen; sieben gezielte Fälle sind grün. Der nächste minimale Schritt ist die sichtbare Prüfung und ausdrückliche Abnahme von QB-06A.5 und der korrigierten QB-06-Anzeige. Danach beginnt QB-07 mit dem nächsten vollständigen Projektcheck. AG-15 bleibt bis zu Bericht, gezielter Folgeentscheidung und ausdrücklicher Annahme des endgültigen Algorithmus gesperrt.

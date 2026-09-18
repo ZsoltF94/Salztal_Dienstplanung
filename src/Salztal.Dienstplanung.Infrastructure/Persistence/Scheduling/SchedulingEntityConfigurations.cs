@@ -263,6 +263,9 @@ internal static class SchedulingEntityConfigurations
         builder.Property(entity => entity.SolverName).HasMaxLength(200);
         builder.Property(entity => entity.SolverVersion).HasMaxLength(100);
         builder.Property(entity => entity.SettingsPayload).IsRequired();
+        builder.Property(entity => entity.PhasesPayload)
+            .IsRequired()
+            .HasDefaultValue("[]");
         builder.Property(entity => entity.ObjectivePayload).IsRequired();
         builder.HasOne<ScheduleDraftEntity>()
             .WithOne()

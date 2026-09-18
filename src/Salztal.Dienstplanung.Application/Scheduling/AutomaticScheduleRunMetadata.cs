@@ -2,6 +2,13 @@ using System.Collections.ObjectModel;
 
 namespace Salztal.Dienstplanung.Application.Scheduling;
 
+public enum AutomaticSchedulePhaseTraceCompleteness
+{
+    Complete,
+    InputValidationNotRecorded,
+    NotRecorded,
+}
+
 public sealed record AutomaticScheduleSetting(string Key, string Value)
 {
     public string Key { get; } = string.IsNullOrWhiteSpace(Key)
@@ -24,7 +31,8 @@ public sealed class AutomaticScheduleRunMetadata
         TimeSpan optimizationDuration,
         TimeSpan resultMappingDuration,
         TimeSpan totalDuration,
-        IEnumerable<AutomaticScheduleSetting> settings)
+        IEnumerable<AutomaticScheduleSetting> settings,
+        IEnumerable<AutomaticSchedulePhaseSnapshot>? phases = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(solverName);
         ArgumentException.ThrowIfNullOrWhiteSpace(solverVersion);
@@ -77,6 +85,12 @@ public sealed class AutomaticScheduleRunMetadata
         TotalDuration = totalDuration;
         Settings = Array.AsReadOnly(
             settingValues.OrderBy(setting => setting.Key, StringComparer.Ordinal).ToArray());
+        Phases = AutomaticSchedulePhaseSequence.Create(phases ?? []);
+        PhaseTraceCompleteness = Phases.Count == 0
+            ? AutomaticSchedulePhaseTraceCompleteness.NotRecorded
+            : Phases[0].Kind == AutomaticSchedulePhaseKind.InputValidation
+                ? AutomaticSchedulePhaseTraceCompleteness.Complete
+                : AutomaticSchedulePhaseTraceCompleteness.InputValidationNotRecorded;
     }
 
     public string SolverName { get; }
@@ -96,6 +110,27 @@ public sealed class AutomaticScheduleRunMetadata
     public TimeSpan TotalDuration { get; }
 
     public ReadOnlyCollection<AutomaticScheduleSetting> Settings { get; }
+
+    public ReadOnlyCollection<AutomaticSchedulePhaseSnapshot> Phases { get; }
+
+    public AutomaticSchedulePhaseTraceCompleteness PhaseTraceCompleteness { get; }
+
+    internal AutomaticScheduleRunMetadata PrependPhase(
+        AutomaticSchedulePhaseSnapshot phase)
+    {
+        ArgumentNullException.ThrowIfNull(phase);
+        return new AutomaticScheduleRunMetadata(
+            SolverName,
+            SolverVersion,
+            ResultStatus,
+            TimeLimit,
+            ModelBuildDuration,
+            OptimizationDuration,
+            ResultMappingDuration,
+            TotalDuration,
+            Settings,
+            [phase, .. Phases]);
+    }
 
     private static void ThrowIfNegative(TimeSpan value, string parameterName)
     {

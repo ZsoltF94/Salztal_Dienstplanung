@@ -59,6 +59,29 @@ internal sealed class RecordingAutomaticScheduleGenerationActions
     }
 }
 
+internal sealed class RecordingAutomaticScheduleReportPresenter
+    : IAutomaticScheduleReportPresenter
+{
+    public AutomaticScheduleReportSource? Source { get; private set; }
+
+    public string? UnavailableMessage { get; private set; }
+
+    public int ShowCallCount { get; private set; }
+
+    public void SetSource(
+        AutomaticScheduleReportSource? source,
+        string unavailableMessage)
+    {
+        Source = source;
+        UnavailableMessage = unavailableMessage;
+    }
+
+    public void ShowCurrent()
+    {
+        ShowCallCount++;
+    }
+}
+
 internal static class AutomaticScheduleGenerationTestData
 {
     public static readonly Guid DraftId = new("38443985-7d74-41a8-b5c3-6867dcb70934");
@@ -75,26 +98,54 @@ internal static class AutomaticScheduleGenerationTestData
         null);
 
     public static AutomaticScheduleGenerationOutcome SuccessOutcome(
-        AutomaticSchedulePlanningStatus status = AutomaticSchedulePlanningStatus.Optimal)
+        AutomaticSchedulePlanningStatus status = AutomaticSchedulePlanningStatus.Optimal,
+        IEnumerable<AutomaticSchedulePhaseSnapshot>? phases = null)
     {
-        AutomaticScheduleProposal proposal = CreateProposal(status);
+        AutomaticScheduleProposal proposal = CreateProposal(status, phases);
+        AutomaticSchedulePlanningReport planningReport =
+            PlanningDemandReportTestData.Create();
+        AutomaticScheduleGenerationStatus generationStatus =
+            status == AutomaticSchedulePlanningStatus.Optimal
+                ? AutomaticScheduleGenerationStatus.Optimal
+                : AutomaticScheduleGenerationStatus.FeasibleNotProvenOptimal;
         string message = status == AutomaticSchedulePlanningStatus.Optimal
             ? "Der automatische Vorschlag wurde erfolgreich erzeugt."
             : "Ein zulässiger Vorschlag wurde erzeugt.";
         return new AutomaticScheduleGenerationOutcome(
-            status == AutomaticSchedulePlanningStatus.Optimal
-                ? AutomaticScheduleGenerationStatus.Optimal
-                : AutomaticScheduleGenerationStatus.FeasibleNotProvenOptimal,
+            generationStatus,
             message,
             new AutomaticSchedulePreview(status, proposal),
-            []);
+            [],
+            new AutomaticScheduleGenerationReport(
+                generationStatus,
+                planningReport,
+                proposal.Metadata.Phases,
+                [],
+                proposal.Metadata,
+                AutomaticScheduleObjectiveSnapshot.Create(
+                    proposal.ObjectiveVector)));
     }
+
+    public static AutomaticScheduleGenerationOutcome TimeLimitedFeasibleOutcome() =>
+        SuccessOutcome(
+            AutomaticSchedulePlanningStatus.FeasibleNotProvenOptimal,
+            CreateRegularCoverageInterruption(includeTermination: true));
+
+    public static AutomaticScheduleGenerationOutcome LegacyInterruptedOutcome() =>
+        SuccessOutcome(
+            AutomaticSchedulePlanningStatus.FeasibleNotProvenOptimal,
+            CreateRegularCoverageInterruption(includeTermination: false));
 
     public static AutomaticScheduleGenerationOutcome CancelledOutcome() => new(
         AutomaticScheduleGenerationStatus.Cancelled,
         "Die automatische Planung wurde abgebrochen. Der Entwurf blieb unverändert.",
         null,
-        []);
+        [],
+        new AutomaticScheduleGenerationReport(
+            AutomaticScheduleGenerationStatus.Cancelled,
+            null,
+            [],
+            []));
 
     public static AutomaticScheduleGenerationOutcome TechnicalFailureOutcome() => new(
         AutomaticScheduleGenerationStatus.TechnicalFailure,
@@ -102,10 +153,21 @@ internal static class AutomaticScheduleGenerationTestData
         null,
         [new AutomaticScheduleError(
             AutomaticScheduleErrorCode.TechnicalFailure,
-            CorrelationId: "test-4711")]);
+            CorrelationId: "test-4711")],
+        new AutomaticScheduleGenerationReport(
+            AutomaticScheduleGenerationStatus.TechnicalFailure,
+            null,
+            [new AutomaticSchedulePhaseSnapshot(
+                AutomaticSchedulePhaseKind.ModelBuilding,
+                AutomaticSchedulePhaseStatus.Failed,
+                TimeSpan.FromMilliseconds(5))],
+            [new AutomaticScheduleError(
+                AutomaticScheduleErrorCode.TechnicalFailure,
+                CorrelationId: "test-4711")]));
 
     private static AutomaticScheduleProposal CreateProposal(
-        AutomaticSchedulePlanningStatus status)
+        AutomaticSchedulePlanningStatus status,
+        IEnumerable<AutomaticSchedulePhaseSnapshot>? phases)
     {
         RuleCatalog catalog = InitialRuleCatalog.Read(InitialRuleCatalog.Version).Value!;
         ScheduleRuleEvaluationSet evaluations = new(
@@ -115,7 +177,7 @@ internal static class AutomaticScheduleGenerationTestData
                 RuleEvaluationStatus.NotApplicable,
                 NoRuleResultParameters.Instance)));
         ScheduleObjectiveVector objective = new(
-            270,
+            240,
             1,
             RuleViolationSet.Empty,
             RuleViolationSet.Empty,
@@ -131,7 +193,8 @@ internal static class AutomaticScheduleGenerationTestData
             TimeSpan.FromSeconds(3),
             TimeSpan.FromMilliseconds(100),
             TimeSpan.FromSeconds(4),
-            [new AutomaticScheduleSetting("workers", "1")]);
+            [new AutomaticScheduleSetting("workers", "1")],
+            phases ?? CreateGenerationPhases(objective, status));
         return new AutomaticScheduleProposal(
             SnapshotId,
             DraftId,
@@ -148,8 +211,8 @@ internal static class AutomaticScheduleGenerationTestData
                     new Guid("2a43f085-f20c-4fb5-821e-d23606b3730c"),
                     1,
                     new TimeOnly(6, 30),
-                    new TimeOnly(10, 30),
-                    240,
+                    new TimeOnly(9, 30),
+                    180,
                     AutomaticScheduleOpenDemandKind.FullyUncovered),
                 new AutomaticScheduleOpenDemand(
                     new Guid("352895eb-12df-4130-a2c9-484ab98d31d8"),
@@ -158,12 +221,102 @@ internal static class AutomaticScheduleGenerationTestData
                     new Guid("8d5e0be0-e6af-4ebf-a387-c66baaec2ff7"),
                     1,
                     new TimeOnly(16, 30),
-                    new TimeOnly(17, 0),
-                    30,
+                    new TimeOnly(17, 30),
+                    60,
                     AutomaticScheduleOpenDemandKind.PartiallyUncoveredReliefShift),
             ],
             objective,
             evaluations,
             metadata);
+    }
+
+    private static AutomaticSchedulePhaseSnapshot[] CreateRegularCoverageInterruption(
+        bool includeTermination)
+    {
+        return
+        [
+            new AutomaticSchedulePhaseSnapshot(
+                AutomaticSchedulePhaseKind.InputValidation,
+                AutomaticSchedulePhaseStatus.Completed,
+                TimeSpan.FromMilliseconds(3),
+                [new AutomaticSchedulePhaseValue("issue_count", 0)]),
+            new AutomaticSchedulePhaseSnapshot(
+                AutomaticSchedulePhaseKind.ModelBuilding,
+                AutomaticSchedulePhaseStatus.Completed,
+                TimeSpan.FromMilliseconds(40),
+                [
+                    new AutomaticSchedulePhaseValue("candidate_count", 42),
+                    new AutomaticSchedulePhaseValue("remaining_demand_count", 8),
+                ]),
+            new AutomaticSchedulePhaseSnapshot(
+                AutomaticSchedulePhaseKind.HardRules,
+                AutomaticSchedulePhaseStatus.Completed,
+                TimeSpan.FromMilliseconds(80)),
+            new AutomaticSchedulePhaseSnapshot(
+                AutomaticSchedulePhaseKind.RegularCoverage,
+                AutomaticSchedulePhaseStatus.Interrupted,
+                TimeSpan.FromSeconds(120),
+                [
+                    new AutomaticSchedulePhaseValue("required_minutes", 360),
+                    new AutomaticSchedulePhaseValue("covered_minutes", 120),
+                    new AutomaticSchedulePhaseValue("uncovered_minutes", 240),
+                    new AutomaticSchedulePhaseValue("covered_full_demand_count", 1),
+                    new AutomaticSchedulePhaseValue(
+                        "fully_uncovered_demand_count",
+                        1),
+                ],
+                includeTermination
+                    ? new AutomaticSchedulePhaseTerminationSnapshot(
+                        AutomaticSchedulePhaseTerminationReason
+                            .TimeLimitWithFeasibleSelection,
+                        AutomaticScheduleOptimizationTargetKind
+                            .RegularTouchedDemandSlots,
+                        TimeSpan.FromSeconds(120),
+                        TimeSpan.FromMilliseconds(120_018))
+                    : null),
+        ];
+    }
+
+    private static AutomaticSchedulePhaseSnapshot[] CreateGenerationPhases(
+        ScheduleObjectiveVector objective,
+        AutomaticSchedulePlanningStatus status)
+    {
+        return Enum.GetValues<AutomaticSchedulePhaseKind>()
+            .Select(kind => new AutomaticSchedulePhaseSnapshot(
+                kind,
+                kind == AutomaticSchedulePhaseKind.LowPriorityRules
+                    ? AutomaticSchedulePhaseStatus.NotApplicable
+                    : kind == AutomaticSchedulePhaseKind.TechnicalTieBreak
+                        && status
+                            == AutomaticSchedulePlanningStatus.FeasibleNotProvenOptimal
+                            ? AutomaticSchedulePhaseStatus.Interrupted
+                            : AutomaticSchedulePhaseStatus.Completed,
+                TimeSpan.FromMilliseconds(1),
+                kind switch
+                {
+                    AutomaticSchedulePhaseKind.HighPriorityRules =>
+                    [new AutomaticSchedulePhaseValue("violation_count", 0)],
+                    AutomaticSchedulePhaseKind.ReliefShiftMinimization
+                        or AutomaticSchedulePhaseKind.SplitShiftMinimization =>
+                    [
+                        new AutomaticSchedulePhaseValue(
+                            "initial_assignment_count",
+                            2),
+                        new AutomaticSchedulePhaseValue("assignment_count", 0),
+                    ],
+                    AutomaticSchedulePhaseKind.AuxiliaryMinimum =>
+                    [
+                        new AutomaticSchedulePhaseValue("violation_count", 0),
+                        new AutomaticSchedulePhaseValue("missing_minutes", 0),
+                    ],
+                    AutomaticSchedulePhaseKind.MediumPriorityRules =>
+                    [new AutomaticSchedulePhaseValue("violation_count", 0)],
+                    AutomaticSchedulePhaseKind.Stability =>
+                    [new AutomaticSchedulePhaseValue(
+                        "total_spread",
+                        objective.StabilityViolations.MagnitudeByRule.Values.Sum())],
+                    _ => [],
+                }))
+            .ToArray();
     }
 }

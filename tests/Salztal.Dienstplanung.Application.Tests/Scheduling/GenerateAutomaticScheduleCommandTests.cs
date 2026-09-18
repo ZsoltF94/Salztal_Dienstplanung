@@ -40,6 +40,237 @@ public sealed class GenerateAutomaticScheduleCommandTests
         Assert.Equal(context.Data.PreparedSnapshot?.Id, result.Preview?.Proposal.SnapshotId);
         Assert.Equal(status, result.Preview?.Proposal.Metadata.ResultStatus);
         Assert.Empty(result.PlanningErrors);
+        Assert.Equal(result.Status, result.Report.Status);
+        Assert.Equal(
+            context.Data.PreparedSnapshot?.Id,
+            result.Report.PlanningReport?.SnapshotId);
+        Assert.Empty(result.Report.Errors);
+        Assert.Equal(15, result.Report.PhaseReports.Count);
+        Assert.NotNull(result.Report.TechnicalDetails);
+        Assert.NotNull(result.Report.Objective);
+        AutomaticScheduleGenerationPhaseReportSnapshot reliefCoverage = Assert.Single(
+            result.Report.PhaseReports,
+            value => value.Kind == AutomaticSchedulePhaseKind.ReliefCoverage);
+        Assert.Equal(
+            result.Report.Objective.UncoveredEmployeeMinutes,
+            Assert.Single(
+                reliefCoverage.Metrics,
+                value => value.Key == "uncovered_minutes").AchievedValue);
+        Assert.Equal(
+            result.Report.Objective.FullyUncoveredDemandSlotCount,
+            Assert.Single(
+                reliefCoverage.Metrics,
+                value => value.Key == "fully_uncovered_demand_count").AchievedValue);
+    }
+
+    [Fact]
+    public async Task OptimalRunExplainsProvenOptimizationPhase()
+    {
+        GenerationTestContext context = await GenerationTestContext.CreateAsync();
+        RecordingPlanner planner = new(request => Task.FromResult(
+            Success(request.Snapshot, AutomaticSchedulePlanningStatus.Optimal)));
+
+        AutomaticScheduleGenerationResult result = await
+            new GenerateAutomaticScheduleCommand(context.Data, planner).ExecuteAsync(
+                context.Request,
+                TestContext.Current.CancellationToken);
+
+        AutomaticScheduleGenerationPhaseReportSnapshot regular = Assert.Single(
+            result.Report.PhaseReports,
+            phase => phase.Kind == AutomaticSchedulePhaseKind.RegularCoverage);
+        Assert.Equal(
+            AutomaticScheduleGenerationPhaseReportStatus.OptimalProven,
+            regular.Status);
+        Assert.Equal(
+            "Die Optimalität dieses Teilziels wurde nachgewiesen.",
+            regular.Explanation);
+        Assert.Null(regular.MetricContext);
+    }
+
+    [Fact]
+    public async Task FeasibleTimeoutExplainsRetainedIntermediateAndFollowingPhases()
+    {
+        GenerationTestContext context = await GenerationTestContext.CreateAsync();
+        AutomaticSchedulePhaseSnapshot[] phases =
+        [
+            new AutomaticSchedulePhaseSnapshot(
+                AutomaticSchedulePhaseKind.InputValidation,
+                AutomaticSchedulePhaseStatus.Completed,
+                TimeSpan.FromMilliseconds(1)),
+            new AutomaticSchedulePhaseSnapshot(
+                AutomaticSchedulePhaseKind.RegularCoverage,
+                AutomaticSchedulePhaseStatus.Interrupted,
+                TimeSpan.FromSeconds(120),
+                [
+                    new AutomaticSchedulePhaseValue("required_minutes", 600),
+                    new AutomaticSchedulePhaseValue("covered_minutes", 480),
+                    new AutomaticSchedulePhaseValue("uncovered_minutes", 120),
+                ],
+                new AutomaticSchedulePhaseTerminationSnapshot(
+                    AutomaticSchedulePhaseTerminationReason
+                        .TimeLimitWithFeasibleSelection,
+                    AutomaticScheduleOptimizationTargetKind
+                        .RegularTouchedDemandSlots,
+                    TimeSpan.FromSeconds(120),
+                    TimeSpan.FromMilliseconds(120_018))),
+        ];
+        RecordingPlanner planner = new(request => Task.FromResult(Success(
+            request.Snapshot,
+            AutomaticSchedulePlanningStatus.FeasibleNotProvenOptimal,
+            phases: phases)));
+
+        AutomaticScheduleGenerationResult result = await
+            new GenerateAutomaticScheduleCommand(context.Data, planner).ExecuteAsync(
+                context.Request,
+                TestContext.Current.CancellationToken);
+
+        AutomaticScheduleGenerationPhaseReportSnapshot regular = Assert.Single(
+            result.Report.PhaseReports,
+            phase => phase.Kind == AutomaticSchedulePhaseKind.RegularCoverage);
+        Assert.Equal(
+            AutomaticScheduleGenerationPhaseReportStatus.FeasibleNotProvenOptimal,
+            regular.Status);
+        Assert.Contains("Zeitgrenze von 120,000 s", regular.Explanation);
+        Assert.Contains(
+            "vollständig berührte reguläre Bedarfsplätze",
+            regular.Explanation);
+        Assert.Contains("nach 120,018 s", regular.Explanation);
+        Assert.Contains("zulässige Zwischenstand wurde behalten", regular.Explanation);
+        Assert.Contains("Optimalität ist nicht nachgewiesen", regular.Explanation);
+        Assert.Equal(
+            "Die Werte beschreiben den behaltenen zulässigen Zwischenstand. Sie sind nicht als Optimum bewiesen.",
+            regular.MetricContext);
+        Assert.All(
+            result.Report.PhaseReports.Where(phase =>
+                phase.Kind > AutomaticSchedulePhaseKind.RegularCoverage),
+            phase =>
+            {
+                Assert.Equal(
+                    AutomaticScheduleGenerationPhaseReportStatus.NotReached,
+                    phase.Status);
+                Assert.Contains("Nicht begonnen", phase.Explanation);
+                Assert.Contains("Reguläre Bedarfsdeckung", phase.Explanation);
+                Assert.Contains("Zeitgrenze", phase.Explanation);
+            });
+    }
+
+    public static TheoryData<
+        AutomaticSchedulePhaseTerminationReason,
+        AutomaticSchedulePlanningStatus,
+        string> TerminationExplanations => new()
+        {
+            {
+                AutomaticSchedulePhaseTerminationReason.TimeLimitWithoutFeasibleSelection,
+                AutomaticSchedulePlanningStatus.TimedOutWithoutFeasibleResult,
+                "keine zulässige Auswahl"
+            },
+            {
+                AutomaticSchedulePhaseTerminationReason.CancellationRequested,
+                AutomaticSchedulePlanningStatus.Cancelled,
+                "auf Anforderung"
+            },
+            {
+                AutomaticSchedulePhaseTerminationReason.TechnicalFailure,
+                AutomaticSchedulePlanningStatus.TechnicalFailure,
+                "technischen Fehlers"
+            },
+        };
+
+    [Theory]
+    [MemberData(nameof(TerminationExplanations))]
+    public async Task FailedRunExplainsConfirmedTerminationAndFollowingPhases(
+        AutomaticSchedulePhaseTerminationReason reason,
+        AutomaticSchedulePlanningStatus planningStatus,
+        string expectedText)
+    {
+        GenerationTestContext context = await GenerationTestContext.CreateAsync();
+        AutomaticSchedulePhaseTerminationSnapshot termination = reason switch
+        {
+            AutomaticSchedulePhaseTerminationReason.TimeLimitWithoutFeasibleSelection =>
+                new AutomaticSchedulePhaseTerminationSnapshot(
+                    reason,
+                    AutomaticScheduleOptimizationTargetKind.RegularCoveredMinutes,
+                    TimeSpan.FromSeconds(120),
+                    TimeSpan.FromMilliseconds(120_006)),
+            _ => new AutomaticSchedulePhaseTerminationSnapshot(
+                reason,
+                AutomaticScheduleOptimizationTargetKind.RegularCoveredMinutes),
+        };
+        AutomaticSchedulePhaseSnapshot terminalPhase = new(
+            AutomaticSchedulePhaseKind.RegularCoverage,
+            reason == AutomaticSchedulePhaseTerminationReason.TechnicalFailure
+                ? AutomaticSchedulePhaseStatus.Failed
+                : AutomaticSchedulePhaseStatus.Interrupted,
+            TimeSpan.FromMilliseconds(8),
+            termination: termination);
+        RecordingPlanner planner = new(_ => Task.FromResult(
+            AutomaticSchedulePlanningResult.Failure(
+                planningStatus,
+                phases:
+                [
+                    new AutomaticSchedulePhaseSnapshot(
+                        AutomaticSchedulePhaseKind.InputValidation,
+                        AutomaticSchedulePhaseStatus.Completed,
+                        TimeSpan.FromMilliseconds(1)),
+                    terminalPhase,
+                ])));
+
+        AutomaticScheduleGenerationResult result = await
+            new GenerateAutomaticScheduleCommand(context.Data, planner).ExecuteAsync(
+                context.Request,
+                TestContext.Current.CancellationToken);
+
+        AutomaticScheduleGenerationPhaseReportSnapshot regular = Assert.Single(
+            result.Report.PhaseReports,
+            phase => phase.Kind == AutomaticSchedulePhaseKind.RegularCoverage);
+        Assert.Contains(expectedText, regular.Explanation);
+        AutomaticScheduleGenerationPhaseReportSnapshot following = Assert.Single(
+            result.Report.PhaseReports,
+            phase => phase.Kind == AutomaticSchedulePhaseKind.ReliefCoverage);
+        Assert.Contains("Nicht begonnen", following.Explanation);
+        Assert.Contains(expectedText, following.Explanation);
+    }
+
+    [Fact]
+    public async Task LegacyInterruptionMarksMissingDetailsWithoutInventingReason()
+    {
+        GenerationTestContext context = await GenerationTestContext.CreateAsync();
+        AutomaticSchedulePhaseSnapshot[] phases =
+        [
+            new AutomaticSchedulePhaseSnapshot(
+                AutomaticSchedulePhaseKind.InputValidation,
+                AutomaticSchedulePhaseStatus.Completed,
+                TimeSpan.FromMilliseconds(1)),
+            new AutomaticSchedulePhaseSnapshot(
+                AutomaticSchedulePhaseKind.RegularCoverage,
+                AutomaticSchedulePhaseStatus.Interrupted,
+                TimeSpan.FromSeconds(120),
+                [new AutomaticSchedulePhaseValue("covered_minutes", 480)]),
+        ];
+        RecordingPlanner planner = new(request => Task.FromResult(Success(
+            request.Snapshot,
+            AutomaticSchedulePlanningStatus.FeasibleNotProvenOptimal,
+            phases: phases)));
+
+        AutomaticScheduleGenerationResult result = await
+            new GenerateAutomaticScheduleCommand(context.Data, planner).ExecuteAsync(
+                context.Request,
+                TestContext.Current.CancellationToken);
+
+        AutomaticScheduleGenerationPhaseReportSnapshot regular = Assert.Single(
+            result.Report.PhaseReports,
+            phase => phase.Kind == AutomaticSchedulePhaseKind.RegularCoverage);
+        Assert.Contains("älteren Lauf nicht gespeichert", regular.Explanation);
+        Assert.DoesNotContain("Zeitgrenze", regular.Explanation);
+        Assert.Equal(
+            "Die aufgezeichneten Werte sind Teilstände und kein nachgewiesenes Optimum.",
+            regular.MetricContext);
+        AutomaticScheduleGenerationPhaseReportSnapshot following = Assert.Single(
+            result.Report.PhaseReports,
+            phase => phase.Kind == AutomaticSchedulePhaseKind.ReliefCoverage);
+        Assert.Contains("Nicht begonnen", following.Explanation);
+        Assert.Contains("älteren Lauf nicht gespeichert", following.Explanation);
+        Assert.DoesNotContain("Zeitgrenze", following.Explanation);
     }
 
     [Fact]
@@ -253,8 +484,15 @@ public sealed class GenerateAutomaticScheduleCommandTests
                     AutomaticScheduleErrorCode.TechnicalFailure,
                     CorrelationId: "synthetic-correlation")]
                 : [];
+        AutomaticSchedulePhaseSnapshot phase = new(
+            AutomaticSchedulePhaseKind.InputValidation,
+            AutomaticSchedulePhaseStatus.Completed,
+            TimeSpan.FromMilliseconds(1));
         RecordingPlanner planner = new(_ => Task.FromResult(
-            AutomaticSchedulePlanningResult.Failure(planningStatus, errors)));
+            AutomaticSchedulePlanningResult.Failure(
+                planningStatus,
+                errors,
+                [phase])));
         GenerateAutomaticScheduleCommand command = new(context.Data, planner);
         int savesBeforeGeneration = context.Data.SaveCallCount;
 
@@ -266,6 +504,24 @@ public sealed class GenerateAutomaticScheduleCommandTests
         Assert.Null(result.Preview);
         Assert.Null(command.CurrentPreview);
         Assert.Equal(savesBeforeGeneration, context.Data.SaveCallCount);
+        Assert.Equal(expectedStatus, result.Report.Status);
+        Assert.Null(result.Report.PlanningReport);
+        Assert.Same(phase, Assert.Single(result.Report.PlanningPhases));
+        Assert.Equal(errors, result.Report.Errors);
+        Assert.Equal(
+            AutomaticSchedulePhaseKind.InputValidation,
+            result.Report.LastReachedPhase);
+        Assert.Equal(15, result.Report.PhaseReports.Count);
+        Assert.Equal(
+            AutomaticScheduleGenerationPhaseReportStatus.Completed,
+            result.Report.PhaseReports[0].Status);
+        Assert.All(
+            result.Report.PhaseReports.Skip(1),
+            value => Assert.Equal(
+                AutomaticScheduleGenerationPhaseReportStatus.NotReached,
+                value.Status));
+        Assert.Null(result.Report.TechnicalDetails);
+        Assert.Null(result.Report.Objective);
     }
 
     [Fact]
@@ -446,7 +702,8 @@ public sealed class GenerateAutomaticScheduleCommandTests
     private static AutomaticSchedulePlanningResult Success(
         PlanningInputSnapshot snapshot,
         AutomaticSchedulePlanningStatus status,
-        Guid? snapshotId = null)
+        Guid? snapshotId = null,
+        AutomaticSchedulePhaseSnapshot[]? phases = null)
     {
         RuleCatalog catalog = Assert.IsType<RuleCatalog>(
             InitialRuleCatalog.Read(InitialRuleCatalog.Version).Value);
@@ -456,9 +713,38 @@ public sealed class GenerateAutomaticScheduleCommandTests
                 definition.Id,
                 RuleEvaluationStatus.Satisfied,
                 NoRuleResultParameters.Instance)));
+        HashSet<(Guid SourceId, DateOnly Date, Guid WorkLocationId, Guid ShiftTypeId,
+            int Ordinal)> covered = snapshot.ServiceManagementAssignments
+            .SelectMany(assignment => assignment.Coverages)
+            .Select(coverage => (
+                coverage.DemandSourceId,
+                coverage.Date,
+                coverage.WorkLocationId,
+                coverage.ShiftTypeId,
+                coverage.Ordinal))
+            .ToHashSet();
+        AutomaticScheduleOpenDemand[] openDemands = snapshot.DemandSlots
+            .Where(demand => !covered.Contains((
+                demand.SourceId,
+                demand.Date,
+                demand.WorkLocationId,
+                demand.ShiftTypeId,
+                demand.Ordinal)))
+            .Select(demand => new AutomaticScheduleOpenDemand(
+                demand.SourceId,
+                demand.Date,
+                demand.WorkLocationId,
+                demand.ShiftTypeId,
+                demand.Ordinal,
+                demand.ActualStart,
+                demand.ActualEnd,
+                demand.DurationMinutes,
+                AutomaticScheduleOpenDemandKind.FullyUncovered))
+            .ToArray();
         ScheduleObjectiveVector vector = new(
-            0,
-            0,
+            openDemands.Sum(value => value.UncoveredMinutes),
+            openDemands.Count(value =>
+                value.Kind == AutomaticScheduleOpenDemandKind.FullyUncovered),
             RuleViolationSet.Empty,
             RuleViolationSet.Empty,
             RuleViolationSet.Empty,
@@ -472,19 +758,120 @@ public sealed class GenerateAutomaticScheduleCommandTests
             TimeSpan.Zero,
             TimeSpan.Zero,
             TimeSpan.Zero,
-            TimeSpan.Zero,
-            [new AutomaticScheduleSetting("workers", "1")]);
+            TimeSpan.FromMilliseconds(15),
+            [new AutomaticScheduleSetting("workers", "1")],
+            phases ?? CreateGenerationPhases(vector));
         AutomaticScheduleProposal proposal = new(
             snapshotId ?? snapshot.Id,
             snapshot.DraftId,
             snapshot.DraftVersion,
             [],
             [],
-            [],
+            openDemands,
             vector,
             evaluations,
             metadata);
         return AutomaticSchedulePlanningResult.Success(status, proposal);
+    }
+
+    private static AutomaticSchedulePhaseSnapshot[] CreateGenerationPhases(
+        ScheduleObjectiveVector objective)
+    {
+        return Enum.GetValues<AutomaticSchedulePhaseKind>()
+            .Select(kind => new AutomaticSchedulePhaseSnapshot(
+                kind,
+                kind == AutomaticSchedulePhaseKind.LowPriorityRules
+                    ? AutomaticSchedulePhaseStatus.NotApplicable
+                    : AutomaticSchedulePhaseStatus.Completed,
+                TimeSpan.FromMilliseconds(1),
+                kind switch
+                {
+                    AutomaticSchedulePhaseKind.InputValidation =>
+                    [new AutomaticSchedulePhaseValue("issue_count", 0)],
+                    AutomaticSchedulePhaseKind.RegularCoverage =>
+                    [
+                        new AutomaticSchedulePhaseValue(
+                            "required_minutes",
+                            objective.UncoveredEmployeeMinutes + 120L),
+                        new AutomaticSchedulePhaseValue("covered_minutes", 60),
+                        new AutomaticSchedulePhaseValue(
+                            "uncovered_minutes",
+                            objective.UncoveredEmployeeMinutes + 60L),
+                        new AutomaticSchedulePhaseValue(
+                            "covered_full_demand_count",
+                            0),
+                        new AutomaticSchedulePhaseValue(
+                            "fully_uncovered_demand_count",
+                            objective.FullyUncoveredDemandSlotCount + 1L),
+                    ],
+                    AutomaticSchedulePhaseKind.ReliefCoverage =>
+                    [
+                        new AutomaticSchedulePhaseValue(
+                            "required_minutes",
+                            objective.UncoveredEmployeeMinutes + 120L),
+                        new AutomaticSchedulePhaseValue("initial_covered_minutes", 60),
+                        new AutomaticSchedulePhaseValue("covered_minutes", 120),
+                        new AutomaticSchedulePhaseValue(
+                            "additional_covered_minutes",
+                            60),
+                        new AutomaticSchedulePhaseValue(
+                            "initial_uncovered_minutes",
+                            objective.UncoveredEmployeeMinutes + 60L),
+                        new AutomaticSchedulePhaseValue(
+                            "uncovered_minutes",
+                            objective.UncoveredEmployeeMinutes),
+                        new AutomaticSchedulePhaseValue(
+                            "covered_full_demand_count",
+                            1),
+                        new AutomaticSchedulePhaseValue(
+                            "initial_fully_uncovered_demand_count",
+                            objective.FullyUncoveredDemandSlotCount + 1L),
+                        new AutomaticSchedulePhaseValue(
+                            "fully_uncovered_demand_count",
+                            objective.FullyUncoveredDemandSlotCount),
+                    ],
+                    AutomaticSchedulePhaseKind.HighPriorityRules =>
+                    [new AutomaticSchedulePhaseValue(
+                        "violation_count",
+                        objective.HighPriorityViolations.Count)],
+                    AutomaticSchedulePhaseKind.ReliefShiftMinimization =>
+                    [
+                        new AutomaticSchedulePhaseValue(
+                            "initial_assignment_count",
+                            objective.ReliefShiftAssignmentCount),
+                        new AutomaticSchedulePhaseValue(
+                            "assignment_count",
+                            objective.ReliefShiftAssignmentCount),
+                    ],
+                    AutomaticSchedulePhaseKind.SplitShiftMinimization =>
+                    [
+                        new AutomaticSchedulePhaseValue(
+                            "initial_assignment_count",
+                            objective.SplitShiftAssignmentCount),
+                        new AutomaticSchedulePhaseValue(
+                            "assignment_count",
+                            objective.SplitShiftAssignmentCount),
+                    ],
+                    AutomaticSchedulePhaseKind.AuxiliaryMinimum =>
+                    [
+                        new AutomaticSchedulePhaseValue(
+                            "violation_count",
+                            objective.AuxiliaryWeeklyMinimum.ViolatedWeekCount),
+                        new AutomaticSchedulePhaseValue(
+                            "missing_minutes",
+                            objective.AuxiliaryWeeklyMinimum.MissingMinutes),
+                    ],
+                    AutomaticSchedulePhaseKind.MediumPriorityRules =>
+                    [new AutomaticSchedulePhaseValue(
+                        "violation_count",
+                        objective.MediumPriorityViolations.Count)],
+                    AutomaticSchedulePhaseKind.Stability =>
+                    [new AutomaticSchedulePhaseValue(
+                        "total_spread",
+                        objective.StabilityViolations.MagnitudeByRule.Values.Sum())],
+                    _ => [],
+                }))
+            .ToArray();
     }
 
     private static AutomaticScheduleGenerationStatus Map(

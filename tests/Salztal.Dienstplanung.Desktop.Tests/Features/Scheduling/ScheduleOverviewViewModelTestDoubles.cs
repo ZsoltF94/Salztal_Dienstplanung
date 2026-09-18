@@ -35,34 +35,57 @@ internal sealed class FakeScheduleDataAccess :
     private readonly List<ScheduleDraft> _drafts = [];
     private readonly Employee[] _employees;
 
-    public FakeScheduleDataAccess(int additionalNormalEmployees = 0)
+    public FakeScheduleDataAccess(
+        int additionalNormalEmployees = 0,
+        bool includeServiceManagement = true,
+        bool includeNormal = true,
+        bool includeAuxiliary = true,
+        int additionalAuxiliaryEmployees = 0)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(additionalNormalEmployees);
+        ArgumentOutOfRangeException.ThrowIfNegative(additionalAuxiliaryEmployees);
 
-        _employees =
-        [
-            CreateEmployee(
-                ServiceManagementEmployeeId,
-                "Sarah",
-                "Leitung",
-                InitialEmployeeTypeCatalog.Type1),
-            CreateEmployee(
+        List<Employee> employees = [];
+        if (includeNormal)
+        {
+            employees.Add(CreateEmployee(
                 NormalEmployeeId,
                 "Erika",
                 "Muster",
-                InitialEmployeeTypeCatalog.Type25),
-            CreateEmployee(
+                InitialEmployeeTypeCatalog.Type25));
+        }
+
+        if (includeAuxiliary)
+        {
+            employees.Add(CreateEmployee(
                 AuxiliaryEmployeeId,
                 "Alex",
                 "Beispiel",
-                InitialEmployeeTypeCatalog.TypeAh1),
-            .. Enumerable.Range(1, additionalNormalEmployees)
-                .Select(index => CreateEmployee(
-                    Guid.Parse($"00000000-0000-0000-0000-{index:000000000000}"),
-                    "Test",
-                    $"Person {index:00}",
-                    InitialEmployeeTypeCatalog.Type25)),
-        ];
+                InitialEmployeeTypeCatalog.TypeAh1));
+        }
+
+        employees.AddRange(Enumerable.Range(1, additionalNormalEmployees)
+            .Select(index => CreateEmployee(
+                Guid.Parse($"00000000-0000-0000-0000-{index:000000000000}"),
+                "Test",
+                $"Person {index:00}",
+                InitialEmployeeTypeCatalog.Type25)));
+        employees.AddRange(Enumerable.Range(1, additionalAuxiliaryEmployees)
+            .Select(index => CreateEmployee(
+                Guid.Parse($"10000000-0000-0000-0000-{index:000000000000}"),
+                "Weitere",
+                $"Person AH {index:00}",
+                InitialEmployeeTypeCatalog.TypeAh1)));
+        if (includeServiceManagement)
+        {
+            employees.Add(CreateEmployee(
+                ServiceManagementEmployeeId,
+                "Sarah",
+                "Leitung",
+                InitialEmployeeTypeCatalog.Type1));
+        }
+
+        _employees = employees.ToArray();
     }
 
     public int LoadCallCount { get; private set; }

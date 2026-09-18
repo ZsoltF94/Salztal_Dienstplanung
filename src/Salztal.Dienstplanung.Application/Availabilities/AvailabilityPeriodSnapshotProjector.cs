@@ -1,3 +1,4 @@
+using Salztal.Dienstplanung.Application.Employees;
 using Salztal.Dienstplanung.Domain.Availabilities;
 using Salztal.Dienstplanung.Domain.Employees;
 
@@ -82,6 +83,8 @@ internal sealed class AvailabilityPeriodSnapshotProjector
             employeeType.Id.Value,
             employeeType.Code.Value,
             employeeType.Name.Value,
+            EmployeeTypePlanningRoleMapper.ToSnapshotKind(
+                employeeType.PlanningPolicy.Role),
             employeeType.AbsencePolicy.AllowsVacationAndSickness,
             employeeType.AbsencePolicy.DayValue?.Minutes,
             entries,

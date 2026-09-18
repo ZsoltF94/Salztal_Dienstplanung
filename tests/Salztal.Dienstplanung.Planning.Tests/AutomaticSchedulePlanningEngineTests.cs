@@ -6,6 +6,7 @@ using Salztal.Dienstplanung.Planning.Mapping;
 using Salztal.Dienstplanung.Planning.Optimization;
 using Salztal.Dienstplanung.Planning.Tests.Candidates;
 using Salztal.Dienstplanung.Planning.Tests.Optimization;
+using Salztal.Dienstplanung.Planning.Tests.Validation;
 
 namespace Salztal.Dienstplanung.Planning.Tests;
 
@@ -27,12 +28,16 @@ public sealed class AutomaticSchedulePlanningEngineTests
     }
 
     [Fact]
-    public async Task RealEngineReturnsOptimalProposalWithTruthfulMetadata()
+    public async Task RealPlannerReturnsOptimalProposalWithCompleteCanonicalMetadata()
     {
-        AutomaticSchedulePlanningRequest request = CreateRequest();
+        AutomaticSchedulePlanningRequest request = new(
+            PlanningInputTestFactory.Create(),
+            TimeSpan.FromSeconds(30));
 
-        AutomaticSchedulePlanningResult result = await new AutomaticSchedulePlanningEngine()
-            .PlanAsync(request, CancellationToken.None);
+        AutomaticSchedulePlanningResult result = await new AutomaticSchedulePlanner(
+            new AutomaticSchedulePlanningEngine()).PlanAsync(
+                request,
+                CancellationToken.None);
 
         Assert.Equal(AutomaticSchedulePlanningStatus.Optimal, result.Status);
         AutomaticScheduleRunMetadata metadata = Assert.IsType<AutomaticScheduleRunMetadata>(
@@ -49,6 +54,83 @@ public sealed class AutomaticSchedulePlanningEngineTests
             item.Key == "optimization_stages"
             && item.Value.StartsWith("joint:", StringComparison.Ordinal)
             && item.Value.Contains("auxiliary_minimum", StringComparison.Ordinal));
+        Assert.Equal(
+            [
+                AutomaticSchedulePhaseKind.InputValidation,
+                AutomaticSchedulePhaseKind.ModelBuilding,
+                AutomaticSchedulePhaseKind.HardRules,
+                AutomaticSchedulePhaseKind.RegularCoverage,
+                AutomaticSchedulePhaseKind.ReliefCoverage,
+                AutomaticSchedulePhaseKind.HighPriorityRules,
+                AutomaticSchedulePhaseKind.ReliefShiftMinimization,
+                AutomaticSchedulePhaseKind.SplitShiftMinimization,
+                AutomaticSchedulePhaseKind.AuxiliaryMinimum,
+                AutomaticSchedulePhaseKind.RelativeWeeklyTarget,
+                AutomaticSchedulePhaseKind.MediumPriorityRules,
+                AutomaticSchedulePhaseKind.LowPriorityRules,
+                AutomaticSchedulePhaseKind.Stability,
+                AutomaticSchedulePhaseKind.TechnicalTieBreak,
+                AutomaticSchedulePhaseKind.ResultMapping,
+            ],
+            metadata.Phases.Select(value => value.Kind));
+        Assert.Equal(metadata.Phases, result.Phases);
+        Assert.Equal(
+            AutomaticSchedulePhaseTraceCompleteness.Complete,
+            metadata.PhaseTraceCompleteness);
+        Assert.All(
+            metadata.Phases.Where(value => value.Kind
+                != AutomaticSchedulePhaseKind.LowPriorityRules),
+            value => Assert.Equal(
+                AutomaticSchedulePhaseStatus.Completed,
+                value.Status));
+        Assert.Equal(
+            AutomaticSchedulePhaseStatus.NotApplicable,
+            Assert.Single(metadata.Phases, value => value.Kind
+                == AutomaticSchedulePhaseKind.LowPriorityRules).Status);
+        AutomaticSchedulePhaseSnapshot relief = Assert.Single(
+            metadata.Phases,
+            value => value.Kind
+                == AutomaticSchedulePhaseKind.ReliefShiftMinimization);
+        Assert.Contains(
+            relief.Values,
+            value => value.Key == "initial_assignment_count");
+        Assert.Contains(
+            relief.Values,
+            value => value.Key == "assignment_count");
+        AutomaticSchedulePhaseSnapshot split = Assert.Single(
+            metadata.Phases,
+            value => value.Kind
+                == AutomaticSchedulePhaseKind.SplitShiftMinimization);
+        Assert.Contains(
+            split.Values,
+            value => value.Key == "initial_assignment_count");
+        Assert.Contains(
+            split.Values,
+            value => value.Key == "assignment_count");
+        AutomaticSchedulePhaseSnapshot reliefCoverage = Assert.Single(
+            metadata.Phases,
+            value => value.Kind == AutomaticSchedulePhaseKind.ReliefCoverage);
+        Assert.Contains(
+            reliefCoverage.Values,
+            value => value.Key == "initial_covered_minutes");
+        Assert.Contains(
+            reliefCoverage.Values,
+            value => value.Key == "additional_covered_minutes");
+        AutomaticSchedulePhaseSnapshot regularCoverage = Assert.Single(
+            metadata.Phases,
+            value => value.Kind == AutomaticSchedulePhaseKind.RegularCoverage);
+        Assert.Contains(
+            regularCoverage.Values,
+            value => value.Key == "uncovered_minutes");
+        Assert.Contains(
+            regularCoverage.Values,
+            value => value.Key == "fully_uncovered_demand_count");
+        Assert.Contains(
+            reliefCoverage.Values,
+            value => value.Key == "initial_uncovered_minutes");
+        Assert.Contains(
+            reliefCoverage.Values,
+            value => value.Key == "fully_uncovered_demand_count");
     }
 
     [Fact]
@@ -91,6 +173,18 @@ public sealed class AutomaticSchedulePlanningEngineTests
         Assert.Null(result.Preview);
         Assert.Empty(result.Errors);
         Assert.Equal(originalAssignments, request.Snapshot.ServiceManagementAssignments);
+        Assert.NotEmpty(result.Phases);
+        Assert.Equal(
+            AutomaticSchedulePhaseStatus.Interrupted,
+            result.Phases[^1].Status);
+        Assert.Equal(
+            AutomaticSchedulePhaseTerminationReason.TimeLimitWithoutFeasibleSelection,
+            result.Phases[^1].Termination?.Reason);
+        Assert.Equal(
+            AutomaticScheduleOptimizationTargetKind.RegularCoveredMinutes,
+            result.Phases[^1].Termination?.ActiveTarget);
+        Assert.Equal(request.TimeLimit, result.Phases[^1].Termination?.TimeLimit);
+        Assert.True(result.Phases[^1].Termination?.BudgetElapsed >= request.TimeLimit);
     }
 
     [Fact]

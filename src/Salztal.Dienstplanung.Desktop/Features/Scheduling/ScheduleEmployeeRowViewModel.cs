@@ -11,6 +11,7 @@ internal sealed class ScheduleEmployeeRowViewModel
         string employeeTypeName,
         bool allowsVacationAndSickness,
         bool isServiceManagement,
+        bool showsAuxiliaryBoundary,
         IEnumerable<ScheduleCellViewModel> cells,
         IEnumerable<ScheduleWeekSummaryViewModel> weeks)
     {
@@ -20,6 +21,7 @@ internal sealed class ScheduleEmployeeRowViewModel
         EmployeeTypeName = employeeTypeName;
         AllowsVacationAndSickness = allowsVacationAndSickness;
         IsServiceManagement = isServiceManagement;
+        ShowsAuxiliaryBoundary = showsAuxiliaryBoundary;
         Cells = Array.AsReadOnly(cells.ToArray());
         Weeks = Array.AsReadOnly(weeks.ToArray());
     }
@@ -35,6 +37,8 @@ internal sealed class ScheduleEmployeeRowViewModel
     public bool AllowsVacationAndSickness { get; }
 
     public bool IsServiceManagement { get; }
+
+    public bool ShowsAuxiliaryBoundary { get; }
 
     public string EmployeeTypeDisplay => $"{EmployeeTypeCode} – {EmployeeTypeName}";
 

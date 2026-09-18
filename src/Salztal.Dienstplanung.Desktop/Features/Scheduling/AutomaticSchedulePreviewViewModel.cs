@@ -5,7 +5,9 @@ namespace Salztal.Dienstplanung.Desktop.Features.Scheduling;
 
 internal sealed class AutomaticSchedulePreviewViewModel
 {
-    public AutomaticSchedulePreviewViewModel(AutomaticSchedulePreview preview)
+    public AutomaticSchedulePreviewViewModel(
+        AutomaticSchedulePreview preview,
+        AutomaticScheduleGenerationReport? report = null)
     {
         ArgumentNullException.ThrowIfNull(preview);
         AutomaticScheduleProposal proposal = preview.Proposal;
@@ -25,6 +27,15 @@ internal sealed class AutomaticSchedulePreviewViewModel
             $"Erzeugt: {proposal.Assignments.Count} Einteilungen und {FormatGeneratedDayOffs(proposal.GeneratedDayOffs.Count)}";
         System10Notice =
             "Ausführliche Ursachen und Lösungsvorschläge werden in System 10 ergänzt.";
+        DemandReport = report?.PlanningReport is null
+            ? null
+            : new PlanningDemandReportViewModel(report.PlanningReport);
+        EmployeeReport = report?.PlanningReport is null
+            ? null
+            : new PlanningEmployeeReportViewModel(report.PlanningReport);
+        GenerationReport = report is null
+            ? null
+            : new AutomaticScheduleGenerationReportViewModel(report);
     }
 
     public AutomaticScheduleProposal Proposal { get; }
@@ -38,6 +49,12 @@ internal sealed class AutomaticSchedulePreviewViewModel
     public string AssignmentDisplay { get; }
 
     public string System10Notice { get; }
+
+    public PlanningDemandReportViewModel? DemandReport { get; }
+
+    public PlanningEmployeeReportViewModel? EmployeeReport { get; }
+
+    public AutomaticScheduleGenerationReportViewModel? GenerationReport { get; }
 
     private static string FormatDuration(TimeSpan duration)
     {

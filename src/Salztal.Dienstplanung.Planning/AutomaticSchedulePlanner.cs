@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Salztal.Dienstplanung.Application.Scheduling;
 using Salztal.Dienstplanung.Planning.Rules;
 using Salztal.Dienstplanung.Planning.Validation;
@@ -35,24 +36,55 @@ internal sealed class AutomaticSchedulePlanner : IAutomaticSchedulePlanner
         if (cancellationToken.IsCancellationRequested)
         {
             return AutomaticSchedulePlanningResult.Failure(
-                AutomaticSchedulePlanningStatus.Cancelled);
+                AutomaticSchedulePlanningStatus.Cancelled,
+                phases:
+                [
+                    new AutomaticSchedulePhaseSnapshot(
+                        AutomaticSchedulePhaseKind.InputValidation,
+                        AutomaticSchedulePhaseStatus.Interrupted,
+                        TimeSpan.Zero,
+                        termination: new AutomaticSchedulePhaseTerminationSnapshot(
+                            AutomaticSchedulePhaseTerminationReason.CancellationRequested)),
+                ]);
         }
 
+        Stopwatch validationStopwatch = Stopwatch.StartNew();
         try
         {
             PlanningInputValidationResult validation = inputValidator.Validate(
                 request.Snapshot);
+            AutomaticSchedulePhaseSnapshot validationPhase = new(
+                AutomaticSchedulePhaseKind.InputValidation,
+                AutomaticSchedulePhaseStatus.Completed,
+                validationStopwatch.Elapsed,
+                [
+                    new AutomaticSchedulePhaseValue(
+                        "issue_count",
+                        validation.Issues.Count),
+                ]);
             if (!validation.IsValid)
             {
-                return CreateBlockedResult(validation);
+                return CreateBlockedResult(validation, validationPhase);
             }
 
-            return await planningEngine.PlanAsync(request, cancellationToken);
+            AutomaticSchedulePlanningResult result = await planningEngine.PlanAsync(
+                request,
+                cancellationToken);
+            return result.PrependPhase(validationPhase);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
             return AutomaticSchedulePlanningResult.Failure(
-                AutomaticSchedulePlanningStatus.Cancelled);
+                AutomaticSchedulePlanningStatus.Cancelled,
+                phases:
+                [
+                    new AutomaticSchedulePhaseSnapshot(
+                        AutomaticSchedulePhaseKind.InputValidation,
+                        AutomaticSchedulePhaseStatus.Interrupted,
+                        validationStopwatch.Elapsed,
+                        termination: new AutomaticSchedulePhaseTerminationSnapshot(
+                            AutomaticSchedulePhaseTerminationReason.CancellationRequested)),
+                ]);
         }
         catch (Exception exception)
         {
@@ -65,12 +97,21 @@ internal sealed class AutomaticSchedulePlanner : IAutomaticSchedulePlanner
                     TechnicalDetails:
                         AutomaticScheduleTechnicalFailureDetails.FromException(
                             AutomaticScheduleTechnicalStage.PlanningBoundary,
-                            exception))]);
+                            exception))],
+                [
+                    new AutomaticSchedulePhaseSnapshot(
+                        AutomaticSchedulePhaseKind.InputValidation,
+                        AutomaticSchedulePhaseStatus.Failed,
+                        validationStopwatch.Elapsed,
+                        termination: new AutomaticSchedulePhaseTerminationSnapshot(
+                            AutomaticSchedulePhaseTerminationReason.TechnicalFailure)),
+                ]);
         }
     }
 
     private static AutomaticSchedulePlanningResult CreateBlockedResult(
-        PlanningInputValidationResult validation)
+        PlanningInputValidationResult validation,
+        AutomaticSchedulePhaseSnapshot validationPhase)
     {
         AutomaticScheduleError[] errors = validation.Issues
             .Select(issue => new AutomaticScheduleError(
@@ -90,7 +131,8 @@ internal sealed class AutomaticSchedulePlanner : IAutomaticSchedulePlanner
             containsUnsupportedRule
                 ? AutomaticSchedulePlanningStatus.UnsupportedRule
                 : AutomaticSchedulePlanningStatus.BlockedByInput,
-            errors);
+            errors,
+            [validationPhase]);
     }
 
     private static AutomaticScheduleErrorCode MapCode(

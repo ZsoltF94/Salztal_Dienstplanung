@@ -29,7 +29,7 @@ public sealed class SqliteAvailabilityStoreTests
 
         await InitializeAsync(database.Path);
 
-        Assert.Equal(9L, await ExecuteScalarAsync(
+        Assert.Equal(10L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM __EFMigrationsHistory;"));
         Assert.Equal(1L, await ExecuteScalarAsync(
@@ -62,7 +62,7 @@ public sealed class SqliteAvailabilityStoreTests
         Assert.Equal(0L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM AvailabilityEntries;"));
-        Assert.Equal(9L, await ExecuteScalarAsync(
+        Assert.Equal(10L, await ExecuteScalarAsync(
             database.Path,
             "SELECT COUNT(*) FROM __EFMigrationsHistory;"));
     }

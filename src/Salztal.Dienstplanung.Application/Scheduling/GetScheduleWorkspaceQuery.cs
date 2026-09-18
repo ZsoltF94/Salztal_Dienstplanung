@@ -102,13 +102,34 @@ public sealed class GetScheduleWorkspaceQuery
                 preparation.Error);
         }
 
+        AcceptedAutomaticScheduleSnapshot? acceptedAutomaticSchedule;
+        try
+        {
+            acceptedAutomaticSchedule = CreateAcceptedAutomaticSchedule(
+                data.ExactDraft,
+                data.PreparedSnapshot,
+                data.AutomaticScheduleRun);
+        }
+        catch (Exception exception) when (
+            exception is ArgumentException
+                or InvalidOperationException
+                or OverflowException)
+        {
+            return ScheduleWorkspaceQueryResult.Failure(
+                ScheduleWorkspaceQueryStatus.StoredDataInvalid,
+                new ScheduleWorkspaceError(
+                    ScheduleWorkspaceErrorCode.StoredDataInvalid,
+                    "Der gespeicherte automatische Bericht passt nicht eindeutig zum aktuellen Entwurf."));
+        }
+
         ScheduleWorkspaceSnapshot snapshot = CreateSnapshot(
             data.ExactDraft,
             data,
             context,
             availability,
             readiness,
-            preparation);
+            preparation,
+            acceptedAutomaticSchedule);
 
         return ScheduleWorkspaceQueryResult.Success(snapshot);
     }
@@ -119,7 +140,8 @@ public sealed class GetScheduleWorkspaceQuery
         ScheduleWorkspaceContext context,
         AvailabilityPeriodSnapshot availability,
         IEnumerable<ServiceManagementReadinessSnapshot> readiness,
-        PreparationProjectionResult preparation)
+        PreparationProjectionResult preparation,
+        AcceptedAutomaticScheduleSnapshot? acceptedAutomaticSchedule)
     {
         ScheduleDemandSlotSnapshot[] slots = ScheduleSnapshotMapper.CreateDemandSlots(
             draft.DemandSlots,
@@ -146,11 +168,12 @@ public sealed class GetScheduleWorkspaceQuery
             data.PreparedSnapshot?.RunOptions,
             data.PreparedSnapshot?.History.Completeness,
             preparation.ChangedCategories,
-            CreateAcceptedAutomaticSchedule(draft, data.AutomaticScheduleRun));
+            acceptedAutomaticSchedule);
     }
 
     private static AcceptedAutomaticScheduleSnapshot? CreateAcceptedAutomaticSchedule(
         ScheduleDraft draft,
+        PlanningInputSnapshot? preparedSnapshot,
         AutomaticScheduleRunRecord? run)
     {
         if (run is null)
@@ -158,10 +181,56 @@ public sealed class GetScheduleWorkspaceQuery
             return null;
         }
 
+        int assignmentCount = draft.Assignments.Count(assignment =>
+            assignment.Origin == AssignmentOrigin.AutomaticGeneration);
+        int dayOffCount = draft.GeneratedDayOffMarkers.Count;
+        if (preparedSnapshot is null
+            || preparedSnapshot.Id != run.SnapshotId
+            || preparedSnapshot.DraftId != draft.Id.Value
+            || run.Metadata.Phases.Count == 0)
+        {
+            return new AcceptedAutomaticScheduleSnapshot(
+                assignmentCount,
+                dayOffCount,
+                AcceptedAutomaticScheduleReportStatus.DetailsUnavailable);
+        }
+
+        if (draft.Version.Value != preparedSnapshot.DraftVersion + 1)
+        {
+            return new AcceptedAutomaticScheduleSnapshot(
+                assignmentCount,
+                dayOffCount,
+                AcceptedAutomaticScheduleReportStatus.ChangedAfterGeneration);
+        }
+
+        ScheduleAssignmentSnapshot[] automaticAssignments = ScheduleSnapshotMapper
+            .CreateAssignments(draft.Assignments.Where(assignment =>
+                assignment.Origin == AssignmentOrigin.AutomaticGeneration));
+        AutomaticSchedulePlanningReport planningReport =
+            AutomaticSchedulePlanningReportCalculator.CreateAccepted(
+                preparedSnapshot,
+                automaticAssignments);
+        AutomaticScheduleGenerationStatus status = run.Metadata.ResultStatus switch
+        {
+            AutomaticSchedulePlanningStatus.Optimal =>
+                AutomaticScheduleGenerationStatus.Optimal,
+            AutomaticSchedulePlanningStatus.FeasibleNotProvenOptimal =>
+                AutomaticScheduleGenerationStatus.FeasibleNotProvenOptimal,
+            _ => throw new InvalidOperationException(
+                "The stored automatic run has an unsupported result status."),
+        };
+        AutomaticScheduleGenerationReport report = new(
+            status,
+            planningReport,
+            run.Metadata.Phases,
+            [],
+            run.Metadata,
+            run.Objective);
         return new AcceptedAutomaticScheduleSnapshot(
-            draft.Assignments.Count(assignment =>
-                assignment.Origin == AssignmentOrigin.AutomaticGeneration),
-            draft.GeneratedDayOffMarkers.Count);
+            assignmentCount,
+            dayOffCount,
+            AcceptedAutomaticScheduleReportStatus.Current,
+            report);
     }
 
     private static ServiceManagementAssignmentOptionSnapshot[] CreateAssignmentOptions(

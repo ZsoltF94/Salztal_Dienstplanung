@@ -88,6 +88,22 @@
         </DataTrigger>
       </Style.Triggers>
     </Style>
+
+    <Style x:Key="ScheduleWeekBoundaryStyle"
+           TargetType="Border">
+      <Setter Property="Width"
+              Value="3" />
+      <Setter Property="HorizontalAlignment"
+              Value="Right" />
+      <Setter Property="Background"
+              Value="#64748B" />
+      <Setter Property="IsHitTestVisible"
+              Value="False" />
+      <Setter Property="SnapsToDevicePixels"
+              Value="True" />
+      <Setter Property="Tag"
+              Value="ScheduleWeekBoundary" />
+    </Style>
   </UserControl.Resources>
 
   <Grid Background="#F3F6FA">
@@ -180,7 +196,8 @@
       </StackPanel>
     </Border>
 
-    <ScrollViewer Grid.Row="1"
+    <ScrollViewer x:Name="WorkspaceScrollViewer"
+                  Grid.Row="1"
                   AutomationProperties.Name="Dienstplan Arbeitsbereich"
                   HorizontalScrollBarVisibility="Disabled"
                   VerticalScrollBarVisibility="Auto">
@@ -308,9 +325,14 @@
         <Border Padding="0"
                 Style="{StaticResource ScheduleCardStyle}"
                 Visibility="{Binding HasEmployees, Converter={StaticResource BooleanToVisibilityConverter}}">
-          <ScrollViewer HorizontalScrollBarVisibility="Auto"
+          <ScrollViewer x:Name="PlanningHorizontalScrollViewer"
+                        AutomationProperties.Name="Horizontaler Scrollbereich der Drei-Wochen-Planung"
+                        HorizontalScrollBarVisibility="Auto"
+                        PreviewMouseWheel="ForwardPlanningMouseWheelToWorkspace"
                         VerticalScrollBarVisibility="Disabled">
-          <StackPanel MinWidth="1690">
+          <Grid x:Name="ScheduleTable"
+                MinWidth="1690">
+            <StackPanel>
             <Grid Background="#E8EDF3">
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="226" />
@@ -373,6 +395,15 @@
                       <ColumnDefinition Width="1134" />
                       <ColumnDefinition Width="330" />
                     </Grid.ColumnDefinitions>
+                    <Border Grid.ColumnSpan="3"
+                            Height="3"
+                            VerticalAlignment="Top"
+                            Panel.ZIndex="1"
+                            Background="#64748B"
+                            IsHitTestVisible="False"
+                            SnapsToDevicePixels="True"
+                            Tag="ScheduleAuxiliaryBoundary"
+                            Visibility="{Binding ShowsAuxiliaryBoundary, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     <Border Padding="12,8"
                             Background="White"
                             BorderBrush="#CBD5E1"
@@ -510,7 +541,31 @@
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
-          </StackPanel>
+            </StackPanel>
+
+            <Grid Panel.ZIndex="1"
+                  IsHitTestVisible="False">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="226" />
+                <ColumnDefinition Width="378" />
+                <ColumnDefinition Width="378" />
+                <ColumnDefinition Width="378" />
+                <ColumnDefinition Width="330" />
+              </Grid.ColumnDefinitions>
+              <Border x:Name="WeekOneStartBoundary"
+                      Grid.Column="0"
+                      Style="{StaticResource ScheduleWeekBoundaryStyle}" />
+              <Border x:Name="WeekOneEndBoundary"
+                      Grid.Column="1"
+                      Style="{StaticResource ScheduleWeekBoundaryStyle}" />
+              <Border x:Name="WeekTwoEndBoundary"
+                      Grid.Column="2"
+                      Style="{StaticResource ScheduleWeekBoundaryStyle}" />
+              <Border x:Name="WeekThreeEndBoundary"
+                      Grid.Column="3"
+                      Style="{StaticResource ScheduleWeekBoundaryStyle}" />
+            </Grid>
+          </Grid>
           </ScrollViewer>
         </Border>
       </Grid>

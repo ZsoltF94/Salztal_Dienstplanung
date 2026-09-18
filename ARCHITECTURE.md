@@ -1,6 +1,6 @@
 # Architektur der Salztal-Dienstplanung
 
-Status: Grundarchitektur abgenommen am 2026-09-13; System-07-Regelgrenzen am 2026-09-16 abgenommen; System-09-Optimierungsziel und Reihenfolge S09A/S09B vor AG-15 am 2026-09-17 bestätigt
+Status: Grundarchitektur abgenommen am 2026-09-13; System-07-Regelgrenzen am 2026-09-16 abgenommen; System-09-Optimierungsziel und Reihenfolge S09A/S09B vor AG-15 am 2026-09-17 bestätigt; S09B-Roadmap und QB-01 bis QB-05 am 2026-09-18 abgenommen; QB-06A freigegeben, QB-06A.1 bis QB-06A.4 abgenommen und QB-06A.5 technisch geprüft
 
 Stand: 2026-09-16
 
@@ -335,13 +335,16 @@ Die technische Umstellung erfolgt versioniert. Vorbereitete Momentaufnahmen mit 
 
 ### Planungsqualitätsbericht vor der endgültigen Optimierung
 
-Der nach dem reinen UI-Zwischenschritt S09A noch zu planende S09B-Bericht beurteilt zunächst den fachlich unveränderten Generator. Er ist ein lesender Mess- und Vergleichsweg und keine Rückkopplung, die Regeln, Zielwerte, Eingaben oder Solverbedingungen automatisch verändert.
+Der nach dem reinen UI-Zwischenschritt S09A vorbereitete S09B-Bericht beurteilt zunächst den fachlich unveränderten Generator. Fragenkatalog, Roadmap und QB-01 bis QB-05 sind ausdrücklich abgenommen; QB-06 stellt beide Berichtsteile im eigenen nicht-modalen Fenster bereit. Die sichtbare Prüfung hat bestätigt, dass die außerhalb der Engine erfasste Eingangsprüfung nicht in die gespeicherten Vorschlagsmetadaten gelangt und dass eine Solverunterbrechung bislang ohne strukturierten Abbruchgrund und aktives Teilziel gespeichert wird. QB-06A ist deshalb als reine Korrektur der Berichtsherkunft und Unterbrechungsinstrumentierung freigegeben. QB-06A.1 ergänzt in Application ausschließlich unveränderliche, validierte Codes und primitive Werte für Aufzeichnungsvollständigkeit, Abbruchgrund, aktives Optimierungsziel und gemeinsames Zeitbudget. QB-06A.2 lässt Application beim Voranstellen der Eingangsprüfung zugleich neue unveränderliche Vorschlagsmetadaten bilden und hält das aktive Ziel ausschließlich am gemeinsamen Planning-Solverbudget. Die vorhandene Auswahl wird bei einer Zeitgrenze ohne zweiten Solverlauf fachlich ausgewertet. QB-06A.3 speichert den optionalen strukturierten Abschlussdatensatz im vorhandenen Phasen-JSON des aktuellen automatischen Laufs; deshalb war weder eine weitere Datenbankspalte noch eine Migration erforderlich. Ältere JSON-Datensätze ohne diesen optionalen Teil bleiben lesbar und ausdrücklich unvollständig. QB-06A.4 übersetzt die strukturierten Daten innerhalb Application in deutsche belegte Abschluss- und Folgephasenaussagen. QB-06A.5 stellt diese Application-Aussagen und die Einordnung vorhandener Zwischenwerte im scrollbaren Generierungsbereich dar; Desktop leitet weder Ursachen noch Zeitgrenzen selbst her. Application bildet weiterhin die vollständige Phasenfolge, prüft erfolgreiche Werte gegen Zielvektor und Planungsbericht und hält bei Fehlerläufen nicht erreichte Phasen ohne erfundene Planwerte fest. EF- und SQLite-Typen bleiben in Infrastructure. Der Bericht bleibt ein lesender Mess- und Vergleichsweg und keine Rückkopplung, die Regeln, Zielwerte, Eingaben oder Solverbedingungen automatisch verändert.
 
-Die genaue Auswahl der Kennzahlen wird erst in einem eigenen Fragenkatalog bestätigt. Für ihre spätere technische Einordnung gelten bereits folgende Grenzen:
+Bestätigt sind ein Planungsbericht für zulässige Vorschläge und ein Generierungsbericht für jeden erfolgreichen oder erfolglosen Versuch. Ohne Vorschlag werden keine Planwerte erfunden; stattdessen bleiben Status, abgeschlossene und zuletzt erreichte Phase, Laufzeiten und vorhandene strukturierte Fehlerdetails sichtbar. Der Bericht öffnet in einem eigenen nicht-modalen WPF-Fenster, sodass Hauptfenster und Bericht nebeneinander bedienbar bleiben. Für die technische Einordnung gelten folgende Grenzen:
 
 - `Planning` liefert ausschließlich strukturierte primitive Ergebniswerte, Zielvektoren, Regelbewertungen, Bedarfsdeckungen und Laufmetadaten; es formuliert keine deutschen Berichtssätze.
 - Fachliche Berechnungen und stabile Vergleichswerte liegen in `Domain` oder `Application`, nicht in WPF-ViewModels, XAML oder Code-behind.
 - `Desktop` stellt vorbereitete Berichtswerte dar und entscheidet weder über ihre fachliche Bedeutung noch über eine Solveränderung.
+- Das Berichts-ViewModel kennt keine konkrete Fensterinstanz. Die Desktop-Schicht koordiniert Erzeugung, Aktivierung, Aktualität und Lebensdauer des nicht-modalen Berichtsfensters. Für denselben aktuellen Bericht wird kein widersprüchliches Duplikat erzeugt.
+- Technische Fehlerdetails bleiben strukturiert und datensparsam. Ungefilterte Ausnahmetexte, lokale Pfade, Namen und Planinhalte werden weder sichtbar ausgegeben noch in technische Fehlerprotokolle übernommen.
+- QB-06A.1 stellt dafür den Application-Vertrag bereit. QB-06A.2 kennzeichnet Planning-Unterbrechungen mit diesen stabilen technischen Codes, aktivem Optimierungsteil, Zeitbudget und ausschließlich bereits vorhandenen belastbaren Zwischenwerten. QB-06A.3 hält Vorschau, übernommenen aktuellen Lauf und Neustart-Round-trip hinsichtlich Phasen- und Abschlussdaten identisch; eine Historie entsteht nicht. QB-06A.4 formuliert daraus in Application die deutschen Aussagen und ordnet nicht begonnene Folgephasen der belegten vorherigen Unterbrechung zu. QB-06A.5 bindet diese Aussagen unverändert an farbunabhängig beschriftete WPF-Bereiche und verwendet für eine fehlende Aufzeichnung die neutrale Überschrift „Keine aufgezeichnete Ausführung“. Aufgezeichnete Teilwerte werden ausdrücklich nicht als Optimum ausgegeben. Ältere gespeicherte Läufe ohne diese Details bleiben lesbar und benennen ihre fehlende Detailtiefe, ohne rückwirkend mit geschätzten Werten ergänzt zu werden.
 - S09B verändert den Generator nicht. Jede spätere Optimierung von Laufzeit, Regelübersetzung, Zielmatrix oder Algorithmus benötigt einen eigenen abgenommenen Folgeplan.
 - S09B bleibt von System 10 getrennt. Vollständige Ursachenanalysen je ausgeschlossener Person und ausformulierte Lösungsvorschläge bleiben Bestandteil der Konflikterklärung.
 - Tests und dokumentierte Vergleichsfälle verwenden ausschließlich synthetische Daten. Lokale Anwendungsdaten dürfen sichtbar beurteilt, aber nicht in Repository, Testfälle oder Berichtsexporte übernommen werden.
@@ -377,9 +380,9 @@ Lösungsvorschläge sind Hinweise. Sie verändern niemals automatisch Stammdaten
 
 ### Planungsqualitätsauswertung
 
-1. `Application` liest den gespeicherten oder flüchtigen Planungsvorschlag mit seinen strukturierten Ergebnis- und Laufwerten.
-2. `Domain` beziehungsweise `Application` berechnet die später bestätigten stabilen Qualitäts- und Vergleichswerte ohne erneuten Solverlauf.
-3. `Desktop` zeigt die vorbereiteten Werte verständlich an, ohne sie fachlich neu zu berechnen.
+1. `Application` liest den gespeicherten oder flüchtigen Planungsvorschlag beziehungsweise das strukturierte Ergebnis eines erfolglosen Generierungsversuchs mit seinen Phasen-, Fehler- und Laufwerten.
+2. Nur bei vorhandenem zulässigem Vorschlag berechnet `Domain` beziehungsweise `Application` die bestätigten stabilen Planungs-, Qualitäts- und Vergleichswerte ohne erneuten Solverlauf.
+3. `Desktop` zeigt die vorbereiteten Werte im eigenen nicht-modalen Berichtsfenster verständlich an, ohne sie fachlich neu zu berechnen. Ohne Vorschlag bleibt der Planungsbereich nicht verfügbar und der Generierungs-/Fehlerbericht sichtbar.
 4. Die Auswertung verändert weder Plan, Vorbereitung, Regeln noch Generator und löst keine automatische Neugenerierung aus.
 
 ### Manuelle Bearbeitung

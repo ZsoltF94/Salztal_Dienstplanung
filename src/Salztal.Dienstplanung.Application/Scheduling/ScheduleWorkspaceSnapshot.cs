@@ -83,9 +83,19 @@ public sealed class ScheduleWorkspaceSnapshot
     public AcceptedAutomaticScheduleSnapshot? AcceptedAutomaticSchedule { get; }
 }
 
+public enum AcceptedAutomaticScheduleReportStatus
+{
+    Current,
+    ChangedAfterGeneration,
+    DetailsUnavailable,
+}
+
 public sealed record AcceptedAutomaticScheduleSnapshot(
     int AssignmentCount,
-    int GeneratedDayOffCount);
+    int GeneratedDayOffCount,
+    AcceptedAutomaticScheduleReportStatus ReportStatus =
+        AcceptedAutomaticScheduleReportStatus.DetailsUnavailable,
+    AutomaticScheduleGenerationReport? Report = null);
 
 public enum ServiceManagementWeekReadinessStatusSnapshot
 {

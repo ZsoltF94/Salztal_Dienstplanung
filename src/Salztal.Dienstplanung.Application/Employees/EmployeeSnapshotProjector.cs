@@ -63,7 +63,7 @@ internal sealed class EmployeeSnapshotProjector
             CreateWeeklyWorkTargetDisplay(employeeType.WeeklyWorkTarget.Minutes),
             employeeType.AbsencePolicy.AllowsVacationAndSickness,
             employeeType.AbsencePolicy.DayValue?.Minutes,
-            CreatePlanningRole(employeeType.PlanningPolicy.Role),
+            EmployeeTypePlanningRoleMapper.ToSnapshotKind(employeeType.PlanningPolicy.Role),
             employeeType.ShiftEligibilities.Select(CreateShiftEligibility));
     }
 
@@ -114,21 +114,6 @@ internal sealed class EmployeeSnapshotProjector
             CreateEligibilityMode(eligibility.Mode),
             CreateEligibilityActivation(eligibility.Activation),
             CreateAvailabilityDisplay(eligibility));
-    }
-
-    private static EmployeeTypePlanningRoleKind CreatePlanningRole(
-        EmployeeTypePlanningRole role)
-    {
-        return role switch
-        {
-            EmployeeTypePlanningRole.Normal => EmployeeTypePlanningRoleKind.Normal,
-            EmployeeTypePlanningRole.ServiceManagement =>
-                EmployeeTypePlanningRoleKind.ServiceManagement,
-            EmployeeTypePlanningRole.Auxiliary =>
-                EmployeeTypePlanningRoleKind.Auxiliary,
-            _ => throw new InvalidOperationException(
-                $"Unsupported employee-type planning role: {role}"),
-        };
     }
 
     private static EmployeeTypeEligibilityMode CreateEligibilityMode(

@@ -58,6 +58,45 @@ internal sealed partial class ScheduleOverviewView : UserControl
         eventArgs.Handled = true;
     }
 
+    private void ForwardPlanningMouseWheelToWorkspace(
+        object sender,
+        MouseWheelEventArgs eventArgs)
+    {
+        if (eventArgs.Delta == 0)
+        {
+            return;
+        }
+
+        int wheelScrollLines = SystemParameters.WheelScrollLines;
+        if (wheelScrollLines == -1)
+        {
+            if (eventArgs.Delta < 0)
+            {
+                WorkspaceScrollViewer.PageDown();
+            }
+            else
+            {
+                WorkspaceScrollViewer.PageUp();
+            }
+        }
+        else
+        {
+            for (int line = 0; line < wheelScrollLines; line++)
+            {
+                if (eventArgs.Delta < 0)
+                {
+                    WorkspaceScrollViewer.LineDown();
+                }
+                else
+                {
+                    WorkspaceScrollViewer.LineUp();
+                }
+            }
+        }
+
+        eventArgs.Handled = true;
+    }
+
     private void HandleConfirmationVisibilityChanged(
         object sender,
         DependencyPropertyChangedEventArgs eventArgs)
